@@ -13,7 +13,7 @@ import (
 
 	"github.com/swaggest/usecase"
 
-	"github.com/magicbutton/magic-master/execution"
+	"github.com/nexi-intra/magic-studio/execution"
 )
 
 func ProvisionWebdeployproductionPost() usecase.Interactor {

@@ -16,9 +16,9 @@ import (
 
 	"github.com/swaggest/usecase"
 
-	"github.com/magicbutton/magic-master/execution"
-	"github.com/magicbutton/magic-master/schemas"
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/execution"
+	"github.com/nexi-intra/magic-studio/schemas"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 func AnalyseParseGroupsPost() usecase.Interactor {
