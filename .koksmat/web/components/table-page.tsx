@@ -35,86 +35,20 @@ import {
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useMemo } from "react";
 import { APPNAME } from "@/app/global";
-export interface Root {
-  Result: Result[];
-}
-
-export interface Result {
-  table_metadata: TableMetadata;
-}
-
-export interface TableMetadata {
-  table_name: string;
-  row_count: number;
-  disk_size: string;
-  columns: Column[];
-  referencing_functions: ReferencingFunction[];
-}
-
-export interface Column {
-  column_name: string;
-  data_type: string;
-  is_nullable: string;
-  column_default?: string;
-}
-
-export interface ReferencingFunction {
-  function_name: string;
-  function_definition: string;
-}
+import {
+  TableDetail,
+  TableMetadata,
+  tableDetailsSql,
+} from "@/schemas/table-details";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export function TablePage(props: { database: string; table: string }) {
   const { database, table } = props;
-  const query = useSQLSelect3<Result>(
-    database,
-    `
-WITH table_info AS (
-    -- Query to get number of records in the table
-    SELECT
-        (SELECT reltuples::bigint AS row_count
-         FROM pg_class
-         WHERE relname = '${table}' AND relkind = 'r') AS row_count,
-    -- Query to get disk size of the table
-    (SELECT pg_size_pretty(pg_total_relation_size('${table}'))) AS disk_size,
-    -- Query to get column definitions
-    (SELECT json_agg(cols)
-     FROM (
-         SELECT column_name, data_type, is_nullable, column_default
-         FROM information_schema.columns
-         WHERE table_name = '${table}'
-     ) cols) AS columns,
-    -- Query to get functions and stored procedures referencing the table
-    (SELECT json_agg(procedures)
-     FROM (
-         SELECT p.proname AS function_name,
-                pg_catalog.pg_get_functiondef(p.oid) AS function_definition
-         FROM pg_catalog.pg_proc p
-         JOIN pg_catalog.pg_depend d ON d.objid = p.oid
-         JOIN pg_catalog.pg_rewrite r ON r.oid = d.refobjid
-         JOIN pg_catalog.pg_class c ON c.oid = r.ev_class
-         WHERE d.refobjid = '${table}'::regclass
-           AND d.classid = 'pg_class'::regclass
-           AND d.refclassid = 'pg_class'::regclass
-           AND r.ev_type = '1' -- NORMAL type of dependency
-         UNION
-         SELECT p.proname AS function_name,
-                pg_catalog.pg_get_functiondef(p.oid) AS function_definition
-         FROM pg_catalog.pg_proc p
-         WHERE p.prosrc ~ '${table}' -- Check for direct reference in function body
-     ) procedures) AS referencing_functions
-)
-
--- Constructing the final JSON object
-SELECT json_build_object(
-    'table_name', '${table}',
-    'row_count', (SELECT row_count FROM table_info),
-    'disk_size', (SELECT disk_size FROM table_info),
-    'columns', (SELECT columns FROM table_info),
-    'referencing_functions', (SELECT referencing_functions FROM table_info)
-) AS table_metadata
-
-    `
-  );
+  const query = useSQLSelect3<TableDetail>(database, tableDetailsSql(table));
 
   const tableMetadata = useMemo<TableMetadata>(() => {
     let metadata: TableMetadata = {
@@ -155,22 +89,6 @@ SELECT json_build_object(
           >
             <EyeIcon className="mr-2 h-4 w-4" />
             View Items
-          </Link>
-          <Link
-            href={
-              "/" +
-              APPNAME +
-              "/database/" +
-              database +
-              "/table/" +
-              table +
-              "/procedure"
-            }
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            prefetch={false}
-          >
-            <CodeIcon className="mr-2 h-4 w-4" />
-            View Procedures
           </Link>
         </div>
       </div>
@@ -219,6 +137,40 @@ SELECT json_build_object(
                     <TableCell>{column.data_type}</TableCell>
                     <TableCell>{column.is_nullable}</TableCell>
                     <TableCell>{column.column_default}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="grid gap-2">
+          <h2 className="text-xl font-bold">Functions &amp; Procedures</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Code</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableMetadata.referencing_functions.map((column, index) => {
+                return (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">
+                      {column.function_name}
+                    </TableCell>
+                    <TableCell className="overflow-clip whitespace-nowrap w-full">
+                      <HoverCard>
+                        <HoverCardTrigger>
+                          {column.function_definition}
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-full overflow-scroll h-[400px] bg-slate-100">
+                          <pre>{column.function_definition}</pre>
+                        </HoverCardContent>
+                      </HoverCard>
+                    </TableCell>
+                    {/* <TableCell>{column.is_nullable}</TableCell>
+                    <TableCell>{column.column_default}</TableCell> */}
                   </TableRow>
                 );
               })}
