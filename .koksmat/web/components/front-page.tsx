@@ -26,118 +26,35 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 
-export function FrontPage() {
+export interface DatabaseProps {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+}
+
+export function FrontPage(props: { databases: DatabaseProps[] }) {
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>Customers</CardTitle>
-            <CardDescription>View and analyze customer data.</CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>Sales</CardTitle>
-            <CardDescription>Track and visualize sales data.</CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>Inventory</CardTitle>
-            <CardDescription>
-              Monitor and manage your inventory.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>Marketing</CardTitle>
-            <CardDescription>
-              Analyze marketing campaign performance.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>Finance</CardTitle>
-            <CardDescription>
-              Monitor financial metrics and KPIs.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>HR</CardTitle>
-            <CardDescription>
-              Analyze employee data and performance.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>IT</CardTitle>
-            <CardDescription>
-              Monitor and optimize IT infrastructure.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-col items-start gap-2">
-            <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
-            <CardTitle>R&D</CardTitle>
-            <CardDescription>
-              Track and analyze research and development data.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="#" className="text-primary" prefetch={false}>
-              Open Database
-            </Link>
-          </CardFooter>
-        </Card>
+        {props.databases.map((database) => (
+          <Card key={database.id}>
+            <CardHeader className="flex flex-col items-start gap-2">
+              <DatabaseIcon className="h-6 w-6 text-muted-foreground" />
+              <CardTitle>{database.title}</CardTitle>
+              <CardDescription>{database.description}</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Link
+                href={"/studio/database/" + database.slug}
+                className="text-primary"
+                prefetch={false}
+              >
+                Open Database
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </main>
   );

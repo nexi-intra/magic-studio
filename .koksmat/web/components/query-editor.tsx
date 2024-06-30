@@ -57,8 +57,33 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { SideBySide } from "./side-by-side";
 
-export function QueryEditor(props: { editor: any; result: any }) {
+export interface QueryActions {
+  onCreateNew?: () => void;
+  onOpen?: () => void;
+  onCopyLink?: () => void;
+  onEmailLink?: () => void;
+  onExport?: () => void;
+}
+
+function IconAction(props: { icon: any; label: string; onClick?: () => void }) {
+  return (
+    <Button disabled={!props.onClick} variant="outline" onClick={props.onClick}>
+      {props.icon}
+      <span className="sr-only">{props.label}</span>
+    </Button>
+  );
+}
+
+export function QueryEditor(props: {
+  editor: any;
+  result: any;
+  actions?: QueryActions;
+}) {
+  const { actions } = props;
+  const { onCreateNew, onOpen, onCopyLink, onEmailLink, onExport } =
+    actions || {};
   return (
     <div className="flex flex-col min-h-screen">
       <header className="flex items-center justify-between h-16 px-4 border-b shrink-0 md:px-6">
@@ -71,32 +96,16 @@ export function QueryEditor(props: { editor: any; result: any }) {
             <DatabaseIcon className="w-6 h-6" />
             <span className="sr-only">SQL Explorer</span>
           </Link>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <PlusIcon className="w-4 h-4" />
-                <span className="sr-only">Create New</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <SheetHeader>
-                <SheetTitle>Create New</SheetTitle>
-                <SheetDescription>
-                  Choose an option to get started.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="grid gap-4 p-6">
-                <Button>
-                  <FileIcon className="w-4 h-4 mr-2" />
-                  New Query
-                </Button>
-                <Button>
-                  <FolderIcon className="w-4 h-4 mr-2" />
-                  New View
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+          <IconAction
+            icon={<PlusIcon className="w-4 h-4" />}
+            label="Create New"
+            onClick={onCreateNew}
+          />
+          <Button disabled={!onCreateNew} variant="outline" size="icon">
+            <PlusIcon className="w-4 h-4" />
+            <span className="sr-only">Create New</span>
+          </Button>
+
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -183,9 +192,8 @@ export function QueryEditor(props: { editor: any; result: any }) {
           </DropdownMenu>
         </div>
       </header>
-      <main className="flex-1 grid gap-4 p-4 md:p-6 md:grid-cols-2">
-        <div className="flex flex-col gap-4">{props.editor}</div>
-        <div className="flex flex-col gap-4">{props.result}</div>
+      <main className=" w-full ">
+        <SideBySide left={props.editor} right={props.result} />
       </main>
     </div>
   );

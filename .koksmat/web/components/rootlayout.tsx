@@ -50,6 +50,7 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
+import { APPNAME } from "@/app/global";
 
 export function RootLayout(props: { children: any }) {
   const children = props.children;
@@ -59,7 +60,7 @@ export function RootLayout(props: { children: any }) {
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
             <Link
-              href="#"
+              href={"/" + APPNAME}
               className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
               prefetch={false}
             >
@@ -79,19 +80,7 @@ export function RootLayout(props: { children: any }) {
               </TooltipTrigger>
               <TooltipContent side="right">Databases</TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  prefetch={false}
-                >
-                  <DatabaseIcon className="h-5 w-5" />
-                  <span className="sr-only">Databases</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Databases</TooltipContent>
-            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
@@ -163,21 +152,14 @@ export function RootLayout(props: { children: any }) {
             <SheetContent side="left" className="sm:max-w-xs">
               <nav className="grid gap-6 text-lg font-medium">
                 <Link
-                  href="#"
+                  href={"/" + APPNAME}
                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                   prefetch={false}
                 >
                   <DatabaseIcon className="h-5 w-5 transition-all group-hover:scale-110" />
                   <span className="sr-only">Acme Analytics</span>
                 </Link>
-                <Link
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                  prefetch={false}
-                >
-                  <LayoutGridIcon className="h-5 w-5" />
-                  Databases
-                </Link>
+
                 <Link
                   href="#"
                   className="flex items-center gap-4 px-2.5 text-foreground"
