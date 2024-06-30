@@ -26,14 +26,6 @@ import {
 import Link from "next/link";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -52,8 +44,9 @@ import {
 } from "@/components/ui/card";
 import { APPNAME } from "@/app/global";
 
-export function RootLayout(props: { children: any }) {
+export function RootLayout(props: { breadcrumb: any; children: any }) {
   const children = props.children;
+  const breadcrumb = props.breadcrumb;
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -195,21 +188,7 @@ export function RootLayout(props: { children: any }) {
               </nav>
             </SheetContent>
           </Sheet>
-          <Breadcrumb className="hidden md:flex">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="#" prefetch={false}>
-                    Databases
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>All Databases</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          {breadcrumb}
           <div className="relative ml-auto flex-1 md:grow-0">
             <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input

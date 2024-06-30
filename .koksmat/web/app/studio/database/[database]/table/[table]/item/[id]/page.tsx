@@ -16,7 +16,8 @@ export default function Page(props: {
       }
       database={database}
       sql={`
-SELECT t.name as title, row_to_json(t)::text as description  FROM ${table} as t WHERE id = ${id}
+SELECT t.name as title, 
+substring(row_to_json(t)::text from 1 for 255) as description  FROM ${table} as t WHERE id = ${id}
     `}
     />
   );

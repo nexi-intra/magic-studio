@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/card";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { CardStackIcon } from "@radix-ui/react-icons";
+import { ReactElement } from "react";
 
 export interface Item {
   id: number;
@@ -36,7 +37,7 @@ export interface Item {
 }
 
 export function ShowItems(props: {
-  Icon: any;
+  Icon: React.ComponentType<{ className?: string }>;
   slugPrefix: string;
   items: Item[];
 }) {
@@ -66,17 +67,17 @@ export function ShowItems(props: {
 }
 
 export default function SQLCards(props: {
-  Icon?: any;
+  Icon?: React.ComponentType<{ className?: string }> | JSX.Element;
   slugPrefix: string;
   database: string;
   sql: string;
 }) {
+  let Icon: React.ComponentType<{ className?: string }>;
+  if (!props.Icon) {
+    Icon = CardStackIcon;
+  } else {
+    Icon = props.Icon as React.ComponentType<{ className?: string }>;
+  }
   const databases = useSQLSelect3<Item>(props.database, props.sql);
-  return (
-    <ShowItems
-      items={databases.dataset}
-      {...props}
-      Icon={props.Icon ?? <CardStackIcon />}
-    />
-  );
+  return <ShowItems items={databases.dataset} {...props} Icon={Icon} />;
 }

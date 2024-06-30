@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Tracer from "@/app/koksmat/components/tracer";
 
+import { usePathname } from "next/navigation";
 import { leftRailApps } from "../../components/navigation";
 import { RootLayout } from "@/components/rootlayout";
+import GlobalBreadcrumb from "@/components/global-breadcrumb";
 export default function Layout(props: { children: any }) {
   const { children } = props;
   const magicbox = useContext(MagicboxContext);
@@ -49,7 +51,7 @@ export default function Layout(props: { children: any }) {
   }
   return (
     <AppProvider>
-      <RootLayout>
+      <RootLayout breadcrumb={<GlobalBreadcrumb />}>
         <div className="p-4">{children}</div>
       </RootLayout>
     </AppProvider>
