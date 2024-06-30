@@ -24,6 +24,7 @@ SELECT name as title,
        description,
         id as slug
 FROM ${table}
+ORDER BY name
 
     
     `}

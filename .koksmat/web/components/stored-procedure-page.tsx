@@ -20,7 +20,11 @@ To read more about using these font, please visit the Next.js documentation:
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function StoredProcedurePage() {
+export function StoredProcedurePage(props: {
+  database: string;
+  procedure: string;
+}) {
+  const { database, procedure } = props;
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
@@ -52,7 +56,7 @@ export function StoredProcedurePage() {
             prefetch={false}
           >
             <DatabaseIcon className="h-4 w-4" />
-            Procedure 1
+            Source Code
           </Link>
           <Link
             href="#"
@@ -60,7 +64,7 @@ export function StoredProcedurePage() {
             prefetch={false}
           >
             <DatabaseIcon className="h-4 w-4" />
-            Procedure 2
+            Table Dependencies
           </Link>
           <Link
             href="#"
@@ -68,7 +72,7 @@ export function StoredProcedurePage() {
             prefetch={false}
           >
             <DatabaseIcon className="h-4 w-4" />
-            Procedure 3
+            Code Generator
           </Link>
         </nav>
         <div className="space-y-8">

@@ -27,7 +27,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { FilterToolbar } from "./filter-toolbar";
 export function ItemPageToolbar(props: { table: string; database: string }) {
   const { table, database } = props;
   return (
@@ -50,21 +60,23 @@ export function ItemPageToolbar(props: { table: string; database: string }) {
           />
           <SearchIcon className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <Sheet>
+          <SheetTrigger>
             <Button variant="outline" size="sm">
               <FilterIcon className="w-4 h-4" />
               Filter
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={8}>
-            <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem checked>Active</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>Inactive</DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem>VIP</DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Are you absolutely sure?</SheetTitle>
+              <SheetDescription>
+                <FilterToolbar {...props} />
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
