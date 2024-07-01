@@ -230,7 +230,7 @@ SELECT json_build_object(
         </CardHeader>
         <CardContent className="grid gap-2">
           {dbinfo?.stored_procedures
-            .sort((a, b) => a.localeCompare(b))
+            ?.sort((a, b) => a.localeCompare(b))
             .map((procedure, index) => (
               <div key={index}>
                 {" "}
