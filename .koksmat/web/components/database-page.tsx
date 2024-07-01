@@ -37,6 +37,7 @@ import {
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
+import { ERDiagram } from "./mermaid-diagram";
 
 export interface Root {
   Result: Result[];
@@ -129,7 +130,7 @@ SELECT json_build_object(
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8 lg:p-10">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Database Overview</CardTitle>
@@ -173,85 +174,88 @@ SELECT json_build_object(
           </CardContent>
         </Card>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Tables</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Records</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {dbinfo?.tables
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((table, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
-                      <Link
-                        href={
-                          "/" +
-                          APPNAME +
-                          "/database/" +
-                          database +
-                          "/table/" +
-                          table.name
-                        }
-                        className="text-blue-600 hover:underline"
-                        prefetch={false}
-                      >
-                        {table.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{table.records}</TableCell>
-                    <TableCell>{table.size}</TableCell>
-                    <TableCell>
-                      <Button variant="outline" size="icon">
-                        <ArrowRightIcon className="h-4 w-4" />
-                        <span className="sr-only">View Table</span>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Stored Procedures</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-2">
-          {dbinfo?.stored_procedures
-            ?.sort((a, b) => a.localeCompare(b))
-            .map((procedure, index) => (
-              <div key={index}>
-                {" "}
-                <Link
-                  href={
-                    "/" +
-                    APPNAME +
-                    "/database/" +
-                    database +
-                    "/procedure/" +
-                    procedure
-                  }
-                  className="text-blue-600 hover:underline"
-                  prefetch={false}
-                >
-                  {procedure}
-                </Link>
-              </div>
-            ))}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Tables</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Records</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {dbinfo?.tables
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((table, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={
+                            "/" +
+                            APPNAME +
+                            "/database/" +
+                            database +
+                            "/table/" +
+                            table.name
+                          }
+                          className="text-blue-600 hover:underline"
+                          prefetch={false}
+                        >
+                          {table.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{table.records}</TableCell>
+                      <TableCell>{table.size}</TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="icon">
+                          <ArrowRightIcon className="h-4 w-4" />
+                          <span className="sr-only">View Table</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Stored Procedures</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-2">
+            {dbinfo?.stored_procedures
+              ?.sort((a, b) => a.localeCompare(b))
+              .map((procedure, index) => (
+                <div key={index}>
+                  {" "}
+                  <Link
+                    href={
+                      "/" +
+                      APPNAME +
+                      "/database/" +
+                      database +
+                      "/procedure/" +
+                      procedure
+                    }
+                    className="text-blue-600 hover:underline"
+                    prefetch={false}
+                  >
+                    {procedure}
+                  </Link>
+                </div>
+              ))}
+          </CardContent>
+        </Card>
+      </div>
+      <ERDiagram database={database} className="bg-slate-50" />
     </div>
   );
 }

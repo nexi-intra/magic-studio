@@ -33,7 +33,7 @@ export interface DatabaseProps {
   description: string;
 }
 
-export function FrontPage(props: { databases: DatabaseProps[] }) {
+export function DashboardDatabases(props: { databases: DatabaseProps[] }) {
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

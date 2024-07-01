@@ -1,6 +1,9 @@
 "use client";
 
-import { DatabaseProps, FrontPage } from "@/components/front-page";
+import {
+  DatabaseProps,
+  DashboardDatabases,
+} from "@/components/dashboard-databases";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 
 export default function Page() {
@@ -17,5 +20,5 @@ ORDER BY name
 
     `
   );
-  return <FrontPage databases={databases.dataset} />;
+  return <DashboardDatabases databases={databases.dataset} />;
 }

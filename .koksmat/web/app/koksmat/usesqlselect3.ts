@@ -22,7 +22,6 @@ export function useSQLSelect3<T>(databasename: string, sql: string) {
   useEffect(() => {
     //debugger;
     const load = async () => {
-      debugger;
       if (didRun) return;
       setisLoading(true);
       seterror("");

@@ -43,6 +43,130 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { APPNAME } from "@/app/global";
+import { Fragment } from "react";
+
+export namespace href {
+  export const HOME = "/" + APPNAME;
+  export const DATABASE = "/" + APPNAME + "/database";
+}
+export function NavigationItems(props: { withCaptions: boolean }) {
+  const withCaptions = props.withCaptions;
+
+  if (!withCaptions) {
+    return (
+      <TooltipProvider>
+        <Link
+          href={href.HOME}
+          className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+          prefetch={false}
+        >
+          <ChefHatIcon className="h-4 w-4 transition-all group-hover:scale-110" />
+          <span className="sr-only">Acme Analytics</span>
+        </Link>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href.DATABASE}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <DatabaseIcon className="h-5 w-5" />
+              <span className="sr-only">Databases</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Databases</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="#"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <CookingPotIcon className="h-5 w-5" />
+              <span className="sr-only">Queries</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Queries</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="#"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <ShareIcon className="h-5 w-5" />
+              <span className="sr-only">Shared</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Shared</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="#"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <SettingsIcon className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Settings</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  } else {
+    return (
+      <Fragment>
+        <Link
+          href={href.HOME}
+          className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+          prefetch={false}
+        >
+          <ChefHatIcon className="h-5 w-5 transition-all group-hover:scale-110" />
+          <span className="sr-only">Koksmat Studio</span>
+        </Link>
+
+        <Link
+          href={href.DATABASE}
+          className="flex items-center gap-4 px-2.5 text-foreground"
+          prefetch={false}
+        >
+          <DatabaseIcon className="h-5 w-5" />
+          Databases
+        </Link>
+        <Link
+          href="#"
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          prefetch={false}
+        >
+          <CookingPotIcon className="h-5 w-5" />
+          Queries
+        </Link>
+        <Link
+          href="#"
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          prefetch={false}
+        >
+          <ShareIcon className="h-5 w-5" />
+          Shared
+        </Link>
+        <Link
+          href="#"
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          prefetch={false}
+        >
+          <SettingsIcon className="h-5 w-5" />
+          Settings
+        </Link>
+      </Fragment>
+    );
+  }
+  return <div>rootlayout</div>;
+}
 
 export function RootLayout(props: { breadcrumb: any; children: any }) {
   const children = props.children;
@@ -51,69 +175,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
     <div className="flex min-h-screen w-full bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <TooltipProvider>
-            <Link
-              href={"/" + APPNAME}
-              className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-              prefetch={false}
-            >
-              <DatabaseIcon className="h-4 w-4 transition-all group-hover:scale-110" />
-              <span className="sr-only">Acme Analytics</span>
-            </Link>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  prefetch={false}
-                >
-                  <LayoutGridIcon className="h-5 w-5" />
-                  <span className="sr-only">Databases</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Databases</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  prefetch={false}
-                >
-                  <CodeIcon className="h-5 w-5" />
-                  <span className="sr-only">Queries</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Queries</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  prefetch={false}
-                >
-                  <ShareIcon className="h-5 w-5" />
-                  <span className="sr-only">Shared</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Shared</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  prefetch={false}
-                >
-                  <SettingsIcon className="h-5 w-5" />
-                  <span className="sr-only">Settings</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">Settings</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <NavigationItems withCaptions={false} />
         </nav>
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
@@ -143,48 +205,8 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="sm:max-w-xs">
-              <nav className="grid gap-6 text-lg font-medium">
-                <Link
-                  href={"/" + APPNAME}
-                  className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-                  prefetch={false}
-                >
-                  <DatabaseIcon className="h-5 w-5 transition-all group-hover:scale-110" />
-                  <span className="sr-only">Acme Analytics</span>
-                </Link>
-
-                <Link
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-foreground"
-                  prefetch={false}
-                >
-                  <DatabaseIcon className="h-5 w-5" />
-                  Databases
-                </Link>
-                <Link
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                  prefetch={false}
-                >
-                  <CodeIcon className="h-5 w-5" />
-                  Queries
-                </Link>
-                <Link
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                  prefetch={false}
-                >
-                  <ShareIcon className="h-5 w-5" />
-                  Shared
-                </Link>
-                <Link
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                  prefetch={false}
-                >
-                  <SettingsIcon className="h-5 w-5" />
-                  Settings
-                </Link>
+              <nav className="grid gap-6 text-lg font-medium ">
+                <NavigationItems withCaptions={true} />
               </nav>
             </SheetContent>
           </Sheet>
@@ -301,27 +323,6 @@ function LayoutGridIcon(props: any) {
   );
 }
 
-function MenuIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="4" x2="20" y1="12" y2="12" />
-      <line x1="4" x2="20" y1="6" y2="6" />
-      <line x1="4" x2="20" y1="18" y2="18" />
-    </svg>
-  );
-}
-
 function PlusIcon(props: any) {
   return (
     <svg
@@ -399,6 +400,116 @@ function UserIcon(props: any) {
     >
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function ChefHatIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z" />
+      <path d="M6 17h12" />
+    </svg>
+  );
+}
+
+function CookingPotIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2 12h20" />
+      <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+      <path d="m4 8 16-4" />
+      <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
+    </svg>
+  );
+}
+
+function FolderIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+    </svg>
+  );
+}
+
+function HeaterIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M11 8c2-3-2-3 0-6" />
+      <path d="M15.5 8c2-3-2-3 0-6" />
+      <path d="M6 10h.01" />
+      <path d="M6 14h.01" />
+      <path d="M10 16v-4" />
+      <path d="M14 16v-4" />
+      <path d="M18 16v-4" />
+      <path d="M20 6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3" />
+      <path d="M5 20v2" />
+      <path d="M19 20v2" />
+    </svg>
+  );
+}
+
+function MenuIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
   );
 }
