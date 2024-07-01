@@ -107,7 +107,7 @@ export function TablePage(props: { database: string; table: string }) {
             <div className="grid gap-1">
               <p className="text-muted-foreground">Procedures</p>
               <p className="font-medium">
-                {tableMetadata.referencing_functions.length}
+                {tableMetadata?.referencing_functions?.length}
               </p>
             </div>
             <div className="grid gap-1">
@@ -153,7 +153,7 @@ export function TablePage(props: { database: string; table: string }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableMetadata.referencing_functions.map((column, index) => {
+              {tableMetadata?.referencing_functions?.map((column, index) => {
                 return (
                   <TableRow key={index}>
                     <TableCell className="font-medium">
