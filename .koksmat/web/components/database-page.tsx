@@ -162,9 +162,11 @@ SELECT json_build_object(
             <CardTitle>Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2">
-            <Button variant="outline" size="sm">
-              Manage Access Control
-            </Button>
+            <Link href={"/" + APPNAME + "/database/" + database + "/roles"}>
+              <Button variant="link" size="sm">
+                Manage Access Control
+              </Button>
+            </Link>
             <Button variant="outline" size="sm">
               View Audit Log
             </Button>

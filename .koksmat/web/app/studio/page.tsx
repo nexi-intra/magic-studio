@@ -1,25 +1,14 @@
-"use client";
-
-import {
-  DatabaseProps,
-  DashboardDatabases,
-} from "@/components/dashboard-databases";
-import { useSQLSelect3 } from "../koksmat/usesqlselect3";
 import { DashboardHomepage } from "@/components/dashboard-homepage";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | KOKSMAT studio",
+    default: "KOKSMAT studio",
+  },
+  description: "The place to cook Magic Button Apps.",
+};
 
 export default function Page() {
-  const databases = useSQLSelect3<DatabaseProps>(
-    "mix",
-    `
-select  id
-
-,name as title
-,name as slug
-,description 
-from public.connection
-ORDER BY name
-
-    `
-  );
   return <DashboardHomepage />;
 }

@@ -23,6 +23,15 @@ import { Button } from "@/components/ui/button";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
+import { extractAndParseJson } from "@/lib/tsql-extract";
+import { z } from "zod";
+import { resolveRefs } from "json-refs";
+import * as parserTypeScript from "prettier/parser-typescript";
+import * as prettier from "prettier/standalone";
+import { jsonSchemaToZod } from "json-schema-to-zod";
+import InterfaceBuilder from "./interface-builder";
+import { InterfaceViewer } from "./interface-viewer";
+
 export interface Root {
   Result: Result[];
 }
@@ -93,9 +102,29 @@ GROUP BY
   `;
   const query = useSQLSelect3<Result>(database, sql);
   const [procedureInfo, setprocedureInfo] = useState<ProcedureInfo>();
+  const [jsonSchema, setjsonSchema] = useState<any | null>();
+  const [zodSchema, setzodSchema] = useState<any | null>();
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
-      setprocedureInfo(query.dataset[0].procedure_info);
+      const procedure = query.dataset[0].procedure_info;
+      setprocedureInfo(procedure);
+      const metadata = extractAndParseJson(procedure.source_code);
+      if (metadata) {
+        try {
+          setjsonSchema(metadata);
+          const txtcode = jsonSchemaToZod(metadata);
+
+          // const code = prettier.format(txtcode, {
+          //   parser: "typescript",
+          //   plugins: [parserTypeScript],
+          // });
+          //setzodSchema(JSON.parse(zodSchema));
+          setzodSchema(txtcode);
+        } catch (error) {
+          setzodSchema(error);
+        }
+      }
+      //setmetadata(metadata);
     }
   }, [query, database, procedure]);
 
@@ -151,6 +180,27 @@ GROUP BY
         </nav>
         <div className="space-y-8">
           <section>
+            <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
+            {/* <div>
+              <h3 className="mb-2 text-lg font-medium">ZOD definition</h3>
+              <pre className="text-wrap">{zodSchema}</pre>
+            </div>
+            <div>
+              <h3 className="mb-2 text-lg font-medium">JSON schema</h3>
+              <pre className="text-wrap">
+                {JSON.stringify(jsonSchema, null, 2)}
+              </pre>
+            </div> */}
+            <InterfaceViewer />
+            <div>
+              <h3 className="mb-2 text-lg font-medium">TypeScript Interface</h3>
+              <InterfaceBuilder
+                schema={JSON.stringify(jsonSchema, null, 2)}
+                typeName={"Koksmat"}
+              />
+            </div>
+          </section>
+          <section>
             <h2 className="mb-4 text-2xl font-bold">Procedure Details</h2>
             <div className="grid gap-8">
               <div>
@@ -189,29 +239,7 @@ GROUP BY
             </div>
           </section>
           <section>
-            <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
             <div className="grid gap-4">
-              <div>
-                <h3 className="mb-2 text-lg font-medium">NATS Service Mesh</h3>
-                <pre className="rounded-md bg-muted p-4 text-sm">
-                  <code>{`
-import { NatsClient } from 'nats-client';
-
-const client = new NatsClient({
-  servers: ['nats://nats.example.com:4222'],
-  token: 'your-nats-token',
-});
-
-const request = await client.request({
-  subject: 'GetOrdersByUser',
-  payload: JSON.stringify({ UserId: 123 }),
-});
-
-const response = JSON.parse(request.data.toString());
-console.log(response);
-                    `}</code>
-                </pre>
-              </div>
               <div>
                 <h3 className="mb-2 text-lg font-medium">REST POST</h3>
                 <pre className="rounded-md bg-muted p-4 text-sm">
