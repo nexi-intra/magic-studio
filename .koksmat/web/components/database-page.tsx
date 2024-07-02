@@ -174,6 +174,7 @@ SELECT json_build_object(
           </CardContent>
         </Card>
       </div>
+      <ERDiagram database={database} className="bg-slate-50" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -255,7 +256,6 @@ SELECT json_build_object(
           </CardContent>
         </Card>
       </div>
-      <ERDiagram database={database} className="bg-slate-50" />
     </div>
   );
 }

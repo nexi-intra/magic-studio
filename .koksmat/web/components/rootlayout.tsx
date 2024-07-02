@@ -43,11 +43,16 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { APPNAME } from "@/app/global";
-import { Fragment } from "react";
+import { Fragment, useContext } from "react";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import Tracer from "@/app/koksmat/components/tracer";
 
 export namespace href {
   export const HOME = "/" + APPNAME;
   export const DATABASE = "/" + APPNAME + "/database";
+  export const ADMIN = "/" + APPNAME + "/admin";
+  export const ACCESS = "/" + APPNAME + "/access";
+  export const KITCHEN = "/" + APPNAME + "/kitchen";
 }
 export function NavigationItems(props: { withCaptions: boolean }) {
   const withCaptions = props.withCaptions;
@@ -63,6 +68,20 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           <ChefHatIcon className="h-4 w-4 transition-all group-hover:scale-110" />
           <span className="sr-only">Acme Analytics</span>
         </Link>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href.KITCHEN}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <CookingPotIcon className="h-5 w-5" />
+              <span className="sr-only">Queries</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Queries</TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
@@ -75,20 +94,6 @@ export function NavigationItems(props: { withCaptions: boolean }) {
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right">Databases</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href="#"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              prefetch={false}
-            >
-              <CookingPotIcon className="h-5 w-5" />
-              <span className="sr-only">Queries</span>
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="right">Queries</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -106,7 +111,20 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href="#"
+              href={href.ACCESS}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <ShieldIcon className="h-5 w-5" />
+              <span className="sr-only">Access Control</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Access Control</TooltipContent>
+        </Tooltip>
+        {/* <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href.ADMIN}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               prefetch={false}
             >
@@ -115,7 +133,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right">Settings</TooltipContent>
-        </Tooltip>
+        </Tooltip> */}
       </TooltipProvider>
     );
   } else {
@@ -131,6 +149,14 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         </Link>
 
         <Link
+          href={href.KITCHEN}
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          prefetch={false}
+        >
+          <CookingPotIcon className="h-5 w-5" />
+          Queries
+        </Link>
+        <Link
           href={href.DATABASE}
           className="flex items-center gap-4 px-2.5 text-foreground"
           prefetch={false}
@@ -138,14 +164,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           <DatabaseIcon className="h-5 w-5" />
           Databases
         </Link>
-        <Link
-          href="#"
-          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-          prefetch={false}
-        >
-          <CookingPotIcon className="h-5 w-5" />
-          Queries
-        </Link>
+
         <Link
           href="#"
           className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
@@ -155,13 +174,21 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           Shared
         </Link>
         <Link
-          href="#"
+          href={href.ACCESS}
+          className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          prefetch={false}
+        >
+          <ShieldIcon className="h-5 w-5" />
+          Access Control
+        </Link>
+        {/* <Link
+          href={href.ADMIN}
           className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           prefetch={false}
         >
           <SettingsIcon className="h-5 w-5" />
           Settings
-        </Link>
+        </Link> */}
       </Fragment>
     );
   }
@@ -171,6 +198,8 @@ export function NavigationItems(props: { withCaptions: boolean }) {
 export function RootLayout(props: { breadcrumb: any; children: any }) {
   const children = props.children;
   const breadcrumb = props.breadcrumb;
+  const magicbox = useContext(MagicboxContext);
+
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -254,7 +283,16 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main>{children}</main>
+        <main>
+          <div className="flex">
+            <div className="grow">{children}</div>
+            {magicbox.showTracer && (
+              <div className="hidden md:block min-w-56 bg-slate-100-300 mt-20">
+                <Tracer />
+              </div>
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );
@@ -510,6 +548,25 @@ function MenuIcon(props: any) {
       <line x1="4" x2="20" y1="12" y2="12" />
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+function ShieldIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
     </svg>
   );
 }

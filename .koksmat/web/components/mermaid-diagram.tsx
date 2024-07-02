@@ -2,9 +2,38 @@
 import React, { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
+import { transformToMermaidERDiagram } from "@/lib/mermaid";
 
 interface MermaidDiagramProps {
   chart: string;
+}
+export interface TableResult {
+  tables: Table[];
+}
+
+export interface Table {
+  table_name: string;
+  columns: Column[];
+}
+
+export interface Column {
+  column_name: string;
+  data_type: string;
+}
+
+export interface Root {
+  Result: Result[];
+}
+
+export interface RelationshipResult {
+  relationships: Relationship[];
+}
+
+export interface Relationship {
+  source_table: string;
+  source_column: string;
+  target_table: string;
+  target_column: string;
 }
 
 function MermaidDiagram(props: { chart: string; className?: string }) {
@@ -43,7 +72,32 @@ export interface Result {
 }
 
 export function ERDiagram(props: { className?: string; database: string }) {
-  const query = useSQLSelect3<Result>(
+  const releationsQuery = useSQLSelect3<RelationshipResult>(
+    props.database,
+    `
+SELECT 
+    json_agg(
+        json_build_object(
+            'source_table', tc.table_name,
+            'source_column', kcu.column_name,
+            'target_table', ccu.table_name,
+            'target_column', ccu.column_name
+        )
+    ) AS relationships
+FROM 
+    information_schema.table_constraints AS tc
+JOIN 
+    information_schema.key_column_usage AS kcu 
+    ON tc.constraint_name = kcu.constraint_name
+JOIN 
+    information_schema.constraint_column_usage AS ccu 
+    ON ccu.constraint_name = tc.constraint_name
+WHERE 
+    tc.constraint_type = 'FOREIGN KEY'
+
+    `
+  );
+  const tablesAndColumnsQuery = useSQLSelect3<TableResult>(
     props.database,
     `
 WITH tables AS (
@@ -58,250 +112,54 @@ WITH tables AS (
 columns AS (
     SELECT 
         table_name, 
-        column_name, 
-        data_type
+        json_agg(json_build_object('column_name', column_name, 'data_type', data_type)) AS columns
     FROM 
         information_schema.columns
     WHERE 
         table_schema = 'public'
-),
-foreign_keys AS (
-    SELECT 
-        tc.table_name AS table_name,
-        kcu.column_name AS column_name,
-        ccu.table_name AS foreign_table_name,
-        ccu.column_name AS foreign_column_name
-    FROM 
-        information_schema.table_constraints AS tc
-        JOIN information_schema.key_column_usage AS kcu 
-            ON tc.constraint_name = kcu.constraint_name
-        JOIN information_schema.constraint_column_usage AS ccu 
-            ON ccu.constraint_name = tc.constraint_name
-    WHERE 
-        tc.constraint_type = 'FOREIGN KEY'
-),
-er_diagram AS (
-    -- Begin the ER diagram with 'erDiagram'
-    SELECT 
-        'erDiagram' AS part
-    UNION ALL
-    -- Add table definitions
-    SELECT 
-        '    ' || table_name || ' {' AS part
-    FROM 
-        tables
-    UNION ALL
-    -- Add column definitions within each table
-    SELECT 
-        '        ' || column_name || ' ' || data_type AS part
-    FROM 
-        columns
-    UNION ALL
-    -- Close table definitions
-    SELECT 
-        '    }' AS part
-    FROM 
-        tables
-    UNION ALL
-    -- Add foreign key relationships
-    SELECT 
-        '    ' || table_name || ' }o--|| ' || foreign_table_name || ' : "' || column_name || ' to ' || foreign_column_name || '"' AS part
-    FROM 
-        foreign_keys
+    GROUP BY 
+        table_name
 )
 SELECT 
-    string_agg(part, E'\n') AS mermaid_diagram
+    json_agg(
+        json_build_object(
+            'table_name', t.table_name,
+            'columns', c.columns
+        )
+    ) AS tables
 FROM 
-    er_diagram
+    tables t
+JOIN 
+    columns c ON t.table_name = c.table_name
+
+
     
     `
   );
   const [chart, setChart] = useState("");
   useEffect(() => {
-    if (!query) return;
-    if (!query.dataset) return;
-    if (!query.dataset[0]) return;
-    const { mermaid_diagram } = query.dataset[0];
+    if (!releationsQuery) return;
+    if (!releationsQuery.dataset) return;
+    if (!releationsQuery.dataset[0]) return;
+    if (!tablesAndColumnsQuery) return;
+    if (!tablesAndColumnsQuery.dataset) return;
+    if (!tablesAndColumnsQuery.dataset[0]) return;
 
-    const mermaidDiagram = `
-erDiagram
-    COUNTRY ||--o{ SITE: "contains"
-    SITE ||--o{ BUILDING: "contains"
-    BUILDING ||--o{ FLOOR: "contains"
-    FLOOR ||--o{ DESK: "contains"
-    COUNTRY ||--o{ USER: "home country of"
-    DESK ||--o{ BOOKING: "has"
-    USER ||--o{ BOOKING: "makes"
-    USER ||--o{ USER_M2M_DESK: "has"
-    DESK ||--o{ USER_M2M_DESK: "has"
-    RESTRICTIONGROUP ||--o{ RESTRICTIONGROUP_M2M_DESK: "has"
-    DESK ||--o{ RESTRICTIONGROUP_M2M_DESK: "has"
-    RESTRICTIONGROUP ||--o{ RESTRICTIONGROUP_M2M_USER: "has"
-    USER ||--o{ RESTRICTIONGROUP_M2M_USER: "has"
+    const tables = tablesAndColumnsQuery.dataset[0];
+    const relations = releationsQuery.dataset[0];
+    const schema = {
+      tables: tables.tables,
+      relationships: relations.relationships,
+    };
+    const mermaidDiagram = transformToMermaidERDiagram(schema);
 
-    COUNTRY {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-        jsonb metadata
-    }
-
-    SITE {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-        int country_id FK
-    }
-
-    BUILDING {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-        int site_id FK
-    }
-
-    FLOOR {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-        varchar floorplan
-        int building_id FK
-    }
-
-    DESK {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-        int floor_id FK
-        jsonb metadata
-    }
-
-    USER {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        int homecountry_id FK
-    }
-
-    USER_M2M_DESK {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        int user_id FK
-        int desk_id FK
-    }
-
-    RESTRICTIONGROUP {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        varchar code
-    }
-
-    RESTRICTIONGROUP_M2M_DESK {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        int restrictiongroup_id FK
-        int desk_id FK
-    }
-
-    RESTRICTIONGROUP_M2M_USER {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        int restrictiongroup_id FK
-        int user_id FK
-    }
-
-    BOOKING {
-        int id PK
-        timestamp created_at
-        varchar created_by
-        timestamp updated_at
-        varchar updated_by
-        timestamp deleted_at
-        varchar tenant
-        varchar searchindex
-        varchar name
-        varchar description
-        int desk_id FK
-        int user_id FK
-        varchar fromdatetime
-        varchar todatetime
-    }
-
-  `;
     setChart(mermaidDiagram);
-  }, [query, props.database]);
+  }, [releationsQuery, tablesAndColumnsQuery, props.database]);
 
   return (
     <div>
       <h1>Mermaid ER Diagram</h1>
-
+      {/* <pre>{chart}</pre> */}
       <MermaidDiagram className={props.className} chart={chart} />
     </div>
   );
