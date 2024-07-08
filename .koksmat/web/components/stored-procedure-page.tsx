@@ -31,7 +31,12 @@ import * as prettier from "prettier/standalone";
 import { jsonSchemaToZod } from "json-schema-to-zod";
 import InterfaceBuilder from "./interface-builder";
 import { InterfaceViewer } from "./interface-viewer";
-
+import ShareCreateBite from "./actions/share-create-bite";
+import { createIngredienceTemmplate } from "@/lib/kitchen";
+import { nanoid } from "nanoid";
+import { FilePenIcon } from "./icons/FilePenIcon";
+import { DownloadIcon } from "./icons/DownloadIcon";
+import { DatabaseIcon } from "./icons/DatabaseIcon";
 export interface Root {
   Result: Result[];
 }
@@ -104,30 +109,43 @@ GROUP BY
   const [procedureInfo, setprocedureInfo] = useState<ProcedureInfo>();
   const [jsonSchema, setjsonSchema] = useState<any | null>();
   const [zodSchema, setzodSchema] = useState<any | null>();
+  const [shareId, setshareId] = useState("");
+
+  const [doShareBite, setdoShareBite] = useState(false);
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
-      const procedure = query.dataset[0].procedure_info;
-      setprocedureInfo(procedure);
-      const metadata = extractAndParseJson(procedure.source_code);
-      if (metadata) {
-        try {
-          setjsonSchema(metadata);
-          const txtcode = jsonSchemaToZod(metadata);
-
-          // const code = prettier.format(txtcode, {
-          //   parser: "typescript",
-          //   plugins: [parserTypeScript],
-          // });
-          //setzodSchema(JSON.parse(zodSchema));
-          setzodSchema(txtcode);
-        } catch (error) {
-          setzodSchema(error);
-        }
-      }
-      //setmetadata(metadata);
+      setprocedureInfo(query.dataset[0].procedure_info);
     }
-  }, [query, database, procedure]);
+  }, [query.dataset]);
 
+  useEffect(() => {
+    if (!procedureInfo) {
+      return;
+    }
+
+    const metadata = extractAndParseJson(procedureInfo.source_code);
+    if (metadata) {
+      try {
+        setjsonSchema(metadata);
+        const txtcode = jsonSchemaToZod(metadata);
+
+        // const code = prettier.format(txtcode, {
+        //   parser: "typescript",
+        //   plugins: [parserTypeScript],
+        // });
+        //setzodSchema(JSON.parse(zodSchema));
+        setzodSchema(txtcode);
+      } catch (error) {
+        setzodSchema(error);
+      }
+    }
+  }, [procedureInfo]);
+
+  useEffect(() => {
+    if (doShareBite) {
+      setshareId(nanoid());
+    }
+  }, [doShareBite]);
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
@@ -144,40 +162,33 @@ GROUP BY
               <FilePenIcon className="mr-2 h-4 w-4" />
               Edit
             </Button>
-            <Button>
+            <Button onClick={() => setdoShareBite(true)}>
               <DownloadIcon className="mr-2 h-4 w-4" />
               Download
             </Button>
           </div>
         </div>
       </header>
+      <div>
+        {doShareBite && (
+          <ShareCreateBite
+            transactionid={shareId}
+            request={{
+              name: shareId,
+              description: "description",
+              searchindex: `name:${shareId}`,
+              tenant: "",
+              body: createIngredienceTemmplate(
+                database,
+                procedure,
+                "CreateBiteProps",
+                jsonSchema
+              ),
+            }}
+          />
+        )}
+      </div>
       <div className="container mx-auto grid grid-cols-[200px_1fr] gap-8 py-8 sm:px-6">
-        <nav className="sticky top-20 space-y-2">
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
-            prefetch={false}
-          >
-            <DatabaseIcon className="h-4 w-4" />
-            Source Code
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
-            prefetch={false}
-          >
-            <DatabaseIcon className="h-4 w-4" />
-            Table Dependencies
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
-            prefetch={false}
-          >
-            <DatabaseIcon className="h-4 w-4" />
-            Code Generator
-          </Link>
-        </nav>
         <div className="space-y-8">
           <section>
             <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
@@ -196,7 +207,9 @@ GROUP BY
               <h3 className="mb-2 text-lg font-medium">TypeScript Interface</h3>
               <InterfaceBuilder
                 schema={JSON.stringify(jsonSchema, null, 2)}
-                typeName={"Koksmat"}
+                typeName={
+                  (procedureInfo?.procedure_name ?? "Unknown") + "Props"
+                }
               />
             </div>
           </section>
@@ -285,68 +298,5 @@ console.log(data);
         </div>
       </footer>
     </div>
-  );
-}
-
-function DatabaseIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <ellipse cx="12" cy="5" rx="9" ry="3" />
-      <path d="M3 5V19A9 3 0 0 0 21 19V5" />
-      <path d="M3 12A9 3 0 0 0 21 12" />
-    </svg>
-  );
-}
-
-function DownloadIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" x2="12" y1="15" y2="3" />
-    </svg>
-  );
-}
-
-function FilePenIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10" />
-      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-      <path d="M10.4 12.6a2 2 0 1 1 3 3L8 21l-4 1 1-4Z" />
-    </svg>
   );
 }

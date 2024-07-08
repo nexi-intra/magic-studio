@@ -35,7 +35,7 @@ export function transformToMermaidERDiagram(schema: Schema): string {
   // });
 
   // Add relationships
-  schema.relationships.forEach((relationship) => {
+  schema?.relationships?.forEach((relationship) => {
     diagram += `    ${relationship.source_table} }o--|| ${relationship.target_table} : "${relationship.source_column} to ${relationship.target_column}"\n`;
   });
 

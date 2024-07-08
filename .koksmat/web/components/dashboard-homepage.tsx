@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ChevronDownIcon } from "./icons/ChevronDownIcon";
 
 export function DashboardHomepage() {
   const [timeRange, setTimeRange] = useState("this_week");
@@ -72,14 +73,14 @@ export function DashboardHomepage() {
                     {timeRange === "this_week"
                       ? "This Week"
                       : timeRange === "previous_week"
-                      ? "Previous Week"
-                      : timeRange === "month"
-                      ? "This Month"
-                      : timeRange === "today"
-                      ? "Today"
-                      : timeRange === "yesterday"
-                      ? "Yesterday"
-                      : "Last Hour"}
+                        ? "Previous Week"
+                        : timeRange === "month"
+                          ? "This Month"
+                          : timeRange === "today"
+                            ? "Today"
+                            : timeRange === "yesterday"
+                              ? "Yesterday"
+                              : "Last Hour"}
                     <ChevronDownIcon className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -223,24 +224,5 @@ export function DashboardHomepage() {
         </Card>
       </div>
     </div>
-  );
-}
-
-function ChevronDownIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
   );
 }

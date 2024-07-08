@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  quicktype,
-  InputData,
-  jsonInputForTargetLanguage,
-  JSONSchemaInput,
-  FetchingJSONSchemaStore,
-} from "quicktype-core";
+import { jsonInputForTargetLanguage } from "quicktype-core";
+import { buildInterface } from "../lib/buildInterface";
 
 export default function InterfaceBuilder(props: {
   schema: string;
@@ -16,18 +11,8 @@ export default function InterfaceBuilder(props: {
   const [code, setcode] = useState("");
   useEffect(() => {
     const load = async () => {
-      const schemaInput = new JSONSchemaInput(new FetchingJSONSchemaStore());
-      await schemaInput.addSource({ name: typeName, schema });
-      const inputData = new InputData();
-      inputData.addInput(schemaInput);
-      const { lines: tsLines } = await quicktype({
-        inputData,
-        lang: "typescript",
-        rendererOptions: {
-          "just-types": true,
-        },
-      });
-      setcode(tsLines.join("\n"));
+      const code = await buildInterface(typeName, schema);
+      setcode(code);
     };
     if (!schema) return;
     if (!typeName) return;
