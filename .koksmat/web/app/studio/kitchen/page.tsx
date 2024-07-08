@@ -1,13 +1,13 @@
 "use client";
 import CreateActivityModel, {
   CreateActivitymodelProps,
-} from "@/components/actions/create-activitymodel";
+} from "@/components/actions/work-create-activitymodel";
 import { Button } from "@/components/ui/button";
 import WorkflowEditor from "@/components/workflow-editor2";
 import { set } from "date-fns";
 import React, { useEffect, useState } from "react";
 
-export default function page() {
+export default function Page() {
   const [activityModel, setactivityModel] =
     useState<CreateActivitymodelProps>();
   useEffect(() => {

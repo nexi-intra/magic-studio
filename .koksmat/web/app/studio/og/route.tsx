@@ -28,7 +28,7 @@ export async function GET() {
   );
 }
 
-export function ChefHatIcon(props: any) {
+function ChefHatIcon(props: any) {
   return (
     <svg
       {...props}

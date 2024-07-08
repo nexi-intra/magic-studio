@@ -1,7 +1,6 @@
 import { run } from "@/app/koksmat/magicservices";
-import type { NextApiRequest, NextApiResponse } from "next";
 export async function GET(
-  request: NextApiRequest,
+  request: Request,
   { params }: { params: { packageid: string } }
 ) {
   const { packageid } = params;
