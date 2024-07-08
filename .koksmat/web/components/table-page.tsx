@@ -45,6 +45,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { Button } from "./ui/button";
 
 export function TablePage(props: { database: string; table: string }) {
   const { database, table } = props;
@@ -153,27 +154,42 @@ export function TablePage(props: { database: string; table: string }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableMetadata?.referencing_functions?.map((column, index) => {
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
-                      {column.function_name}
-                    </TableCell>
-                    <TableCell className="overflow-clip whitespace-nowrap w-full">
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          {column.function_definition}
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-full overflow-scroll h-[400px] bg-slate-100">
-                          <pre>{column.function_definition}</pre>
-                        </HoverCardContent>
-                      </HoverCard>
-                    </TableCell>
-                    {/* <TableCell>{column.is_nullable}</TableCell>
+              {tableMetadata?.referencing_functions
+                ?.sort((a, b) => a.function_name.localeCompare(b.function_name))
+                .map((column, index) => {
+                  return (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={
+                            "/" +
+                            APPNAME +
+                            "/database/" +
+                            database +
+                            "/procedure/" +
+                            column.function_name
+                          }
+                          className="text-blue-600 hover:underline"
+                          prefetch={false}
+                        >
+                          <Button variant="link">{column.function_name}</Button>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="overflow-clip whitespace-nowrap w-full">
+                        <HoverCard>
+                          <HoverCardTrigger>
+                            {column.function_definition}
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-full overflow-scroll h-[400px] bg-slate-100">
+                            <pre>{column.function_definition}</pre>
+                          </HoverCardContent>
+                        </HoverCard>
+                      </TableCell>
+                      {/* <TableCell>{column.is_nullable}</TableCell>
                     <TableCell>{column.column_default}</TableCell> */}
-                  </TableRow>
-                );
-              })}
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </div>

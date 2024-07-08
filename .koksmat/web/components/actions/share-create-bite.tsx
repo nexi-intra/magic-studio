@@ -17,6 +17,7 @@ export interface CreateBiteProps {
 
 import React, { useEffect, useState } from "react";
 import ExecuteTransaction from "./execute";
+import { CopyIcon } from "lucide-react";
 
 export default function ShareCreateBite(props: {
   transactionid: string;
@@ -42,8 +43,29 @@ export default function ShareCreateBite(props: {
           database="share"
           payload={payload}
           processname="create_bite"
+          onSuccess={(result) => {
+            console.log("Bite created", result);
+          }}
           transactionId={transactionid}
-        />
+        >
+          <div className="w-full">
+            Copy the following code to add the bite to your project:
+            <div className="flex text-center w-full m-4">
+              <pre className="text-nowrap whitespace-nowrap">
+                <code>koksmat add {transactionid}</code>
+              </pre>
+
+              <CopyIcon
+                className="ml-2"
+                onClick={() => {
+                  // set text to clipboard
+
+                  navigator.clipboard.writeText(`koksmat add ${transactionid}`);
+                }}
+              />
+            </div>
+          </div>
+        </ExecuteTransaction>
       )}
     </div>
   );

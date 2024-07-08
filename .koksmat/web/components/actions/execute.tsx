@@ -146,6 +146,7 @@ export function Execute(props: ProcessProps) {
 }
 
 export default function ExecuteTransaction(props: {
+  children?: any;
   database: string;
   processname: string;
   payload: any;
@@ -154,7 +155,7 @@ export default function ExecuteTransaction(props: {
   onError?: (error: any) => void;
   options?: { suppressError?: boolean; suppressProgress?: boolean };
 }) {
-  const { database, payload, processname, transactionId } = props;
+  const { children, database, payload, processname, transactionId } = props;
   const [running, setrunning] = useState(false);
   const [error, seterror] = useState("");
   const [result, setresult] = useState("");
@@ -190,7 +191,7 @@ export default function ExecuteTransaction(props: {
 
   const component = (
     <div>
-      {doShowError() && <div className="bg-red-500">Error: {error}</div>}
+      {doShowError() && <div className="p-10 bg-red-500">Error: {error}</div>}
       {running && (
         <div>
           <Execute
@@ -239,9 +240,12 @@ export default function ExecuteTransaction(props: {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Processing</DialogTitle>
-            <DialogDescription>Processing</DialogDescription>
+            {/* <DialogDescription>Processing</DialogDescription> */}
           </DialogHeader>
           {component}
+          <DialogContent>{result && children}</DialogContent>
+
+          <DialogFooter>{result && <Button>Done</Button>}</DialogFooter>
         </DialogContent>
       </Dialog>
     );

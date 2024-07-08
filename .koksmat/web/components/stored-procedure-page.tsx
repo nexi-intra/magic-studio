@@ -38,6 +38,7 @@ import { FilePenIcon } from "./icons/FilePenIcon";
 import { DownloadIcon } from "./icons/DownloadIcon";
 import { DatabaseIcon } from "./icons/DatabaseIcon";
 import { buildInterface } from "@/lib/buildInterface";
+import { Code2Icon, SquareFunction } from "lucide-react";
 export interface Root {
   Result: Result[];
 }
@@ -107,12 +108,80 @@ GROUP BY
 
   `;
   const query = useSQLSelect3<Result>(database, sql);
+
+  const relationQuery = useSQLSelect3<any>(
+    database,
+    `
+WITH RECURSIVE proc_deps AS (
+    -- Starting point: Get the details of the target procedure
+    SELECT 
+        p.oid AS procedure_oid,
+        p.proname AS procedure_name,
+        pg_get_functiondef(p.oid) AS source_code,
+        d.description AS comment
+    FROM 
+        pg_proc p
+    LEFT JOIN 
+        pg_description d ON p.oid = d.objoid
+    WHERE 
+        p.proname = '${procedure}'
+    
+    UNION ALL
+    
+    -- Recursively find all dependent procedures and functions
+    SELECT 
+        p.oid,
+        p.proname,
+        pg_get_functiondef(p.oid) AS source_code,
+        d.description
+    FROM 
+        pg_depend dep
+    JOIN 
+        pg_proc p ON dep.objid = p.oid
+    LEFT JOIN 
+        pg_description d ON p.oid = d.objoid
+    JOIN 
+        proc_deps pd ON dep.refobjid = pd.procedure_oid
+    WHERE 
+        p.oid != pd.procedure_oid
+),
+table_deps AS (
+    -- Get the tables that the target procedure and its dependencies depend on
+    SELECT 
+        DISTINCT c.relname AS table_name
+    FROM 
+        pg_depend dep
+    JOIN 
+        pg_class c ON dep.refobjid = c.oid
+    JOIN 
+        proc_deps pd ON dep.objid = pd.procedure_oid
+    WHERE 
+        c.relkind = 'r'
+)
+SELECT 
+    'procedure' AS type,
+    procedure_name AS name,
+    source_code,
+    comment
+FROM 
+    proc_deps
+UNION ALL
+SELECT 
+    'table' AS type,
+    table_name AS name,
+    NULL AS source_code,
+    NULL AS comment
+FROM 
+    table_deps
+    
+    `
+  );
   const [procedureInfo, setprocedureInfo] = useState<ProcedureInfo>();
   const [jsonSchema, setjsonSchema] = useState<any | null>();
   const [zodSchema, setzodSchema] = useState<any | null>();
   const [tsInterface, settsInterface] = useState("");
   const [shareId, setshareId] = useState("");
-
+  const [tsxComponentCode, settsxComponentCode] = useState("");
   const [doShareBite, setdoShareBite] = useState(false);
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
@@ -148,30 +217,49 @@ GROUP BY
       if (doShareBite) {
         setshareId(nanoid());
       }
+    };
+    load();
+  }, [doShareBite]);
+
+  useEffect(() => {
+    const load = async () => {
       const code = await buildInterface(
         (procedureInfo?.procedure_name ?? "Unknown") + "Props",
         JSON.stringify(jsonSchema, null, 2)
       );
       settsInterface(code);
+      const tsx = await createIngredienceTemmplate(
+        database,
+        procedure,
+        "CreateBiteProps",
+        code
+      );
+      settsxComponentCode(tsx.tsxContent);
     };
     load();
-  }, [doShareBite]);
+  }, [jsonSchema]);
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {/* <pre className="whitespace-pre-wrap">
+        {JSON.stringify(relationQuery, null, 2)}
+      </pre> */}
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="#" className="flex items-center gap-2" prefetch={false}>
-              <DatabaseIcon className="h-6 w-6" />
-              <span className="font-bold">{procedure}</span>
+              <span className="font-bold text-3xl"></span>
+              <SquareFunction className="h-6 w-6" />
+              <span className="font-bold text-3xl">
+                {procedure} ({database})
+              </span>
             </Link>
-            <span className="text-muted-foreground">Procedure Name</span>
+            {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="outline">
+            {/* <Button variant="outline">
               <FilePenIcon className="mr-2 h-4 w-4" />
               Edit
-            </Button>
+            </Button> */}
             <Button onClick={() => setdoShareBite(true)}>
               <DownloadIcon className="mr-2 h-4 w-4" />
               Download
@@ -198,7 +286,7 @@ GROUP BY
           />
         )}
       </div>
-      <div className="container mx-auto grid grid-cols-[200px_1fr] gap-8 py-8 sm:px-6">
+      <div className="container mx-auto grid  gap-8 py-8 sm:px-6">
         <div className="space-y-8">
           <section>
             <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
@@ -212,15 +300,19 @@ GROUP BY
                 {JSON.stringify(jsonSchema, null, 2)}
               </pre>
             </div> */}
-            <InterfaceViewer />
+            {/* <InterfaceViewer /> */}
             <div>
               <h3 className="mb-2 text-lg font-medium">TypeScript Interface</h3>
-              <InterfaceBuilder
+
+              <pre>
+                <code>{tsxComponentCode}</code>
+              </pre>
+              {/* <InterfaceBuilder
                 schema={JSON.stringify(jsonSchema, null, 2)}
                 typeName={
                   (procedureInfo?.procedure_name ?? "Unknown") + "Props"
                 }
-              />
+              /> */}
             </div>
           </section>
           <section>
@@ -261,7 +353,7 @@ GROUP BY
               </div>
             </div>
           </section>
-          <section>
+          <section className="hidden">
             <div className="grid gap-4">
               <div>
                 <h3 className="mb-2 text-lg font-medium">REST POST</h3>

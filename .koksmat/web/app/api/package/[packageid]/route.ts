@@ -10,10 +10,10 @@ export async function GET(
       "magic-mix.app",
       [
         "query",
-        "mix",
+        "share",
         `
-        select '${packageid}' as packageid,
-        1 as "2"
+        select * from bite where name = '${packageid}'
+
         `,
       ],
       "",

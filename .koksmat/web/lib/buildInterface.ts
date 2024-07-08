@@ -7,6 +7,9 @@ import {
 } from "quicktype-core";
 
 export async function buildInterface(typeName: string, schema: string) {
+  if (!schema) {
+    return "";
+  }
   const schemaInput = new JSONSchemaInput(new FetchingJSONSchemaStore());
   await schemaInput.addSource({ name: typeName, schema });
   const inputData = new InputData();
