@@ -37,6 +37,7 @@ import { nanoid } from "nanoid";
 import { FilePenIcon } from "./icons/FilePenIcon";
 import { DownloadIcon } from "./icons/DownloadIcon";
 import { DatabaseIcon } from "./icons/DatabaseIcon";
+import { buildInterface } from "@/lib/buildInterface";
 export interface Root {
   Result: Result[];
 }
@@ -109,6 +110,7 @@ GROUP BY
   const [procedureInfo, setprocedureInfo] = useState<ProcedureInfo>();
   const [jsonSchema, setjsonSchema] = useState<any | null>();
   const [zodSchema, setzodSchema] = useState<any | null>();
+  const [tsInterface, settsInterface] = useState("");
   const [shareId, setshareId] = useState("");
 
   const [doShareBite, setdoShareBite] = useState(false);
@@ -142,9 +144,17 @@ GROUP BY
   }, [procedureInfo]);
 
   useEffect(() => {
-    if (doShareBite) {
-      setshareId(nanoid());
-    }
+    const load = async () => {
+      if (doShareBite) {
+        setshareId(nanoid());
+      }
+      const code = await buildInterface(
+        (procedureInfo?.procedure_name ?? "Unknown") + "Props",
+        JSON.stringify(jsonSchema, null, 2)
+      );
+      settsInterface(code);
+    };
+    load();
   }, [doShareBite]);
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -175,14 +185,14 @@ GROUP BY
             transactionid={shareId}
             request={{
               name: shareId,
-              description: "description",
+              description: "",
               searchindex: `name:${shareId}`,
               tenant: "",
               body: createIngredienceTemmplate(
                 database,
                 procedure,
                 "CreateBiteProps",
-                jsonSchema
+                tsInterface
               ),
             }}
           />
