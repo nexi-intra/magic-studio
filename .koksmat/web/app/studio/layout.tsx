@@ -11,13 +11,15 @@ export const metadata: Metadata = {
     description: "The place to cook Magic Button Apps.",
     images: [
       {
-        url: "/studio/og",
+        url: "//studio/og",
         width: 1200,
         height: 600,
+
         alt: "Koksmat image",
       },
     ],
   },
+
   applicationName: "KOKSMAT studio",
   referrer: "origin-when-cross-origin",
   keywords: ["no code", "low code", "power apps", "power automate"],
