@@ -2,6 +2,9 @@ import ClientLayout from "./Clientlayout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    "https://nexi-intra-magic-studio-canary.intra.nexigroup.com"
+  ),
   title: {
     template: "%s | KOKSMAT studio",
     default: "KOKSMAT studio",
@@ -11,7 +14,7 @@ export const metadata: Metadata = {
     description: "The place to cook Magic Button Apps.",
     images: [
       {
-        url: "//studio/og",
+        url: "/studio/og",
         width: 1200,
         height: 600,
 
