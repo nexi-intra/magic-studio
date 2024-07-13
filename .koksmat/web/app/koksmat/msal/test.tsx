@@ -9,12 +9,7 @@ import { https } from "@/app/koksmat/httphelper";
 import { DataTableColumnHeader } from "@/app/koksmat/components/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { GenericItem } from "@/app/koksmat/table/data/schema";
-interface CaseProps {
-  scopes: string[];
-  title: string;
-  testurl: string;
-  token?: string;
-}
+import { CaseProps } from "./auth";
 const cases: CaseProps[] = [
   {
     scopes: ["User.Read"],

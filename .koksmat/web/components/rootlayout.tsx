@@ -47,9 +47,13 @@ import { Fragment, useContext } from "react";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import Tracer from "@/app/koksmat/components/tracer";
 import { ChefHatIcon } from "./icons/ChefHatIcon";
+import { AppWindowMac } from "lucide-react";
 
 export namespace href {
   export const HOME = "/" + APPNAME;
+  export const APPS = "/" + APPNAME + "/apps";
+  export const WORKSPACES = "/" + APPNAME + "/workspace";
+
   export const DATABASE = "/" + APPNAME + "/database";
   export const ADMIN = "/" + APPNAME + "/admin";
   export const ACCESS = "/" + APPNAME + "/access";
@@ -67,9 +71,21 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           prefetch={false}
         >
           <ChefHatIcon className="h-4 w-4 transition-all group-hover:scale-110" />
-          <span className="sr-only">Acme Analytics</span>
+          <span className="sr-only">Koksmat Studio</span>
         </Link>
-
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href.WORKSPACES}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <AppWindowMac className="h-5 w-5" />
+              <span className="sr-only">Workspaces</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Workspaces</TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
@@ -78,10 +94,10 @@ export function NavigationItems(props: { withCaptions: boolean }) {
               prefetch={false}
             >
               <CookingPotIcon className="h-5 w-5" />
-              <span className="sr-only">Queries</span>
+              <span className="sr-only">Workspaces</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Queries</TooltipContent>
+          <TooltipContent side="right">Workspaces</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -155,7 +171,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           prefetch={false}
         >
           <CookingPotIcon className="h-5 w-5" />
-          Queries
+          Workspaces
         </Link>
         <Link
           href={href.DATABASE}

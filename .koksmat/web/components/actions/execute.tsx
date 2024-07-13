@@ -1,6 +1,6 @@
 "use client";
 
-import { https } from "@/app/koksmat/httphelper";
+import { https, Result } from "@/app/koksmat/httphelper";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import { run } from "@/app/koksmat/magicservices";
 
@@ -38,7 +38,32 @@ export interface ProcessProps {
   payload: any;
   onError?: (error: any) => void;
   onSuccess?: (response: any) => void;
+  onMounted?: (ExecutionTracer: JSX.Element) => void;
 }
+export async function execute(
+  database: string,
+  servicename: string,
+  processname: string,
+  payload: any,
+  onMounted?: (ExecutionTracer: JSX.Element) => void
+): Promise<Result<string>> {
+  return new Promise((resolve, reject) => {
+    const ExecutionTracer = (
+      <Execute
+        database={database}
+        servicename={servicename}
+        processname={processname}
+        payload={payload}
+        onError={(error) => resolve({ hasError: true, errorMessage: error })}
+        onSuccess={(response) => resolve({ hasError: false, data: "" })}
+      />
+    );
+    if (onMounted) {
+      onMounted(ExecutionTracer);
+    }
+  });
+}
+
 export function Execute(props: ProcessProps) {
   const { database, servicename, processname, payload, onError, onSuccess } =
     props;
@@ -188,7 +213,7 @@ export default function ExecuteTransaction(props: {
   if (!transactionId) {
     return null;
   }
-
+  debugger;
   const component = (
     <div>
       {doShowError() && <div className="p-10 bg-red-500">Error: {error}</div>}

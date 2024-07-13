@@ -5,23 +5,10 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 
-/** Add fonts into your Next.js project:
-
-import { Libre_Franklin } from 'next/font/google'
-
-libre_franklin({
-  subsets: ['latin'],
-  display: 'swap',
-})
-
-To read more about using these font, please visit the Next.js documentation:
-- App Directory: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
-- Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
-**/
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
 import { extractAndParseJson } from "@/lib/tsql-extract";
 import { z } from "zod";
@@ -31,14 +18,19 @@ import * as prettier from "prettier/standalone";
 import { jsonSchemaToZod } from "json-schema-to-zod";
 import InterfaceBuilder from "./interface-builder";
 import { InterfaceViewer } from "./interface-viewer";
-import ShareCreateBite from "./actions/share-create-bite";
+import { shareCreateBite } from "./actions/share-create-bite";
 import { createIngredienceTemmplate } from "@/lib/kitchen";
 import { nanoid } from "nanoid";
 import { FilePenIcon } from "./icons/FilePenIcon";
 import { DownloadIcon } from "./icons/DownloadIcon";
 import { DatabaseIcon } from "./icons/DatabaseIcon";
 import { buildInterface } from "@/lib/buildInterface";
-import { Code2Icon, SquareFunction } from "lucide-react";
+import { Code2Icon, Play, PlayIcon, SquareFunction } from "lucide-react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import { set } from "date-fns";
+
 export interface Root {
   Result: Result[];
 }
@@ -60,6 +52,8 @@ export function StoredProcedurePage(props: {
   procedure: string;
 }) {
   const { database, procedure } = props;
+
+  const magicbox = useContext(MagicboxContext);
   const sql = `
 WITH proc_source AS (
     SELECT
@@ -182,7 +176,10 @@ FROM
   const [tsInterface, settsInterface] = useState("");
   const [shareId, setshareId] = useState("");
   const [tsxComponentCode, settsxComponentCode] = useState("");
-  const [doShareBite, setdoShareBite] = useState(false);
+  const [errorMessage, seterrorMessage] = useState("");
+  const [biteReady, setbiteReady] = useState(false);
+  const [isProcessing, setisProcessing] = useState(false);
+
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
       setprocedureInfo(query.dataset[0].procedure_info);
@@ -214,15 +211,6 @@ FROM
 
   useEffect(() => {
     const load = async () => {
-      if (doShareBite) {
-        setshareId(nanoid());
-      }
-    };
-    load();
-  }, [doShareBite]);
-
-  useEffect(() => {
-    const load = async () => {
       const code = await buildInterface(
         (procedureInfo?.procedure_name ?? "Unknown") + "Props",
         JSON.stringify(jsonSchema, null, 2)
@@ -238,11 +226,45 @@ FROM
     };
     load();
   }, [jsonSchema]);
+
+  const handleShareCreateBite = async () => {
+    setisProcessing(true);
+    seterrorMessage("");
+    let id = nanoid();
+    setshareId(id);
+    const result = await shareCreateBite(
+      magicbox.authtoken,
+      id,
+      `A bite for ${procedure} in ${database}`,
+      createIngredienceTemmplate(
+        database,
+        procedure,
+        "CreateBiteProps",
+        tsInterface
+      )
+    );
+    setisProcessing(false);
+
+    if (result.hasError) {
+      seterrorMessage(result.errorMessage ?? "unknown error");
+      return;
+    }
+    setbiteReady(true);
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* <pre className="whitespace-pre-wrap">
-        {JSON.stringify(relationQuery, null, 2)}
-      </pre> */}
+      <pre className="whitespace-pre-wrap">
+        {JSON.stringify(
+          {
+            errorMessage,
+            biteReady,
+            token: magicbox.authtoken?.substring(0, 10),
+          },
+          null,
+          2
+        )}
+      </pre>
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -256,36 +278,21 @@ FROM
             {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
           <div className="flex items-center gap-4">
-            {/* <Button variant="outline">
-              <FilePenIcon className="mr-2 h-4 w-4" />
-              Edit
-            </Button> */}
-            <Button onClick={() => setdoShareBite(true)}>
+            <Button variant="outline">
+              <PlayIcon className="mr-2 h-4 w-4" />
+              Run
+            </Button>
+            <Button
+              disabled={isProcessing}
+              onClick={() => handleShareCreateBite()}
+            >
               <DownloadIcon className="mr-2 h-4 w-4" />
               Download
             </Button>
           </div>
         </div>
       </header>
-      <div>
-        {doShareBite && (
-          <ShareCreateBite
-            transactionid={shareId}
-            request={{
-              name: shareId,
-              description: "",
-              searchindex: `name:${shareId}`,
-              tenant: "",
-              body: createIngredienceTemmplate(
-                database,
-                procedure,
-                "CreateBiteProps",
-                tsInterface
-              ),
-            }}
-          />
-        )}
-      </div>
+
       <div className="container mx-auto grid  gap-8 py-8 sm:px-6">
         <div className="space-y-8">
           <section>
@@ -302,11 +309,11 @@ FROM
             </div> */}
             {/* <InterfaceViewer /> */}
             <div>
-              <h3 className="mb-2 text-lg font-medium">TypeScript Interface</h3>
+              <h3 className="mb-2 text-lg font-medium">React Component</h3>
+              <SyntaxHighlighter language="jsx" style={dark}>
+                {tsxComponentCode}
+              </SyntaxHighlighter>
 
-              <pre>
-                <code>{tsxComponentCode}</code>
-              </pre>
               {/* <InterfaceBuilder
                 schema={JSON.stringify(jsonSchema, null, 2)}
                 typeName={

@@ -1,4 +1,5 @@
 "use client";
+import { execute } from "./execute2";
 /**
  * Create operation
  */
@@ -15,58 +16,18 @@ export interface CreateBiteProps {
   [property: string]: any;
 }
 
-import React, { useEffect, useState } from "react";
-import ExecuteTransaction from "./execute";
-import { CopyIcon } from "lucide-react";
-
-export default function ShareCreateBite(props: {
-  transactionid: string;
-  request: CreateBiteProps | null | undefined;
-}) {
-  const { request, transactionid } = props;
-  const hasRequestBeenInitialized = () => {
-    return request !== null && request !== undefined;
+export async function shareCreateBite(
+  token: string,
+  name: string,
+  description: string,
+  body: any
+) {
+  const request: CreateBiteProps = {
+    name: name,
+    description: description,
+    body,
+    tenant: "",
+    searchindex: "name:" + name,
   };
-  const [payload, setpayload] = useState<CreateBiteProps | null | undefined>(
-    null
-  );
-  useEffect(() => {
-    if (!hasRequestBeenInitialized()) return;
-
-    setpayload(request);
-  }, [request]);
-
-  return (
-    <div>
-      {hasRequestBeenInitialized() && (
-        <ExecuteTransaction
-          database="share"
-          payload={payload}
-          processname="create_bite"
-          onSuccess={(result) => {
-            console.log("Bite created", result);
-          }}
-          transactionId={transactionid}
-        >
-          <div className="w-full">
-            Copy the following code to add the bite to your project:
-            <div className="flex text-center w-full m-4">
-              <pre className="text-nowrap whitespace-nowrap">
-                <code>koksmat add {transactionid}</code>
-              </pre>
-
-              <CopyIcon
-                className="ml-2"
-                onClick={() => {
-                  // set text to clipboard
-
-                  navigator.clipboard.writeText(`koksmat add ${transactionid}`);
-                }}
-              />
-            </div>
-          </div>
-        </ExecuteTransaction>
-      )}
-    </div>
-  );
+  return execute(token, "share", "magic-mix.app", "create_bite", request);
 }
