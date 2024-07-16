@@ -2,33 +2,18 @@
 
 import { APPNAME } from "@/app/global";
 import { ItemPageToolbar } from "@/components/item-page-toolbar";
+import { KitchenOverview } from "@/components/kitchen-overview";
 import SQLCards from "@/components/sql-cards";
 import { CardStackIcon } from "@radix-ui/react-icons";
 
 export default function Page(props: {
-  params: { database: string; table: string };
+  params: { workspaceid: string; kitchen: string };
 }) {
-  const { database, table } = props.params;
+  const { workspaceid, kitchen } = props.params;
   return (
     <div>
-      <ItemPageToolbar database={database} table={table} />
-
-      <SQLCards
-        Icon={CardStackIcon}
-        slugPrefix={
-          "/" + APPNAME + "/database/" + database + "/table/" + table + "/item/"
-        }
-        database={database}
-        sql={`
-SELECT name as title, 
-       description,
-        id as slug
-FROM ${table}
-ORDER BY name
-
-    
-    `}
-      />
+      {/* <ItemPageToolbar database={database} table={table} /> */}
+      <KitchenOverview />
     </div>
   );
 }

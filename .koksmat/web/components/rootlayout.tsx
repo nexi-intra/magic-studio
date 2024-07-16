@@ -48,6 +48,8 @@ import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import Tracer from "@/app/koksmat/components/tracer";
 import { ChefHatIcon } from "./icons/ChefHatIcon";
 import { AppWindowMac } from "lucide-react";
+import useWorkspaceConnectionStatus from "./hooks/use-workspace-connectionstatus";
+import { ConnectionStatus } from "./connection-status";
 
 export namespace href {
   export const HOME = "/" + APPNAME;
@@ -217,6 +219,10 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
   const breadcrumb = props.breadcrumb;
   const magicbox = useContext(MagicboxContext);
 
+  const connectionStatus = useWorkspaceConnectionStatus(
+    magicbox.currentWorkspace
+  );
+
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -257,6 +263,15 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
             </SheetContent>
           </Sheet>
           {breadcrumb}
+          <div className="flex space-x-2  ">
+            {magicbox.currentWorkspace && (
+              <Link
+                href={"/" + APPNAME + "/workspace/" + magicbox.currentWorkspace}
+              >
+                <ConnectionStatus connectionStatus={connectionStatus} />
+              </Link>
+            )}
+          </div>
           <div className="relative ml-auto flex-1 md:grow-0">
             <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input

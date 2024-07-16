@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 import { callWorkspace } from "@/components/actions/call-workspace";
@@ -14,29 +14,26 @@ export default function Page(props: {
   const [workspace, setWorkspace] = useState<JSX.Element>();
   const [running, setrunning] = useState(false);
   const pathname = usePathname();
+  useEffect(() => {
+    const load = async () => {
+      setrunning(true);
+      const workspaceUI = await callWorkspace(
+        sessionid,
+        "execute", // "ping
+        "koksmat",
+        [],
+        10,
+        { onSuccess: "redirect", finalUrl: pathname + "?done=true" }
+      );
+      setWorkspace(workspaceUI);
+    };
+    load();
+  }, [sessionid]);
+
   return (
     <div>
+      Pinging workspace: {sessionid}
       {done && <div>Done</div>}
-      {!done && (
-        <Button
-          disabled={running}
-          onClick={async () => {
-            setrunning(true);
-            const workspaceUI = await callWorkspace(
-              sessionid,
-              "execute", // "ping
-              "ping",
-              ["www.dr.dk", "-c", "4"],
-              30,
-              { onSuccess: "redirect", finalUrl: pathname + "?done=true" }
-            );
-            setWorkspace(workspaceUI);
-          }}
-        >
-          Call Workspace
-        </Button>
-      )}
-
       {workspace}
     </div>
   );

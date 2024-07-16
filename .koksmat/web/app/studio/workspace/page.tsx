@@ -5,7 +5,7 @@ import SQLCards from "@/components/sql-cards";
 import { CardStackIcon } from "@radix-ui/react-icons";
 import React, { useContext } from "react";
 
-export default function page() {
+export default function Page() {
   const magicbox = useContext(MagicboxContext);
   return (
     <div>

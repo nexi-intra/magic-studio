@@ -52,6 +52,8 @@ export type MagicboxContextType = {
   clearServiceCallLog: () => void;
   showTracer: boolean;
   setShowTracer: (showTracer: boolean) => void;
+  currentWorkspace: string;
+  setCurrentWorkspace: (workspace: string) => void;
 };
 export const MagicboxContext = createContext<MagicboxContextType>({
   session: {
@@ -99,6 +101,10 @@ export const MagicboxContext = createContext<MagicboxContextType>({
   },
   showTracer: false,
   setShowTracer: function (showTracer: boolean): void {
+    throw new Error("Function not implemented.");
+  },
+  currentWorkspace: "",
+  setCurrentWorkspace: function (workspace: string): void {
     throw new Error("Function not implemented.");
   },
 });

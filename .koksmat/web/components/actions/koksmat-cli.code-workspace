@@ -1,0 +1,17 @@
+{
+  "folders": [
+	{
+		"path": "../../../../../koksmat-cli"
+	},
+	{
+		"path": "../../../../../magic-mix"
+	},
+	{
+		"path": "../../../.."
+	},
+	{
+		"path": "../../../../../365admin-publish"
+	}
+],
+  "settings": {}
+}

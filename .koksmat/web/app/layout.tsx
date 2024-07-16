@@ -15,9 +15,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Script from "next/script";
 import { ServiceInspector } from "@/app/koksmat/components/service-inspector";
 
-import { ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 import { CLARITY } from "./global";
-
+import { CookiesProvider } from "react-cookie";
 export default function RootLayout2({
   children,
 }: Readonly<{
@@ -46,7 +46,7 @@ export default function RootLayout2({
               {children}
               <TailwindIndicator />
               <ServiceInspector />
-              <ToastProvider />
+              <Toaster />
             </MSALWrapper>
           </MagicboxProvider>
         </ThemeProvider>

@@ -1,61 +1,19 @@
 import { run } from "@/app/koksmat/magicservices";
 import { tryCatch } from "@/app/officeaddin/actions/outlook-samples";
+import { log } from "@/lib/log";
+import { NatsMessageReceiver } from "@/lib/nats-message-receiver";
+import { getDate } from "date-fns";
 import { NatsConnection, connect, StringCodec } from "nats";
-
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 export async function GET(
   request: Request,
   { params }: { params: { sessionid: string } }
-): Promise<Response> {
-  return new Promise(async (resolve, reject) => {
-    const { sessionid } = params;
-    let nc: NatsConnection | null = null;
-    try {
-      const result = {
-        session_id: sessionid,
-        command: "COMMAND_A",
-      };
-      const connectionString = process.env.NATS ?? "nats://127.0.0.1:4222";
-      nc = await connect({
-        servers: [connectionString],
-      });
-      let waiting = true;
-      let loopcounter = 0;
-      try {
-        const sub = nc.subscribe("autopilot.request." + sessionid, {
-          callback: (err, msg) => {
-            const sc = StringCodec();
-            if (err) {
-              console.log("subscription error", err.message);
-              return;
-            }
-            const requestBody = sc.decode(msg.data);
-            console.log("request", requestBody);
+) {
+  log("GET /autopilot/session2/[sessionid]");
+  const msg = await NatsMessageReceiver(params.sessionid);
 
-            resolve(new Response(requestBody));
-            waiting = false;
-            sub.unsubscribe();
-          },
-        });
-        while (waiting) {
-          loopcounter++;
-
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          if (loopcounter > 30) {
-            waiting = false;
-            sub.unsubscribe();
-            resolve(new Response("timeout"));
-          }
-        }
-      } catch (error) {
-      } finally {
-        if (nc) {
-          nc.close();
-        }
-      }
-    } catch (error) {
-      return Response.error();
-    }
-  });
+  return new Response(msg ? msg : JSON.stringify({ errormessage: "timeout" }));
 }
 
 /**
