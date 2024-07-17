@@ -15,12 +15,13 @@ export async function NatsMessageReceiver(sessionid: string): Promise<string> {
       const name = "autopilot";
       const js = nc.jetstream();
       const jsm = await js.jetstreamManager();
-      const durable_name = nanoid();
+      const durable_name = "NatsMessageReceiver";
       // Use a unique consumer name or ephemeral consumer
 
       await jsm.consumers.add(name, {
         durable_name,
         ack_policy: AckPolicy.Explicit,
+        filter_subject: name + ".request.>",
       });
       log("consumer added", durable_name);
       const c = await js.consumers.get(name, durable_name);

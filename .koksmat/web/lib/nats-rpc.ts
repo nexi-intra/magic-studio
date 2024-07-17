@@ -7,7 +7,8 @@ export async function NatsRPC(
   sessionid: string,
   action: string,
   command: string,
-  args: string[]
+  args: string[],
+  cwd?: string
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     let nc: NatsConnection | null = null;
@@ -19,6 +20,7 @@ export async function NatsRPC(
         command,
         reply_to,
         args,
+        cwd,
       };
       const connectionString = process.env.NATS ?? "nats://127.0.0.1:4222";
       nc = await connect({

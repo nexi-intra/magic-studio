@@ -125,7 +125,7 @@ export default function ClientLayout(props: { children: any }) {
     <AppProvider>
       <Authenticate apiScope={UserProfileAPI}>
         <RootLayout breadcrumb={<GlobalBreadcrumb />}>
-          <div className="p-4">{children}</div>
+          <div className="px-4">{children}</div>
         </RootLayout>
       </Authenticate>
     </AppProvider>

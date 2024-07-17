@@ -16,7 +16,7 @@ export default function Page() {
         slugPrefix={"/" + APPNAME + "/workspace/"}
         database={"mix"}
         sql={`
-SELECT W.name as title, W.description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
+SELECT W.name as title, '' as description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
 WHERE U.email = '${magicbox?.user?.email}'
 
     

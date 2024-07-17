@@ -7,7 +7,8 @@ export async function POST(request: Request) {
     body.sessionid,
     body.action,
     body.command,
-    body.args
+    body.args,
+    body.cwd
   );
 
   return new Response(result);

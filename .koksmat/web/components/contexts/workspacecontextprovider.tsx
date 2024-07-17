@@ -16,14 +16,15 @@ export const WorkspaceContextProvider = (props: {
     if (!props.workspace) return;
     const load = async () => {
       const getKitchenRoot = await fetch(
-        `/api/exec/remote/${props.workspace}/echo/$KITCHENROOT`
+        `/api/exec/remote/${props.workspace}/koksmat/context/kitchenRoot`
       );
-      debugger;
+
       const kitchenRoot = await getKitchenRoot.text().catch((e) => {
         return { e };
       });
+      if (!kitchenRoot) return;
 
-      setKitchenRoot(kitchenRoot);
+      setKitchenRoot((kitchenRoot as string).split("\n")[0]);
     };
     load();
   }, [props.workspace]);
