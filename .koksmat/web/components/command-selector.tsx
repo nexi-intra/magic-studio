@@ -25,14 +25,17 @@ import {
 } from "@/components/ui/hover-card";
 
 export interface CommandSelectorItem {
+  id: string;
   title: string;
   description: string;
+  children?: JSX.Element;
   slug: string;
 }
 export interface CommandSelectorProps {
   placeholder: string;
   onSelect: (command: CommandSelectorItem) => void;
   commands: CommandSelectorItem[];
+  value?: string;
 }
 
 export function CommandSelector(props: CommandSelectorProps) {
@@ -45,6 +48,10 @@ export function CommandSelector(props: CommandSelectorProps) {
     console.log("x");
   }, []);
 
+  useEffect(() => {
+    setValue(props.value || "");
+  }, [props.value]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -54,8 +61,8 @@ export function CommandSelector(props: CommandSelectorProps) {
           aria-expanded={open}
           className="w-[200px] max-w-[200px] justify-between overflow-hidden"
         >
-          {value
-            ? commands.find((command) => command.slug === value)?.title
+          {commands?.find((command) => command.id === value)
+            ? commands.find((command) => command.id === value)?.title
             : props.placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -66,7 +73,7 @@ export function CommandSelector(props: CommandSelectorProps) {
           <CommandEmpty>Nothing found.</CommandEmpty>
           <CommandGroup className="max-h-[60vh] overflow-scroll">
             {commands
-              .sort((a, b) => a.title.localeCompare(b.title))
+              ?.sort((a, b) => a.title.localeCompare(b.title))
               .map((command, index) => (
                 <CommandItem
                   key={index}
@@ -81,13 +88,17 @@ export function CommandSelector(props: CommandSelectorProps) {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          value === command.slug ? "opacity-100" : "opacity-0"
+                          value === command.id ? "opacity-100" : "opacity-0"
                         )}
                       />
 
-                      {command.slug}
+                      {command.title}
                     </HoverCardTrigger>
-                    <HoverCardContent>{command.description}</HoverCardContent>
+                    <HoverCardContent>
+                      {command.description}
+
+                      {command.children}
+                    </HoverCardContent>
                   </HoverCard>
                 </CommandItem>
               ))}

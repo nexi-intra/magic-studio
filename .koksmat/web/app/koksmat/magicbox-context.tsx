@@ -54,6 +54,12 @@ export type MagicboxContextType = {
   setShowTracer: (showTracer: boolean) => void;
   currentWorkspace: string;
   setCurrentWorkspace: (workspace: string) => void;
+  currentOrganization: string;
+  setCurrentOrganization: (organization: string) => void;
+  currentRepository: string;
+  setCurrentRepository: (repository: string) => void;
+  currentBranch: string;
+  setCurrentBranch: (branch: string) => void;
 };
 export const MagicboxContext = createContext<MagicboxContextType>({
   session: {
@@ -105,6 +111,18 @@ export const MagicboxContext = createContext<MagicboxContextType>({
   },
   currentWorkspace: "",
   setCurrentWorkspace: function (workspace: string): void {
+    throw new Error("Function not implemented.");
+  },
+  currentOrganization: "",
+  setCurrentOrganization: function (organization: string): void {
+    throw new Error("Function not implemented.");
+  },
+  currentRepository: "",
+  setCurrentRepository: function (repository: string): void {
+    throw new Error("Function not implemented.");
+  },
+  currentBranch: "",
+  setCurrentBranch: function (branch: string): void {
     throw new Error("Function not implemented.");
   },
 });

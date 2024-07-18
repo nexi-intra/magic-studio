@@ -42,96 +42,38 @@ import GitRepos from "./git-repos";
 
 export type ConnectionStatusType = "connected" | "disconnected" | "unknown";
 
-export function WorkspaceToolbar(props: {
+export function GitHubToolbar(props: {
   workspacekey: string;
   connectionStatus: ConnectionStatusType;
-  kitchens: Kitchen[];
 }) {
   const magicbox = useContext(MagicboxContext);
 
   const router = useRouter();
-  const workspaces = useSQLSelect3(
-    "mix",
-    `
-SELECT W.name as title, W.description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
-WHERE U.email = '${magicbox?.user?.email}'`
-  );
-
-  const [connectionStatus, setConnectionStatus] =
-    React.useState<ConnectionStatusType>("unknown");
-  React.useEffect(() => {
-    setConnectionStatus(props.connectionStatus);
-  }, [props.connectionStatus]);
-
-  const handleWorkspaceClick = (slug: string) => {
-    router.push("/" + APPNAME + "/workspace/" + slug);
-
-    // const workspace = workspaces.dataset.find((workspace: any) => workspace.slug === slug);
-    // console.log("workspace", workspace);
-  };
 
   return (
     <div className="flex  justify-between p-2 border-b w-full">
       <div className="flex items-center gap-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <WorkflowIcon className="w-4 h-4" />
-              Workspace
-              <ChevronDownIcon className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {workspaces.dataset.map((workspace: any, key) => {
-              return (
-                <DropdownMenuItem
-                  key={key}
-                  onClick={() => {
-                    handleWorkspaceClick(workspace.slug);
-                  }}
-                >
-                  <WorkflowIcon className="w-4 h-4 mr-2" />
-                  {workspace.title}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <CommandSelector
-          placeholder="Search workspace"
-          onSelect={(command) => {
-            router.push(
-              "/" +
-                APPNAME +
-                "/workspace/" +
-                magicbox.currentWorkspace +
-                "/kitchen/" +
-                command.slug
-            );
-            //handleWorkspaceClick(command.slug);
+        <GitOrganizations
+          visualisation="combobox"
+          workspaceId={magicbox.currentWorkspace}
+          value={magicbox.currentOrganization}
+          onChange={function (value: string): void {
+            magicbox.setCurrentOrganization(value);
           }}
-          commands={props.kitchens.map((kitchen) => {
-            return {
-              id: kitchen.name,
-              title: kitchen.name,
-              description: kitchen.description,
-              slug: kitchen.name,
-            };
-          })}
+        />
+        <GitRepos
+          visualisation="combobox"
+          workspaceId={magicbox.currentWorkspace}
+          value={magicbox.currentOrganization}
+          onChange={function (value: string): void {
+            magicbox.setCurrentRepository(value);
+          }}
+          organisation={magicbox.currentOrganization}
         />
 
         <Separator orientation="vertical" className="h-6" />
       </div>
       <div className="grow"></div>
-      <ConnectionStatus connectionStatus={connectionStatus} showText />
-      <Button
-        className="ml-3"
-        onClick={() => {
-          magicbox.setCurrentWorkspace(props.workspacekey);
-        }}
-      >
-        Set as current
-      </Button>
     </div>
   );
 }

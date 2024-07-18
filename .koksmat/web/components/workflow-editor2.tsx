@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -17,6 +17,17 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "./ui/input";
 import WorkflowSectionEditor from "./workflow-section-add";
 import { Sheet, SheetContent, SheetHeader } from "./ui/sheet";
+import { SaveIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import WorkCreateActivityModel from "./actions/work-create-activitymodel";
+import { EditTitleDescription } from "./edit-title-description";
+import { set } from "date-fns";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import { https } from "@/app/koksmat/httphelper";
 
 interface Section {
   id: string;
@@ -81,7 +92,16 @@ const initialSections: Section[] = [
   },
 ];
 
+export interface WorkflowMetadata {
+  title: string;
+  description: string;
+}
 export default function Component() {
+  const [metadata, setmetadata] = useState<WorkflowMetadata>({
+    title: "",
+    description: "",
+  });
+  const magicbox = useContext(MagicboxContext);
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -212,6 +232,30 @@ export default function Component() {
     );
   };
 
+  const handleSave = async () => {
+    const payload = {
+      activity: "",
+      data: sections,
+      description: metadata.description,
+      name: metadata.title,
+      searchindex: "name:" + metadata.title,
+      tenant: "",
+    };
+    const args = [
+      "execute",
+      "works",
+      "update_activitymodel",
+      magicbox.authtoken,
+      JSON.stringify(payload),
+    ];
+
+    const result = await https("", "POST", "/api/run", {
+      args,
+      channel: "x",
+      timeout: 600,
+    });
+    alert(result.hasError ? result.errorMessage : "Saved successfully");
+  };
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen w-full">
@@ -220,10 +264,23 @@ export default function Component() {
           <ActivityPanel />
         </div>
         <div className="flex-1 bg-background p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3 mb-4">
             <h1 className="text-2xl font-bold">Manage Sections</h1>
             <div className="flex items-center gap-2">
-              <Button onClick={handleAddSection}>
+              <Button onClick={handleSave}>
+                <SaveIcon className="w-4 h-4 mr-2" />
+                Save
+              </Button>
+
+              <EditTitleDescription
+                title={metadata.title}
+                description={metadata.description}
+                onSave={function (title: string, description: string): void {
+                  setmetadata({ title, description });
+                }}
+                onCancel={function (): void {}}
+              />
+              <Button onClick={handleAddSection} variant="outline">
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Add Section
               </Button>
@@ -234,7 +291,7 @@ export default function Component() {
                 <BoxSelectIcon className="w-4 h-4 mr-2" />
                 {isSelectionMode ? "Done" : "Select"}
               </Button>
-              <Button onClick={handleToggleDetailsPanel}>
+              <Button onClick={handleToggleDetailsPanel} variant="outline">
                 <InfoIcon className="w-4 h-4 mr-2" />
                 Details
               </Button>
@@ -372,7 +429,14 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                 disabled={!isSelectionMode}
               />
             </div>
-            <h3 className="text-lg font-semibold">{section.title}</h3>
+            <CollapsibleTrigger asChild>
+              <h3
+                onClick={() => handleSectionCollapse(section.id)}
+                className="text-lg font-semibold"
+              >
+                {section.title}
+              </h3>
+            </CollapsibleTrigger>
           </div>
           <CollapsibleTrigger asChild>
             <Button

@@ -27,6 +27,10 @@ export const MagicboxProvider = ({ children }: Props) => {
   const [pca, setpca] = useState<IPublicClientApplication>();
   const [transactionId, settransactionId] = useState("");
   const [currentWorkspace, setcurrentWorkspace] = useState("");
+
+  const [currentOrganization, setcurrentOrganization] = useState("");
+  const [currentRepository, setcurrentRepository] = useState("");
+  const [currentBranch, setcurrentBranch] = useState("");
   const { toast } = useToast();
   const servicecalllog = useMemo<ServiceCallLogEntry[]>(() => {
     return [];
@@ -37,6 +41,11 @@ export const MagicboxProvider = ({ children }: Props) => {
   const magicbox: MagicboxContextType = {
     currentWorkspace,
     setCurrentWorkspace: (workspace: string) => {
+      if (workspace === currentWorkspace) return;
+      setcurrentOrganization("");
+      setcurrentRepository("");
+      setcurrentBranch("");
+
       localStorage.setItem("currentWorkspace", workspace);
       setcurrentWorkspace(workspace);
       setversion(version + 1);
@@ -115,6 +124,26 @@ export const MagicboxProvider = ({ children }: Props) => {
       localStorage.setItem("showtracer", showTracer ? "true" : "false");
       setshowtracer(showTracer);
     },
+    currentOrganization,
+    setCurrentOrganization: function (organization: string): void {
+      if (organization === currentOrganization) return;
+      localStorage.setItem("currentOrganization", organization);
+      setcurrentOrganization(organization);
+      setcurrentRepository("");
+      setcurrentBranch("");
+    },
+    currentRepository,
+    setCurrentRepository: function (repository: string): void {
+      if (repository === currentRepository) return;
+      localStorage.setItem("currentRepository", repository);
+      setcurrentBranch("");
+      setcurrentRepository(repository);
+    },
+    currentBranch,
+    setCurrentBranch: function (branch: string): void {
+      localStorage.setItem("currentBranch", branch);
+      setcurrentBranch(branch);
+    },
   };
 
   useEffect(() => {
@@ -125,6 +154,18 @@ export const MagicboxProvider = ({ children }: Props) => {
     const currentWorkspace = localStorage.getItem("currentWorkspace");
     if (currentWorkspace) {
       setcurrentWorkspace(currentWorkspace);
+    }
+    const currentOrganization = localStorage.getItem("currentOrganization");
+    if (currentOrganization) {
+      setcurrentOrganization(currentOrganization);
+    }
+    const currentRepository = localStorage.getItem("currentRepository");
+    if (currentRepository) {
+      setcurrentRepository(currentRepository);
+    }
+    const currentBranch = localStorage.getItem("currentBranch");
+    if (currentBranch) {
+      setcurrentBranch(currentBranch);
     }
   }, []);
   return (

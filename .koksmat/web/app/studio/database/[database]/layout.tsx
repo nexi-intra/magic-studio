@@ -1,3 +1,4 @@
+import { DatabaseToolbar } from "@/components/database-toolbar";
 import type { Metadata, ResolvingMetadata } from "next";
 
 export async function generateMetadata(
@@ -14,7 +15,18 @@ export async function generateMetadata(
     },
   };
 }
-export default function Layout(props: { children: any }) {
+export default function Layout(props: {
+  children: any;
+  params: { database: string };
+}) {
   const { children } = props;
-  return <div> {children}</div>;
+  const { database } = props.params;
+  return (
+    <div>
+      <div>
+        <DatabaseToolbar database={database}></DatabaseToolbar>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
 }

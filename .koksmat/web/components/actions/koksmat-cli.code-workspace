@@ -1,17 +1,25 @@
 {
   "folders": [
-	{
-		"path": "../../../../../koksmat-cli"
-	},
-	{
-		"path": "../../../../../magic-mix"
-	},
-	{
-		"path": "../../../.."
-	},
-	{
-		"path": "../../../../../365admin-publish"
-	}
-],
-  "settings": {}
+    {
+      "path": "../../../../../365admin-publish"
+    },
+    {
+      "path": "../../../../../koksmat-cli"
+    },
+    {
+      "path": "../../../../../magic-it"
+    },
+    {
+      "path": "../../../.."
+    },
+    {
+      "path": "../../../../../magic-mix"
+    },
+    {
+      "path": "../../../../../magic-query"
+    },
+    {
+      "path": "../../../../../magic-people"
+    }
+  ]
 }

@@ -16,7 +16,7 @@ export default function Page() {
         slugPrefix={"/" + APPNAME + "/kitchen/recipe/"}
         database={"works"}
         sql={`
-SELECT W.name as title, '' as description, W.id as slug FROM activitymodel as W 
+SELECT W.name as title, '' as description, W.name as slug FROM activitymodel as W 
 
     
     `}

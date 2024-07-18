@@ -2,22 +2,10 @@
 
 import { https, Result } from "@/app/koksmat/httphelper";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
-import { run } from "@/app/koksmat/magicservices";
 
 import { useMsal, useAccount } from "@azure/msal-react";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { trace } from "console";
-import { set } from "date-fns";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface CaseProps {
   scopes: string[];
@@ -213,7 +201,7 @@ export default function ExecuteTransaction(props: {
   if (!transactionId) {
     return null;
   }
-  debugger;
+
   const component = (
     <div>
       {doShowError() && <div className="p-10 bg-red-500">Error: {error}</div>}
@@ -254,25 +242,12 @@ export default function ExecuteTransaction(props: {
 
   if (true) {
     wrapper = (
-      <Dialog
-        defaultOpen={true}
-        onOpenChange={(open) => {
-          if (!open) {
-            setrunning(false);
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Processing</DialogTitle>
-            {/* <DialogDescription>Processing</DialogDescription> */}
-          </DialogHeader>
-          {component}
-          <DialogContent>{result && children}</DialogContent>
+      <div>
+        {component}
+        {result && children}
 
-          <DialogFooter>{result && <Button>Done</Button>}</DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {result && <Button>Done</Button>}
+      </div>
     );
   }
 

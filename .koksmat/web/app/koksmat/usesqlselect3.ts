@@ -10,7 +10,7 @@ export const version = 1;
 const servicename = "magic-mix.app";
 
 export function useSQLSelect3<T>(databasename: string, sql: string) {
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setisLoading] = useState(true);
   const [error, seterror] = useState("");
   const [didRun, setdidRun] = useState(false);
   const magicbox = useContext(MagicboxContext);
