@@ -341,7 +341,10 @@ The input values shall be kept using state variables. Like to have a cancel butt
                         <Link href="https://chat.openai.com/" target="_blank">
                           Chat GPT
                         </Link>{" "}
-                        to refine the code from v0.dev
+                        to refine the code from v0.dev -{" "}
+                        <Link href="https://chatgpt.com/share/8028c27a-0a8c-4fdf-9ed2-2aeccdd801ab">
+                          <Button variant="link">check this example</Button>
+                        </Link>
                       </p>
                     </AccordionTrigger>
                     <AccordionContent className="ml-8 ">
