@@ -272,13 +272,8 @@ FROM
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="#" className="flex items-center gap-2" prefetch={false}>
-              <span className="font-bold text-3xl"></span>
-              <SquareFunction className="h-6 w-6" />
-              <span className="font-bold text-3xl">
-                {procedure} ({database})
-              </span>
-            </Link>
+            <span className="font-bold text-3xl">{procedure}</span>
+
             {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
           <div className="flex items-center gap-4">
@@ -302,13 +297,27 @@ FROM
           <Accordion type="multiple">
             <AccordionItem value="item--2">
               <AccordionTrigger>
-                <h2 className="mb-4 text-2xl font-bold">v0.dev prompt</h2>
+                <h2 className="mb-4 text-2xl font-bold">
+                  AI prompt suggestions
+                </h2>
               </AccordionTrigger>
               <AccordionContent>
-                <section>
-                  Copy this prompt:
-                  <SourceCode language="text" isDark>
-                    {`
+                <Accordion type="multiple">
+                  <AccordionItem value="item--2">
+                    <AccordionTrigger>
+                      <h2 className="ml-8 mb-4 text-2xl font-bold">
+                        v0.dev prompt
+                      </h2>
+                      <p>
+                        You can use v0.dev to generate Next.JS based UI based on
+                        prompts or images
+                      </p>
+                    </AccordionTrigger>
+                    <AccordionContent className="ml-8 ">
+                      <section>
+                        Copy this prompt:
+                        <SourceCode language="text" isDark>
+                          {`
 like to have a component which can be used to get data from a zod schema. 
 The input values shall be kept using state variables. Like to have a cancel button and a submit button
 
@@ -316,12 +325,44 @@ The input values shall be kept using state variables. Like to have a cancel butt
 
                    
                   `}
-                  </SourceCode>
-                  Then open{" "}
-                  <Link href="https://v0.dev" target="_blank">
-                    v0.dev
-                  </Link>
-                </section>
+                        </SourceCode>
+                        Then open{" "}
+                        <Link href="https://v0.dev" target="_blank">
+                          v0.dev
+                        </Link>
+                      </section>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item--2">
+                    <AccordionTrigger>
+                      <h2 className="ml-8 mb-4 text-2xl font-bold">Chat GPT</h2>
+                      <p>
+                        You can use{" "}
+                        <Link href="https://chat.openai.com/" target="_blank">
+                          Chat GPT
+                        </Link>{" "}
+                        to refine the code from v0.dev
+                      </p>
+                    </AccordionTrigger>
+                    <AccordionContent className="ml-8 ">
+                      <section>
+                        Copy this prompt to Chat GPT:
+                        <SourceCode language="text" isDark>
+                          {`
+convert from jsx to tsx
+
+<Insert code here>
+
+and like to have all input having an id ending with _id to be replaced with a component which is consisting of a textfield and a lookup button - the lookup button shall trigger a shadcdn popover presenting a search fields and a list of values matching those
+                   
+                  `}
+                        </SourceCode>
+                        Copy the code from v0.dev and paste it into Chat GPT and
+                        press send.
+                      </section>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item--1">
