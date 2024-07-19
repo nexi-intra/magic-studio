@@ -117,7 +117,7 @@ export default function DatabaseTables(props: {
     <ItemsViewer
       visualisation={props.visualisation}
       value={value}
-      placeholder="Table"
+      placeholder="Tables"
       commands={tables ? tables : []}
       onSelect={(command) => {
         onChange(command.id);

@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
-import { useContext, useEffect, useState } from "react";
+import { CSSProperties, useContext, useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
 import { extractAndParseJson } from "@/lib/tsql-extract";
 import { z } from "zod";
@@ -29,7 +29,13 @@ import { Code2Icon, Play, PlayIcon, SquareFunction } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
-import { set } from "date-fns";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { generateValidationClass } from "@/lib/generatevalidationfunction";
 
 export interface Root {
   Result: Result[];
@@ -45,6 +51,10 @@ export interface ProcedureInfo {
   language: string;
   source_code: string;
   dependencies: any[];
+}
+
+function buildFunction(jsonSchema: any, zodSchema: any) {
+  return "";
 }
 
 export function StoredProcedurePage(props: {
@@ -179,6 +189,7 @@ FROM
   const [errorMessage, seterrorMessage] = useState("");
   const [biteReady, setbiteReady] = useState(false);
   const [isProcessing, setisProcessing] = useState(false);
+  const [functionCode, setfunctionCode] = useState("");
 
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
@@ -203,6 +214,10 @@ FROM
         // });
         //setzodSchema(JSON.parse(zodSchema));
         setzodSchema(txtcode);
+
+        setfunctionCode(
+          generateValidationClass(database, procedure, metadata, txtcode)
+        );
       } catch (error) {
         setzodSchema(error);
       }
@@ -254,17 +269,6 @@ FROM
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <pre className="whitespace-pre-wrap">
-        {JSON.stringify(
-          {
-            errorMessage,
-            biteReady,
-            token: magicbox.authtoken?.substring(0, 10),
-          },
-          null,
-          2
-        )}
-      </pre>
       <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -278,7 +282,7 @@ FROM
             {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="outline">
+            {/* <Button variant="outline">
               <PlayIcon className="mr-2 h-4 w-4" />
               Run
             </Button>
@@ -288,84 +292,202 @@ FROM
             >
               <DownloadIcon className="mr-2 h-4 w-4" />
               Download
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>
 
       <div className="container mx-auto grid  gap-8 py-8 sm:px-6">
         <div className="space-y-8">
-          <section>
-            <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
-            {/* <div>
-              <h3 className="mb-2 text-lg font-medium">ZOD definition</h3>
-              <pre className="text-wrap">{zodSchema}</pre>
-            </div>
-            <div>
-              <h3 className="mb-2 text-lg font-medium">JSON schema</h3>
-              <pre className="text-wrap">
-                {JSON.stringify(jsonSchema, null, 2)}
-              </pre>
-            </div> */}
-            {/* <InterfaceViewer /> */}
-            <div>
-              <h3 className="mb-2 text-lg font-medium">React Component</h3>
-              <SyntaxHighlighter language="jsx" style={dark}>
-                {tsxComponentCode}
-              </SyntaxHighlighter>
+          <Accordion type="multiple">
+            <AccordionItem value="item--2">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">v0.dev prompt</h2>
+              </AccordionTrigger>
+              <AccordionContent>
+                <section>
+                  Copy this prompt:
+                  <SourceCode language="text" isDark>
+                    {`
+like to have a component which can be used to get data from a zod schema. 
+The input values shall be kept using state variables. Like to have a cancel button and a submit button
 
-              {/* <InterfaceBuilder
+ ${zodSchema}
+
+                   
+                  `}
+                  </SourceCode>
+                  Then open{" "}
+                  <Link href="https://v0.dev" target="_blank">
+                    v0.dev
+                  </Link>
+                </section>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item--1">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">TypeScript</h2>
+                Like it to be easy for you to call this procedure directly from
+                your TypeScript code
+              </AccordionTrigger>
+              <AccordionContent>
+                <Accordion type="multiple">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger>
+                      <h3 className="ml-4 mb-4 text-xl font-bold">
+                        Prerequisites
+                      </h3>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      Ensure that you have the following dependencies installed:
+                      <SourceCode language="typescript" isDark>
+                        {`pnpm add zod';`}
+                      </SourceCode>
+                      Ensure that you have the file{" "}
+                      <b>/.koksmat/web/app/api/run/route.ts</b>
+                      <SourceCode language="typescript" isDark>
+                        {`
+                    
+import { run } from "@/app/koksmat/magicservices";
+
+export async function POST(request: Request) {
+  try {
+    const res = await request.json();
+    const result = await run(
+      res.channel,
+      res.args,
+      res.body,
+      res.timeout,
+      res.transactionId
+    );
+    return Response.json(result);
+  } catch (error) {
+    return Response.error();
+  }
+}
+                    
+                    `}
+                      </SourceCode>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                Ensure that you have the module imported in your code:
+                <SourceCode language="typescript" isDark>
+                  {`
+import { z } from 'zod';
+import { execute } from "@/components/actions/execute2";
+                    `}
+                </SourceCode>
+                Then copy this snippet into your code:
+                <SourceCode language="typescript" isDark>
+                  {functionCode}
+                </SourceCode>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-0" className="hidden">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">Copy</h2>
+              </AccordionTrigger>
+              <AccordionContent>
+                <section>
+                  <pre className="whitespace-pre-wrap">
+                    {JSON.stringify(
+                      {
+                        errorMessage,
+                        biteReady,
+                        token: magicbox.authtoken?.substring(0, 10),
+                        jsonSchema,
+                        zodSchema,
+                      },
+                      null,
+                      2
+                    )}
+                  </pre>
+                </section>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-1" className="hidden">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">Integration Options</h2>
+              </AccordionTrigger>
+              <AccordionContent>
+                <section>
+                  <div>
+                    <h3 className="mb-2 text-lg font-medium">
+                      React Component
+                    </h3>
+                    <SourceCode language="jsx" isDark>
+                      {tsxComponentCode}
+                    </SourceCode>
+
+                    {/* <InterfaceBuilder
                 schema={JSON.stringify(jsonSchema, null, 2)}
                 typeName={
                   (procedureInfo?.procedure_name ?? "Unknown") + "Props"
                 }
               /> */}
-            </div>
-          </section>
-          <section>
-            <h2 className="mb-4 text-2xl font-bold">Procedure Details</h2>
-            <div className="grid gap-8">
-              <div>
-                <h3 className="mb-2 text-lg font-medium">Description</h3>
-                <pre>{procedureInfo?.comment}</pre>
-              </div>
-              <div>
-                <h3 className="mb-2 text-lg font-medium">Table Dependencies</h3>
-                <ul className="space-y-1">
-                  {procedureInfo?.dependencies.map((dep, index) => (
-                    <li key={index}>
-                      <Link
-                        href={
-                          "/" +
-                          APPNAME +
-                          "/database/" +
-                          database +
-                          "/table/" +
-                          dep
-                        }
-                        className="text-primary hover:underline"
-                        prefetch={false}
-                      >
-                        {dep}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="mb-2 text-lg font-medium">Source Code</h3>
-                <pre className="rounded-md bg-muted p-4 text-sm">
-                  <code>{procedureInfo?.source_code}</code>
-                </pre>
-              </div>
-            </div>
-          </section>
-          <section className="hidden">
-            <div className="grid gap-4">
-              <div>
-                <h3 className="mb-2 text-lg font-medium">REST POST</h3>
-                <pre className="rounded-md bg-muted p-4 text-sm">
-                  <code>{`
+                  </div>
+                </section>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">
+                  Stored Procedure Source code
+                </h2>
+              </AccordionTrigger>
+              <AccordionContent>
+                <section>
+                  <div className="grid gap-8">
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">Description</h3>
+                      <pre>{procedureInfo?.comment}</pre>
+                    </div>
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">
+                        Table Dependencies
+                      </h3>
+                      <ul className="space-y-1">
+                        {procedureInfo?.dependencies.map((dep, index) => (
+                          <li key={index}>
+                            <Link
+                              href={
+                                "/" +
+                                APPNAME +
+                                "/database/" +
+                                database +
+                                "/table/" +
+                                dep
+                              }
+                              className="text-primary hover:underline"
+                              prefetch={false}
+                            >
+                              {dep}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">Source Code</h3>
+                      <pre className="rounded-md bg-muted p-4 text-sm">
+                        <code>{procedureInfo?.source_code}</code>
+                      </pre>
+                    </div>
+                  </div>
+                </section>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="hidden">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">REST POST</h2>
+              </AccordionTrigger>
+              <AccordionContent>
+                <section>
+                  <div className="grid gap-4">
+                    <div>
+                      <pre className="rounded-md bg-muted p-4 text-sm">
+                        <code>{`
 const response = await fetch('/api/procedures/GetOrdersByUser', {
   method: 'POST',
   headers: {
@@ -377,10 +499,13 @@ const response = await fetch('/api/procedures/GetOrdersByUser', {
 const data = await response.json();
 console.log(data);
                     `}</code>
-                </pre>
-              </div>
-            </div>
-          </section>
+                      </pre>
+                    </div>
+                  </div>
+                </section>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </div>
       <footer className="mt-auto border-t bg-background px-4 py-4 shadow-sm sm:px-6">
@@ -407,5 +532,58 @@ console.log(data);
         </div>
       </footer>
     </div>
+  );
+}
+
+function SourceCode(props: {
+  children: any;
+  language: string;
+  isDark: boolean;
+}) {
+  const { children, language, isDark } = props;
+  const [copied, setCopied] = useState<string | null>(null);
+  const [hoovering, sethoovering] = useState(false);
+  const handleCopy = (sourceCode: string) => {
+    navigator.clipboard.writeText(sourceCode);
+    setCopied(sourceCode);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div className="overflow-scroll max-w-[80vw]">
+      <Button variant="ghost" size="icon" onClick={() => handleCopy(children)}>
+        <CopyIcon className="h-5 w-5 text-muted-foreground" />
+      </Button>
+      <pre>
+        <code>
+          <SyntaxHighlighter
+            language={language}
+            style={isDark ? dark : undefined}
+          >
+            {children}
+          </SyntaxHighlighter>
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+function CopyIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </svg>
   );
 }

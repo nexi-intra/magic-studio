@@ -22,7 +22,7 @@ To read more about using these font, please visit the Next.js documentation:
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SaveIcon } from "lucide-react";
+import { Check, CheckIcon, SaveIcon } from "lucide-react";
 
 export function LabelWithEditor(props: {
   initialValue: string;
@@ -74,7 +74,7 @@ export function LabelWithEditor(props: {
             disabled={newValue.trim() === ""}
             className="h-8"
           >
-            <SaveIcon size={16} />
+            <CheckIcon size={16} />
           </Button>
           {/* <Button onClick={handleCancel} variant="outline" className="h-8">
             Cancel

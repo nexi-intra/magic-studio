@@ -26,7 +26,7 @@ export default function Layout(props: {
       <div>
         <DatabaseToolbar database={database}></DatabaseToolbar>
       </div>
-      <div>{children}</div>
+      <div className="h-full">{children}</div>
     </div>
   );
 }

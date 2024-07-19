@@ -313,12 +313,15 @@ export function SqlQueryEditor(props: { database: string }) {
           </Button> */}
         </div>
         <div
-          className="flex-1 grid"
+          className="flex-1 grid max-h-[calc(100vh-200px)] overflow-scroll "
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={20}>
+            <ResizablePanel
+              defaultSize={20}
+              className="overflow-auto max-h-full"
+            >
               <SqlColumnSelector database={database} />
             </ResizablePanel>
             <ResizableHandle withHandle />

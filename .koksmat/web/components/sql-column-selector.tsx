@@ -101,10 +101,10 @@ FROM (
   const query = useSQLSelect3<Result>(database, sql);
 
   return (
-    <aside className="flex flex-col gap-4 bg-muted/40 p-4 rounded-lg">
+    <aside className="flex flex-col gap-4 bg-muted/40 p-4 rounded-lg max-h-full overflow-scroll">
       <Accordion type="multiple">
-        {query.dataset.map((table) => (
-          <AccordionItem value={table.table_name}>
+        {query.dataset.map((table, index) => (
+          <AccordionItem value={table.table_name} key={index}>
             <AccordionTrigger>
               <div className="flex ">
                 <div className="text-xl">{table.table_name}</div>

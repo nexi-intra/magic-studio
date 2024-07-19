@@ -75,7 +75,7 @@ ORDER BY name
     <ItemsViewer
       visualisation={props.visualisation}
       value={value}
-      placeholder="Database"
+      placeholder="Databases"
       commands={tables ? tables : []}
       onSelect={(command) => {
         onChange(command.id);

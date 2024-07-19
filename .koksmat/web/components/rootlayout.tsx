@@ -224,7 +224,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-muted/40">
+    <div className="flex min-h-[calc(100vh-400px) max-h-[calc(100vh-400px) w-full bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <NavigationItems withCaptions={false} />
