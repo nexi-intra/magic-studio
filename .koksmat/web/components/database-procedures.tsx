@@ -95,7 +95,6 @@ export default function DatabaseProcedures(props: {
   const [dbinfo, setdbinfo] = useState<Result2>();
   const query = useSQLSelect3<Result>(database, sql);
   useEffect(() => {
-    debugger;
     if (query && query.dataset && query.dataset.length > 0) {
       //setdbinfo(query.dataset[0].result);
       const items = query.dataset[0].result.stored_procedures?.map((item) => {

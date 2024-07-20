@@ -32,6 +32,7 @@ import { Fragment } from "react";
 import DatabaseProcedures from "./database-procedures";
 import Databases from "./database-databases";
 import { useRouter } from "next/navigation";
+import DatabaseQueries from "./database-queries";
 
 export function DatabaseToolbar(props: { database: string }) {
   const { database } = props;
@@ -90,12 +91,18 @@ export function DatabaseToolbar(props: { database: string }) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <FileTextIcon className="h-5 w-5 text-muted-foreground" />
-                <span className="sr-only">Queries</span>
-              </Button>
+              <DatabaseQueries
+                database={database}
+                value=""
+                onChange={function (value: string): void {
+                  router.push(
+                    "/" + APPNAME + "/database/" + database + "/query/" + value
+                  );
+                }}
+                visualisation={"combobox"}
+              />
             </TooltipTrigger>
-            <TooltipContent>Queries</TooltipContent>
+            <TooltipContent>Procedures</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

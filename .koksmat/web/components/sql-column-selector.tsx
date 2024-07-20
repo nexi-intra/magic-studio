@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { CommandSelectorItem } from "./command-selector";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
+import WithClipboardCopy from "./with-clipboardcopy";
+import { Table, Table2Icon } from "lucide-react";
 
 function Column(props: { column: ColumnsInfo }) {
   const [copiedColumn, setCopiedColumn] = useState<string | null>(null);
@@ -34,20 +36,10 @@ function Column(props: { column: ColumnsInfo }) {
     >
       <div className="flex items-center gap-2">
         {/* <span>{column.icon}</span> */}
-        <span>{column.column_name}</span>
+        <WithClipboardCopy text={column.column_name}>
+          {column.column_name}
+        </WithClipboardCopy>
       </div>
-      {hoovering && copiedColumn === column.column_name && (
-        <span className="text-muted-foreground">Copied!</span>
-      )}
-      {hoovering && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleCopy(column.column_name)}
-        >
-          <CopyIcon className="h-5 w-5 text-muted-foreground" />
-        </Button>
-      )}
     </div>
   );
 }
@@ -107,7 +99,11 @@ FROM (
           <AccordionItem value={table.table_name} key={index}>
             <AccordionTrigger>
               <div className="flex ">
-                <div className="text-xl">{table.table_name}</div>
+                <div className="text-l">
+                  <WithClipboardCopy text={table.table_name}>
+                    <Table className="h-4 w-4" /> {table.table_name}
+                  </WithClipboardCopy>
+                </div>
               </div>
             </AccordionTrigger>
             <AccordionContent>

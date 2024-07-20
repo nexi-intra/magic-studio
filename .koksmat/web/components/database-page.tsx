@@ -130,52 +130,28 @@ SELECT json_build_object(
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8 lg:p-10">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Database Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="flex items-center justify-between">
-              <span>Tables</span>
-              <span className="font-medium">
-                {dbinfo?.database_overview.tables}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Size on Disk</span>
-              <span className="font-medium">
-                {dbinfo?.database_overview.size_on_disk}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Total Records</span>
-              <span className="font-medium">
-                {dbinfo?.database_overview.total_records}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+      <header className="sticky top-0 z-40 border-b bg-background  py-3 shadow-sm sm:px-6">
+        <div className=" mx-auto flex items-center justify-between">
+          <div className="flex items-center ">
+            <span className="font-bold text-3xl">{database.toUpperCase()}</span>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            <Link href={"/" + APPNAME + "/database/" + database + "/roles"}>
-              <Button variant="link" size="sm">
-                Manage Access Control
-              </Button>
-            </Link>
-            <Button variant="outline" size="sm">
-              View Audit Log
+            {/* <span className="text-muted-foreground">Procedure Name</span> */}
+          </div>
+          <div className="flex items-center gap-4">
+            {/* <Button variant="outline">
+              <PlayIcon className="mr-2 h-4 w-4" />
+              Run
             </Button>
-            <Button variant="outline" size="sm">
-              Export SQL Script
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+            <Button
+              disabled={isProcessing}
+              onClick={() => handleShareCreateBite()}
+            >
+              <DownloadIcon className="mr-2 h-4 w-4" />
+              Download
+            </Button> */}
+          </div>
+        </div>
+      </header>
       <ERDiagram database={database} className="bg-slate-50" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
         <Card>
@@ -255,6 +231,52 @@ SELECT json_build_object(
                   </Link>
                 </div>
               ))}
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Database Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="flex items-center justify-between">
+              <span>Tables</span>
+              <span className="font-medium">
+                {dbinfo?.database_overview.tables}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Size on Disk</span>
+              <span className="font-medium">
+                {dbinfo?.database_overview.size_on_disk}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Total Records</span>
+              <span className="font-medium">
+                {dbinfo?.database_overview.total_records}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-2">
+            <Link href={"/" + APPNAME + "/database/" + database + "/roles"}>
+              <Button variant="link" size="sm">
+                Manage Access Control
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm">
+              View Audit Log
+            </Button>
+            <Button variant="outline" size="sm">
+              Export SQL Script
+            </Button>
           </CardContent>
         </Card>
       </div>

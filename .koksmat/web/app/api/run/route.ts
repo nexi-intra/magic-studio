@@ -1,4 +1,4 @@
-import { run } from "@/app/koksmat/magicservices";
+import { run } from "@/actions/server";
 
 export async function POST(request: Request) {
   try {

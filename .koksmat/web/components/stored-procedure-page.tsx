@@ -27,7 +27,7 @@ import { DatabaseIcon } from "./icons/DatabaseIcon";
 import { buildInterface } from "@/lib/buildInterface";
 import { Code2Icon, Play, PlayIcon, SquareFunction } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import {
   Accordion,
@@ -35,7 +35,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { generateValidationClass } from "@/lib/generatevalidationfunction";
+import { generateDatabaseCallSourceCode } from "@/lib/generatevalidationfunction";
+import SourceCode from "./view-sourcecode";
+import WithClipboardCopy from "./with-clipboardcopy";
 
 export interface Root {
   Result: Result[];
@@ -190,6 +192,8 @@ FROM
   const [biteReady, setbiteReady] = useState(false);
   const [isProcessing, setisProcessing] = useState(false);
   const [functionCode, setfunctionCode] = useState("");
+  const [importCode, setimportCode] = useState("");
+  const [callCode, setcallCode] = useState("");
 
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
@@ -214,10 +218,15 @@ FROM
         // });
         //setzodSchema(JSON.parse(zodSchema));
         setzodSchema(txtcode);
-
-        setfunctionCode(
-          generateValidationClass(database, procedure, metadata, txtcode)
+        const code = generateDatabaseCallSourceCode(
+          database,
+          procedure,
+          metadata,
+          txtcode
         );
+        setfunctionCode(code.source);
+        setimportCode(code.import);
+        setcallCode(code.call);
       } catch (error) {
         setzodSchema(error);
       }
@@ -269,10 +278,12 @@ FROM
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-40 border-b bg-background px-4 py-3 shadow-sm sm:px-6">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="font-bold text-3xl">{procedure}</span>
+      <header className="sticky top-0 z-40 border-b bg-background  py-3 shadow-sm sm:px-6">
+        <div className=" mx-auto flex items-center justify-between">
+          <div className="flex items-center ">
+            <span className="font-bold text-3xl">
+              {procedure.toUpperCase()}
+            </span>
 
             {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
@@ -295,11 +306,89 @@ FROM
       <div className="container mx-auto grid  gap-8 py-8 sm:px-6">
         <div className="space-y-8">
           <Accordion type="multiple">
+            <AccordionItem value="item--1">
+              <AccordionTrigger>
+                <h2 className="mb-4 text-2xl font-bold">TypeScript</h2>
+                Like it to be easy for you to call this procedure directly from
+                your TypeScript code
+              </AccordionTrigger>
+              <AccordionContent>
+                <Accordion type="multiple">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger>
+                      <h3 className="ml-4 mb-4 text-xl font-bold">
+                        Prerequisites
+                      </h3>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      Ensure that you have the following dependencies installed:
+                      <SourceCode language="typescript" isDark>
+                        {`pnpm add zod';`}
+                      </SourceCode>
+                      <div className="flex gap-1 items-center">
+                        Ensure that you have the file
+                        <WithClipboardCopy text={`/app/api/run/route.ts`}>
+                          <b>/app/api/run/route.ts</b>{" "}
+                        </WithClipboardCopy>
+                      </div>
+                      <SourceCode language="typescript" isDark>
+                        {`
+                    
+import { run } from "@/actions/server";
+
+export async function POST(request: Request) {
+  try {
+    const res = await request.json();
+    const result = await run(
+      res.channel,
+      res.args,
+      res.body,
+      res.timeout,
+      res.transactionId
+    );
+    return Response.json(result);
+  } catch (error) {
+    return Response.error();
+  }
+}
+                    
+                    `}
+                      </SourceCode>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                <div className="flex items-center gap-1">
+                  Create a new file named&nbsp;
+                  <WithClipboardCopy
+                    text={`actions/database/${database}/${procedure}.ts`}
+                  >
+                    <b>
+                      actions/database/{database}/{procedure}
+                      .ts
+                    </b>{" "}
+                  </WithClipboardCopy>
+                  and copy and paste the following code:
+                </div>
+                <SourceCode language="typescript" isDark>
+                  {functionCode}
+                </SourceCode>
+                In the component where you want to call the procedure, add the
+                import statement:
+                <SourceCode language="typescript" isDark>
+                  {importCode}
+                </SourceCode>
+                Then you can call the procedure like this:
+                <SourceCode language="typescript" isDark>
+                  {callCode}
+                </SourceCode>
+              </AccordionContent>
+            </AccordionItem>
             <AccordionItem value="item--2">
               <AccordionTrigger>
                 <h2 className="mb-4 text-2xl font-bold">
                   AI prompt suggestions
                 </h2>
+                You might want use AI for generating the UI
               </AccordionTrigger>
               <AccordionContent>
                 <Accordion type="multiple">
@@ -336,6 +425,7 @@ The input values shall be kept using state variables. Like to have a cancel butt
                   <AccordionItem value="item--2">
                     <AccordionTrigger>
                       <h2 className="ml-8 mb-4 text-2xl font-bold">Chat GPT</h2>
+
                       <p>
                         You can use{" "}
                         <Link href="https://chat.openai.com/" target="_blank">
@@ -366,66 +456,6 @@ and like to have all input having an id ending with _id to be replaced with a co
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item--1">
-              <AccordionTrigger>
-                <h2 className="mb-4 text-2xl font-bold">TypeScript</h2>
-                Like it to be easy for you to call this procedure directly from
-                your TypeScript code
-              </AccordionTrigger>
-              <AccordionContent>
-                <Accordion type="multiple">
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>
-                      <h3 className="ml-4 mb-4 text-xl font-bold">
-                        Prerequisites
-                      </h3>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      Ensure that you have the following dependencies installed:
-                      <SourceCode language="typescript" isDark>
-                        {`pnpm add zod';`}
-                      </SourceCode>
-                      Ensure that you have the file{" "}
-                      <b>/.koksmat/web/app/api/run/route.ts</b>
-                      <SourceCode language="typescript" isDark>
-                        {`
-                    
-import { run } from "@/app/koksmat/magicservices";
-
-export async function POST(request: Request) {
-  try {
-    const res = await request.json();
-    const result = await run(
-      res.channel,
-      res.args,
-      res.body,
-      res.timeout,
-      res.transactionId
-    );
-    return Response.json(result);
-  } catch (error) {
-    return Response.error();
-  }
-}
-                    
-                    `}
-                      </SourceCode>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-                Ensure that you have the module imported in your code:
-                <SourceCode language="typescript" isDark>
-                  {`
-import { z } from 'zod';
-import { execute } from "@/components/actions/execute2";
-                    `}
-                </SourceCode>
-                Then copy this snippet into your code:
-                <SourceCode language="typescript" isDark>
-                  {functionCode}
-                </SourceCode>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-0" className="hidden">
@@ -479,11 +509,13 @@ import { execute } from "@/components/actions/execute2";
                 <h2 className="mb-4 text-2xl font-bold">
                   Stored Procedure Source code
                 </h2>
+                If you like to understand what is actually happening in the
+                database
               </AccordionTrigger>
               <AccordionContent>
                 <section>
                   <div className="grid gap-8">
-                    <div>
+                    {/* <div>
                       <h3 className="mb-2 text-lg font-medium">Description</h3>
                       <pre>{procedureInfo?.comment}</pre>
                     </div>
@@ -511,12 +543,13 @@ import { execute } from "@/components/actions/execute2";
                           </li>
                         ))}
                       </ul>
-                    </div>
+                    </div> */}
                     <div>
                       <h3 className="mb-2 text-lg font-medium">Source Code</h3>
-                      <pre className="rounded-md bg-muted p-4 text-sm">
-                        <code>{procedureInfo?.source_code}</code>
-                      </pre>
+
+                      <SourceCode language="sql" isDark>
+                        {procedureInfo?.source_code}
+                      </SourceCode>
                     </div>
                   </div>
                 </section>
@@ -553,81 +586,8 @@ console.log(data);
         </div>
       </div>
       <footer className="mt-auto border-t bg-background px-4 py-4 shadow-sm sm:px-6">
-        <div className="container mx-auto flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            &copy; 2024 Acme Inc. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-              prefetch={false}
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground"
-              prefetch={false}
-            >
-              Privacy Policy
-            </Link>
-          </div>
-        </div>
+        <div className="container mx-auto flex items-center justify-between"></div>
       </footer>
     </div>
-  );
-}
-
-function SourceCode(props: {
-  children: any;
-  language: string;
-  isDark: boolean;
-}) {
-  const { children, language, isDark } = props;
-  const [copied, setCopied] = useState<string | null>(null);
-  const [hoovering, sethoovering] = useState(false);
-  const handleCopy = (sourceCode: string) => {
-    navigator.clipboard.writeText(sourceCode);
-    setCopied(sourceCode);
-    setTimeout(() => setCopied(null), 2000);
-  };
-
-  return (
-    <div className="overflow-scroll max-w-[80vw]">
-      <Button variant="ghost" size="icon" onClick={() => handleCopy(children)}>
-        <CopyIcon className="h-5 w-5 text-muted-foreground" />
-      </Button>
-      <pre>
-        <code>
-          <SyntaxHighlighter
-            language={language}
-            style={isDark ? dark : undefined}
-          >
-            {children}
-          </SyntaxHighlighter>
-        </code>
-      </pre>
-    </div>
-  );
-}
-
-function CopyIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-    </svg>
   );
 }

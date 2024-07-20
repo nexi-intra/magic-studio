@@ -1,19 +1,12 @@
-"use client";
-import React, { useRef, DragEvent, useState, useContext } from "react";
-import { Input } from "@/components/ui/input";
+import React, {
+  useRef,
+  DragEvent,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import MonacoEditor, { Monaco } from "@monaco-editor/react";
+import MonacoEditor, { Monaco, useMonaco } from "@monaco-editor/react";
 import SqlColumnSelector from "./sql-column-selector";
 import {
   ResizableHandle,
@@ -22,68 +15,153 @@ import {
 } from "@/components/ui/resizable";
 import { LabelWithEditor } from "./label-with-editor";
 import { SaveIcon } from "lucide-react";
-import { execute } from "@/components/actions/execute2";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
-
+import * as monacoEditor from "monaco-editor"; // Importing the types
+import { format } from "sql-formatter";
+import { run } from "@/actions/server";
 // TypeScript definition for props passed to the icons
 interface IconProps extends React.SVGProps<SVGSVGElement> {}
 
-export function SqlQueryEditor(props: { database: string }) {
+export function SqlQueryEditor(props: {
+  database: string;
+  sql: string;
+  name: string;
+  onSave: (sql: string, name: string) => void;
+}) {
+  const monacoInstance = useMonaco();
   const magicbox = useContext(MagicboxContext);
   const { database } = props;
-  const editorRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(
+    null
+  );
   const [error, seterror] = useState("");
+  const [sqlExpression, setsqlExpression] = useState(props.sql);
+  const [sqlResult, setsqlResult] = useState<any>();
+  const [name, setname] = useState(props.name);
+
+  useEffect(() => {
+    // do conditional chaining
+    monacoInstance?.languages.typescript.javascriptDefaults.setEagerModelSync(
+      true
+    );
+    // or make sure that it exists by other ways
+    if (monacoInstance) {
+      console.log("here is the monaco instance:", monacoInstance);
+      monacoInstance.languages.register({ id: "postgres" });
+      monacoInstance.languages.setMonarchTokensProvider("postgres", {
+        tokenizer: {
+          root: [
+            [
+              /(\bSELECT\b|\bFROM\b|\bWHERE\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b)/,
+              "keyword",
+            ],
+            [/--.*$/, "comment"],
+            [/\b\d+\b/, "number"],
+            [/"[^"]*"/, "string"],
+            [/'[^']*'/, "string"],
+            [/\b[A-Za-z_][A-Za-z0-9_]*\b/, "identifier"],
+          ],
+        },
+      });
+
+      monacoInstance.languages.setLanguageConfiguration("postgres", {
+        comments: {
+          lineComment: "--",
+        },
+        brackets: [
+          ["{", "}"],
+          ["[", "]"],
+          ["(", ")"],
+        ],
+        autoClosingPairs: [
+          { open: "(", close: ")" },
+          { open: "[", close: "]" },
+          { open: "{", close: "}" },
+          { open: '"', close: '"' },
+          { open: "'", close: "'" },
+        ],
+        surroundingPairs: [
+          { open: "(", close: ")" },
+          { open: "[", close: "]" },
+          { open: "{", close: "}" },
+          { open: '"', close: '"' },
+          { open: "'", close: "'" },
+        ],
+      });
+
+      monacoInstance.languages.registerCompletionItemProvider("postgres", {
+        provideCompletionItems: () => {
+          const suggestions: monacoEditor.languages.CompletionItem[] = [
+            {
+              range: new monacoEditor.Range(1, 1, 1, 7),
+              label: "SELECT",
+              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              insertText: "SELECT ",
+            },
+            {
+              range: new monacoEditor.Range(1, 1, 1, 5),
+              label: "FROM",
+              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              insertText: "FROM ",
+            },
+            {
+              range: new monacoEditor.Range(1, 1, 1, 6),
+              label: "WHERE",
+              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              insertText: "WHERE ",
+            },
+            // Add more PostgreSQL-specific keywords
+          ];
+          return { suggestions: suggestions };
+        },
+      });
+
+      monacoInstance.editor.addEditorAction({
+        id: "format-sql",
+        label: "Format SQL",
+        keybindings: [
+          monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyF,
+        ],
+        contextMenuGroupId: "1_modification",
+        contextMenuOrder: 1.5,
+        run: function (ed) {
+          const code = ed.getModel()?.getValue();
+          const formattedCode = format(code!, { language: "postgresql" });
+          ed.getModel()?.setValue(formattedCode);
+        },
+      });
+    }
+  }, [monacoInstance]);
 
   const handleDragStart = (event: DragEvent<HTMLDivElement>, text: string) => {
     event.dataTransfer.setData("text/plain", text);
   };
 
-  async function create_sqlquery(
-    connection_id: number,
-    description: string,
-    name: string,
-    schema: { [key: string]: any },
-    sql: string
-  ) {
-    const token = magicbox.authtoken;
-    const result = await execute(
-      token,
-      "mix",
+  const handleRun = async () => {
+    if (!sqlExpression) return;
+
+    const result = await run(
       "magic-mix.app",
-      "create_sqlquery",
-      {
-        name,
-        description,
-        sql,
-        schema,
-        connection_id,
-        tenant: "",
-        searchindex: "name:" + name,
-      }
+      ["query", database, sqlExpression],
+      "",
+      600,
+      "x"
     );
+
     if (result.hasError) {
-      seterror(result.errorMessage ?? "An error occured");
+      if (result.errorMessage === "503") {
+        result.errorMessage = "Service unavailable";
+      }
+      seterror(result.errorMessage ?? "Unknown error");
       return;
     }
-  }
+    setsqlResult(result.data);
+  };
+
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const text = event.dataTransfer.getData("text/plain");
     const editor = editorRef.current;
-    // if (editor) {
-    //   const position = editor.getModel()?.getPositionAt(0);
-    //   editor.executeEdits("", [
-    //     {
-    //       range: new monaco.Range(
-    //         position.lineNumber,
-    //         position.column,
-    //         position.lineNumber,
-    //         position.column
-    //       ),
-    //       text,
-    //     },
-    //   ]);
-    // }
   };
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
@@ -94,203 +172,20 @@ export function SqlQueryEditor(props: { database: string }) {
     navigator.clipboard.writeText(text);
   };
 
-  const handleEditorDidMount = (editor: Monaco) => {
-    editorRef.current = editor;
+  const handleSave = () => {
+    props.onSave(sqlExpression, name);
   };
 
-  const handleSave = () => {
-    create_sqlquery(1, "description", "name", { schema: "schema" }, "sql");
-  };
   return (
     <div className="flex h-full w-full overflow-hidden">
-      {/* <div className="flex flex-col w-72 border-r bg-muted">
-        <div className="flex items-center gap-2 border-b p-2">
-          <Input
-            type="search"
-            placeholder="Filter tables..."
-            className="h-8 w-full rounded-md border border-border px-2"
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 rounded-md p-0"
-          >
-            <FilterIcon className="h-4 w-4" />
-            <span className="sr-only">Filter</span>
-          </Button>
-        </div>
-        <div className="flex items-center justify-between border-b p-2">
-          <span className="font-medium">Tables</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 rounded-md p-0"
-              >
-                <LayersIcon className="h-4 w-4" />
-                <span className="sr-only">Group by</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <div>
-                  <CheckIcon className="h-4 w-4" />
-                </div>
-                Namespace
-              </DropdownMenuItem>
-              <DropdownMenuItem>None</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className="flex-1 overflow-y-auto p-2">
-          <Collapsible open>
-            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 font-medium hover:bg-muted/50">
-              <span>public</span>
-              <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="grid gap-1 px-4">
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-muted/50">
-                    <span>users</span>
-                    <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="grid gap-1 px-4">
-                      {["id", "name", "email"].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 cursor-grab"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item)}
-                          onClick={() => handleClickToCopy(item)}
-                        >
-                          <DatabaseIcon className="h-4 w-4 text-muted-foreground" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-muted/50">
-                    <span>products</span>
-                    <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="grid gap-1 px-4">
-                      {["id", "name", "price"].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 cursor-grab"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item)}
-                          onClick={() => handleClickToCopy(item)}
-                        >
-                          <DatabaseIcon className="h-4 w-4 text-muted-foreground" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-muted/50">
-                    <span>orders</span>
-                    <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="grid gap-1 px-4">
-                      {["id", "user_id", "total"].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 cursor-grab"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item)}
-                          onClick={() => handleClickToCopy(item)}
-                        >
-                          <DatabaseIcon className="h-4 w-4 text-muted-foreground" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-          <Collapsible>
-            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 font-medium hover:bg-muted/50">
-              <span>sales</span>
-              <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="grid gap-1 px-4">
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-muted/50">
-                    <span>orders</span>
-                    <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="grid gap-1 px-4">
-                      {["id", "customer_id", "total"].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 cursor-grab"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item)}
-                          onClick={() => handleClickToCopy(item)}
-                        >
-                          <DatabaseIcon className="h-4 w-4 text-muted-foreground" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-muted/50">
-                    <span>customers</span>
-                    <ChevronRightIcon className="h-4 w-4 transition [&[data-state=open]>*]:rotate-90" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="grid gap-1 px-4">
-                      {["id", "name", "email"].map((item) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted/50 cursor-grab"
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item)}
-                          onClick={() => handleClickToCopy(item)}
-                        >
-                          <DatabaseIcon className="h-4 w-4 text-muted-foreground" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      </div> */}
       <div className="flex-1 flex flex-col">
         <div className="flex items-center gap-2 border-b bg-background p-2">
-          <LabelWithEditor initialValue="Unnamed" onSave={(value) => {}} />
-          {/* <Button variant="outline" size="sm" className="h-8">
-            <RefreshCcwIcon className="mr-2 h-4 w-4" />
-            Refresh
-          </Button> */}
-          {/* <Button variant="outline" size="sm" className="h-8">
-            <DatabaseIcon className="mr-2 h-4 w-4" />
-            New Query
-          </Button>
-          <Button variant="outline" size="sm" className="h-8">
-            <FileMinusIcon className="mr-2 h-4 w-4" />
-            Close
-          </Button> */}
+          <LabelWithEditor
+            initialValue={name}
+            onSave={(value) => {
+              setname(value);
+            }}
+          />
           <Button
             variant="outline"
             size="sm"
@@ -303,21 +198,13 @@ export function SqlQueryEditor(props: { database: string }) {
             Save
           </Button>
           {error && <div className="text-red-500">{error}</div>}
-          {/* <Button variant="outline" size="sm" className="h-8">
-            <DatabaseIcon className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" className="h-8">
-            <DatabaseIcon className="mr-2 h-4 w-4" />
-            Import
-          </Button> */}
         </div>
         <div
           className="flex-1 grid max-h-[calc(100vh-200px)] overflow-scroll "
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
-          <ResizablePanelGroup direction="horizontal">
+          <ResizablePanelGroup direction="horizontal" className="min-h-full">
             <ResizablePanel
               defaultSize={20}
               className="overflow-auto max-h-full"
@@ -325,14 +212,16 @@ export function SqlQueryEditor(props: { database: string }) {
               <SqlColumnSelector database={database} />
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel>
-              <ResizablePanelGroup direction="vertical">
+            <ResizablePanel className="min-h-full">
+              <ResizablePanelGroup direction="vertical" className="min-h-full">
                 <ResizablePanel defaultSize={60}>
-                  {" "}
                   <MonacoEditor
+                    defaultValue={props.sql}
                     height="100%"
-                    language="sql"
-                    //editorDidMount={handleEditorDidMount}
+                    language="postgres"
+                    onChange={(value) => {
+                      setsqlExpression(value!);
+                    }}
                     theme="vs-dark"
                     options={{
                       minimap: { enabled: false },
@@ -345,7 +234,12 @@ export function SqlQueryEditor(props: { database: string }) {
                   <div className="border-t p-4">
                     <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="h-8">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8"
+                          onClick={handleRun}
+                        >
                           <PlayIcon className="mr-2 h-4 w-4" />
                           Run
                         </Button>
@@ -370,14 +264,15 @@ export function SqlQueryEditor(props: { database: string }) {
                       </div>
                     </div>
                     <div className="border rounded-md p-4 font-mono text-sm">
-                      <div className="mb-2 flex items-center justify-between">
+                      {JSON.stringify(sqlResult)}
+                      {/* <div className="mb-2 flex items-center justify-between">
                         <span>Query OK, 0 rows affected</span>
                         <span>0.015 sec</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <InfoIcon className="h-4 w-4 text-primary" />
                         <span>No results to display.</span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </ResizablePanel>

@@ -158,7 +158,7 @@ JOIN
 
   return (
     <div>
-      <h1>Mermaid ER Diagram</h1>
+      <h1>ER Diagram</h1>
       {/* <pre>{chart}</pre> */}
       <MermaidDiagram className={props.className} chart={chart} />
     </div>

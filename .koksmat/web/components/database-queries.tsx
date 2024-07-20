@@ -30,25 +30,27 @@ export interface Table {
   records: number;
   size: string;
 }
-export default function Databases(props: {
+export default function DatabaseQueries(props: {
   visualisation: Visualisation;
-
+  database: string;
   value: string;
   onChange: (value: string) => void;
 }) {
-  const { value, onChange } = props;
-  const [tables, settables] = useState<CommandSelectorItem[]>([]);
+  const { value, onChange, database } = props;
+  const [queries, setqueries] = useState<CommandSelectorItem[]>([]);
 
   const query = useSQLSelect3<DatabaseProps>(
     "mix",
     `
-select  id
+select  public.sqlquery.id
 
-,name as title
-,name as slug
-,description 
-from public.connection
-ORDER BY name
+,public.sqlquery.name as title
+,public.sqlquery.id as slug
+,public.sqlquery.description 
+from public.sqlquery
+left join public.connection on public.sqlquery.connection_id = public.connection.id
+where public.connection.name = '${database}'
+ORDER BY public.sqlquery.name
 
     `
   );
@@ -57,7 +59,7 @@ ORDER BY name
       //setdbinfo(query.dataset[0].result);
       const items = query.dataset.map((item) => {
         const cmd: CommandSelectorItem = {
-          id: item.title,
+          id: item.id.toString(),
           title: item.title,
           description: item.description,
           children: <div></div>,
@@ -67,15 +69,15 @@ ORDER BY name
       });
 
       items.sort((a: any, b: any) => a.title.localeCompare(b.title));
-      settables(items);
+      setqueries(items);
     }
   }, [query.dataset]);
   return (
     <ItemsViewer
       visualisation={props.visualisation}
       value={value}
-      placeholder="Databases"
-      commands={tables ? tables : []}
+      placeholder="Queries"
+      commands={queries ? queries : []}
       onSelect={(command) => {
         onChange(command.id);
       }}
