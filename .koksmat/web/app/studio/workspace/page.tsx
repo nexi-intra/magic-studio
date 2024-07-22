@@ -2,14 +2,15 @@
 import { APPNAME } from "@/app/global";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import SQLCards from "@/components/sql-cards";
+import { Button } from "@/components/ui/button";
 import { CardStackIcon } from "@radix-ui/react-icons";
 import React, { useContext } from "react";
 
 export default function Page() {
   const magicbox = useContext(MagicboxContext);
+
   return (
     <div>
-      workspaces
       {/* <pre>{JSON.stringify(magicbox, null, 2)}</pre> */}
       <SQLCards
         Icon={CardStackIcon}

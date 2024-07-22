@@ -60,7 +60,7 @@ ORDER BY public.sqlquery.name
       const items = query.dataset.map((item) => {
         const cmd: CommandSelectorItem = {
           id: item.id.toString(),
-          title: item.title,
+          title: item.title + " (" + item.id + ")",
           description: item.description,
           children: <div></div>,
           slug: item.title,

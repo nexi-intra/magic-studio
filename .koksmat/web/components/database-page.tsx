@@ -183,7 +183,8 @@ SELECT json_build_object(
                             "/database/" +
                             database +
                             "/table/" +
-                            table.name
+                            table.name +
+                            "/item"
                           }
                           className="text-blue-600 hover:underline"
                           prefetch={false}

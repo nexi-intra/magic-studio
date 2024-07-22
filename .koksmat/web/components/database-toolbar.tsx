@@ -62,7 +62,13 @@ export function DatabaseToolbar(props: { database: string }) {
                 value={""}
                 onChange={function (value: string): void {
                   router.push(
-                    "/" + APPNAME + "/database/" + database + "/table/" + value
+                    "/" +
+                      APPNAME +
+                      "/database/" +
+                      database +
+                      "/table/" +
+                      value +
+                      "/item"
                   );
                 }}
               />
@@ -106,9 +112,9 @@ export function DatabaseToolbar(props: { database: string }) {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
+      {/* <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
         <Button className="h-9 px-6">New Query</Button>
-      </Link>
+      </Link> */}
     </div>
   );
 }

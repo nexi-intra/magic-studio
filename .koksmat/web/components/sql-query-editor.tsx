@@ -38,6 +38,9 @@ export function SqlQueryEditor(props: {
   const [sqlExpression, setsqlExpression] = useState(props.sql);
   const [sqlResult, setsqlResult] = useState<any>();
   const [name, setname] = useState(props.name);
+  useEffect(() => {
+    setsqlExpression(props.sql);
+  }, [props.sql]);
 
   useEffect(() => {
     // do conditional chaining
@@ -88,30 +91,89 @@ export function SqlQueryEditor(props: {
           { open: "'", close: "'" },
         ],
       });
+      // Mock data for tables and columns
+      const tables: string[] = ["users", "orders", "products"];
+      const columns: Record<string, string[]> = {
+        users: ["id", "name", "email"],
+        orders: ["id", "user_id", "total"],
+        products: ["id", "name", "price"],
+      };
 
       monacoInstance.languages.registerCompletionItemProvider("postgres", {
-        provideCompletionItems: () => {
-          const suggestions: monacoEditor.languages.CompletionItem[] = [
+        provideCompletionItems: (model, position) => {
+          const textUntilPosition = model.getValueInRange({
+            startLineNumber: 1,
+            startColumn: 1,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column,
+          });
+
+          let suggestions: monacoEditor.languages.CompletionItem[] = [
             {
               range: new monacoEditor.Range(1, 1, 1, 7),
               label: "SELECT",
-              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              kind: monacoEditor.languages.CompletionItemKind.Keyword,
               insertText: "SELECT ",
             },
             {
               range: new monacoEditor.Range(1, 1, 1, 5),
               label: "FROM",
-              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              kind: monacoEditor.languages.CompletionItemKind.Keyword,
               insertText: "FROM ",
             },
             {
               range: new monacoEditor.Range(1, 1, 1, 6),
               label: "WHERE",
-              kind: monacoInstance.languages.CompletionItemKind.Keyword,
+              kind: monacoEditor.languages.CompletionItemKind.Keyword,
               insertText: "WHERE ",
             },
-            // Add more PostgreSQL-specific keywords
+            // Add more PostgreSQL-specific keywords as needed
           ];
+
+          // Determine context for additional suggestions
+          if (/select\s*$/i.test(textUntilPosition)) {
+            // Provide table suggestions after "SELECT"
+            suggestions = suggestions.concat(
+              tables.map((table) => {
+                return {
+                  range: new monacoEditor.Range(
+                    position.lineNumber,
+                    position.column,
+                    position.lineNumber,
+                    position.column
+                  ),
+                  label: table,
+                  kind: monacoEditor.languages.CompletionItemKind.Keyword,
+                  insertText: table,
+                  documentation: `Table: ${table}`,
+                };
+              })
+            );
+          } else if (/from\s+(\w+)\s*$/i.test(textUntilPosition)) {
+            const tableNameMatch = textUntilPosition.match(/from\s+(\w+)\s*$/i);
+            if (tableNameMatch) {
+              const tableName = tableNameMatch[1];
+              if (columns[tableName]) {
+                // Provide column suggestions for the specified table
+                suggestions = suggestions.concat(
+                  columns[tableName].map((column) => ({
+                    range: new monacoEditor.Range(
+                      position.lineNumber,
+                      position.column,
+                      position.lineNumber,
+                      position.column
+                    ),
+
+                    label: column,
+                    kind: monacoEditor.languages.CompletionItemKind.Field,
+                    insertText: column,
+                    documentation: `Column: ${column}`,
+                  }))
+                );
+              }
+            }
+          }
+
           return { suggestions: suggestions };
         },
       });

@@ -90,6 +90,20 @@ export default function MenuRoot() {
                 Ping
               </Link>
             </MenubarItem>
+            <MenubarItem>
+              <Link
+                href={
+                  "/" +
+                  APPNAME +
+                  "/workspace/" +
+                  magicbox.currentWorkspace +
+                  "/commandline"
+                }
+                className="w-full"
+              >
+                Commands
+              </Link>
+            </MenubarItem>
             <MenubarItem disabled>
               <Link
                 href={

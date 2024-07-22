@@ -3,12 +3,9 @@ import { tryCatch } from "@/app/officeaddin/actions/outlook-samples";
 import { nanoid } from "nanoid";
 import { NatsConnection, connect, StringCodec } from "nats";
 
-export async function NatsRPC(
+export async function NatsWrite(
   sessionid: string,
-  action: string,
-  command: string,
-  args: string[],
-  cwd?: string
+  args: string[]
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     let nc: NatsConnection | null = null;
@@ -16,16 +13,11 @@ export async function NatsRPC(
       const reply_to = "autopilot.response." + nanoid();
       const request = {
         session_id: sessionid,
-        action: "execute-nostream",
-        command,
+        action: "write",
+        command: "",
         reply_to,
         args,
-        cwd,
       };
-      if (!command) {
-        resolve(JSON.stringify({ errormessage: "no command" }));
-        return;
-      }
       const connectionString = process.env.NATS ?? "nats://127.0.0.1:4222";
       nc = await connect({
         servers: [connectionString],

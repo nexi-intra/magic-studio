@@ -1,7 +1,57 @@
 import { nanoid } from "nanoid";
-import { NatsConnection, connect, StringCodec, AckPolicy, millis } from "nats";
+import {
+  NatsConnection,
+  connect,
+  StringCodec,
+  AckPolicy,
+  millis,
+  JetStreamManager,
+  RetentionPolicy,
+  StreamConfig,
+  StorageType,
+  DiscardPolicy,
+  nanos,
+} from "nats";
 import { JsMsgImpl } from "nats/lib/jetstream/jsmsg";
 import { log } from "./log";
+
+const SUBJECT = "autopilot.request";
+async function createStream(stream_name: string, jsm: JetStreamManager) {
+  const config: StreamConfig = {
+    name: stream_name,
+    subjects: [SUBJECT + ".>"],
+    retention: RetentionPolicy.Workqueue,
+    storage: StorageType.File,
+    max_consumers: 0,
+    sealed: false,
+    first_seq: 0,
+    max_msgs_per_subject: 0,
+    max_msgs: 0,
+    max_age: nanos(1000 * 30), // 30 secs
+    max_bytes: 0,
+    max_msg_size: 0,
+    discard: DiscardPolicy.Old,
+    discard_new_per_subject: false,
+    duplicate_window: 0,
+    allow_rollup_hdrs: false,
+    num_replicas: 0,
+    deny_delete: false,
+    deny_purge: false,
+    allow_direct: false,
+    mirror_direct: false,
+  };
+  await jsm.streams.add(config);
+  return true;
+}
+async function ensureStream(stream_name: string, jsm: JetStreamManager) {
+  return createStream(stream_name, jsm);
+  // try {
+  //   const x = await jsm.streams.find(SUBJECT + ".1");
+  //   return true;
+  // } catch (error) {
+  //   return createStream(stream_name, jsm);
+  // }
+}
 
 export async function NatsMessageReceiver(sessionid: string): Promise<string> {
   return new Promise(async (resolve, reject) => {
@@ -17,6 +67,9 @@ export async function NatsMessageReceiver(sessionid: string): Promise<string> {
       const jsm = await js.jetstreamManager();
       const durable_name = "NatsMessageReceiver";
       // Use a unique consumer name or ephemeral consumer
+
+      const streamOk = await ensureStream(name, jsm);
+      log("streamOk", streamOk);
 
       await jsm.consumers.add(name, {
         durable_name,
