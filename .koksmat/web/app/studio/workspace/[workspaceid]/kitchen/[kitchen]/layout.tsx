@@ -121,7 +121,7 @@ function Loaded(props: {
             }}
             onOpenTerminal={function (): void {
               router.push(
-                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/commandline`
+                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/terminal`
               );
             }}
             onOpenReleases={function (): void {

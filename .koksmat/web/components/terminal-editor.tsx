@@ -13,7 +13,7 @@ type Command = {
 };
 import * as monacoEditor from "monaco-editor"; // Importing the types
 import { set } from "date-fns";
-export default function CommandLineEditor(props: {
+export default function TerminalEditor(props: {
   code: string;
   language: string;
   onCodeChange: (code: string) => void;

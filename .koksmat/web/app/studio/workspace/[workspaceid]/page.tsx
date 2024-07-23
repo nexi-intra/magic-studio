@@ -30,7 +30,7 @@ export default function Page(props: { params: { workspaceid: string } }) {
             <div key={kitchen.name} className="m-2">
               <Link href={path + "/kitchen/" + kitchen.name}>
                 <Card className="w-72 hover:shadow-lg cursor-pointer">
-                  <CardHeader>{kitchen.title}</CardHeader>
+                  <CardHeader>{kitchen.name}</CardHeader>
 
                   {/* <p>{kitchen.description}</p> */}
                 </Card>

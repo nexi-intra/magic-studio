@@ -44,7 +44,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import WithClipboardCopy from "./with-clipboardcopy";
-import CommandLineEditor from "./command-line-editor";
+import TerminalEditor from "./terminal-editor";
 
 class CommandManager {
   private commands: Command[] = [];
@@ -132,7 +132,7 @@ class CommandManager {
 // commandManager.marshal(newJsonString);
 // console.log(commandManager.getCommands());
 
-export function AutopilotCommandLine(props: {
+export function Terminal(props: {
   workspace_id: string;
   kitchen_root: string;
   kitchen?: string;
@@ -304,7 +304,7 @@ export function AutopilotCommandLine(props: {
               </div>
               <div className="ml-4">Command to run</div>
               <div className="flex items-center gap-2 border-t bg-background px-4 py-2 h-full max-w-[calc(80vw-100px)]">
-                <CommandLineEditor
+                <TerminalEditor
                   language="bash"
                   onEnter={() => {
                     execute();

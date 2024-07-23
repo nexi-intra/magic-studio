@@ -97,7 +97,7 @@ export default function MenuRoot() {
                   APPNAME +
                   "/workspace/" +
                   magicbox.currentWorkspace +
-                  "/commandline"
+                  "/terminal"
                 }
                 className="w-full"
               >

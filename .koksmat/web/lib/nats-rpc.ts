@@ -8,12 +8,18 @@ export async function NatsRPC(
   action: string,
   command: string,
   args: string[],
-  cwd?: string
+  cwd?: string,
+  options?: { onStart?: (echoSubject: string) => void }
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
     let nc: NatsConnection | null = null;
+    const id = nanoid();
     try {
-      const reply_to = "autopilot.response." + nanoid();
+      const reply_to = "autopilot.response." + id;
+      const echo = "autopilot.response." + id + ".echo";
+      if (options?.onStart) {
+        options.onStart(echo);
+      }
       const request = {
         session_id: sessionid,
         action: "execute-nostream",
