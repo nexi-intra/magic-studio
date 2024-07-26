@@ -224,12 +224,9 @@ export default function ExecuteProcedure(props: {
       procedureName, // <-- this is the name of the procedure in the database pointed to by the connection
       JSON.parse(input) // <-- this is the data to be sent to the procedure
     );
-    if (result.hasError) {
-      throw new Error(result.errorMessage);
-    }
     setisRunning(false);
 
-    setoutput(JSON.stringify(result.data, null, 2));
+    setoutput(JSON.stringify(result, null, 2));
     return result.data;
   };
   // const execute = async () => {
