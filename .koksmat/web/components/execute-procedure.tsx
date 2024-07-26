@@ -226,7 +226,7 @@ export default function ExecuteProcedure(props: {
     );
     setisRunning(false);
 
-    setoutput(JSON.stringify(result, null, 2));
+    setoutput(JSON.stringify(result.data, null, 2));
     return result.data;
   };
   // const execute = async () => {

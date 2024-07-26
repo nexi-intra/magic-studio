@@ -31,10 +31,11 @@ export async function execute(
     channel: servicename,
     timeout: 600,
   });
+
   const result: Result<string> = {
-    data: response.data?.data,
-    hasError: response.data?.hasError,
-    errorMessage: response.data?.errorMessage,
+    data: response.data,
+    hasError: response.error,
+    errorMessage: response.error,
   };
 
   return result;
