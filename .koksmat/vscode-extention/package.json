@@ -1,0 +1,74 @@
+{
+  "name": "koksmat",
+  "displayName": "Koksmat",
+  "description": "A helping hand for any developer",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:koksmatWebView"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "koksmat.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "koksmat.openWebView",
+        "title": "Open Koksmat Application"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "koksmat",
+          "title": "Koksmat",
+          "icon": "images/chef-logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "koksmat": [
+        {
+          "id": "demoTreeView",
+          "name": "Demo Tree View"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.91.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/moment": "^2.13.0",
+    "moment": "^2.30.1"
+  }
+}

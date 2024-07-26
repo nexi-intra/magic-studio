@@ -13,6 +13,7 @@ type Command = {
 };
 import * as monacoEditor from "monaco-editor"; // Importing the types
 import { set } from "date-fns";
+import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 export default function TerminalEditor(props: {
   code: string;
   language: string;
@@ -35,21 +36,26 @@ export default function TerminalEditor(props: {
   };
 
   return (
-    <MonacoEditor
-      width={"100%"}
-      defaultValue=""
-      height="100%"
-      language={language}
-      onChange={(value) => {
-        onCodeChange(value!);
-      }}
-      onMount={handleEditorDidMount}
-      value={editorText}
-      theme="vs-dark"
-      options={{
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-      }}
-    />
+    <ResizablePanelGroup direction="vertical" className="min-h-full">
+      <ResizablePanel defaultSize={20}>
+        <MonacoEditor
+          width={"100%"}
+          defaultValue=""
+          height="100%"
+          language={language}
+          onChange={(value) => {
+            onCodeChange(value!);
+          }}
+          onMount={handleEditorDidMount}
+          value={editorText}
+          theme="vs-dark"
+          options={{
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+          }}
+        />
+      </ResizablePanel>
+      <ResizablePanel defaultSize={80}>dfds</ResizablePanel>
+    </ResizablePanelGroup>
   );
 }

@@ -38,16 +38,10 @@ export function generateDatabaseCallSourceCode(
 import { z, ZodObject } from "zod";
 import { execute } from "@/actions/client";
 
-/*
-  The schema for the ${className(procedureName)} procedure
-*/
-
+// The schema for the ${className(procedureName)} procedure
 const _schema = ${zodSchema}
 
-/*
-  TypeScript type based on the schema
-*/
-
+//  TypeScript type based on the schema
 export type ${className(procedureName)}Props = z.infer<typeof _schema>;
 
 // Exclude 'tenant' and 'searchindex' from the type
@@ -56,50 +50,42 @@ export type InputType = Omit<${className(procedureName)}Props, "tenant" | "searc
 /**
 // Example usage of the  function ${className(procedureName)}
 try {
-  const  result =  ${className(procedureName)}(${"authtoken,\n"} ${properties.map((key) => `${key}, //replace ${key} with your own variable`).join("\n    ")});
+  const  result =  ${className(procedureName)}(${"\n    authtoken, // ensure this is a valid token\n   "} ${properties.map((key) => `${key}, //replace ${key} with your own variable`).join("\n    ")});
   
   
 } catch (error) {
-  console.error('Validation failed:', error.message);
+  console.error( error.message);
 }
   */
 
-export default function ${className(procedureName)} (${"authtoken : string,\n"}${parameterList}${",\n id? : number,\n"}) {
-   
-const input = { ${properties.join(", ")} };
-   
+export default async function ${className(procedureName)} (${"\n authtoken : string,\n "}${parameterList}${",\n id? : number,\n"}) {
+  // constructs an object from the input parameters
+  const input = { ${properties.join(", ")} };  
+  
+  // The tenant name and search index are applied upstream, so they are omitted from the schema
+  const __schema = _schema.omit({ tenant: true, searchindex: true });
 
-    /* 
-    
-    
-    The tenant name and search index are applied upstream, so they are omitted from the schema
+  // Input data is validated against the schema, and might be transform during that process
+  const item = __schema.safeParse(input);  
 
-    */ 
-
-     const __schema = _schema.omit({ tenant: true, searchindex: true });
-
-    /*
-    
-    Input data is validated against the schema, and might be transform during that process
-
-    */ 
-    const item = __schema.safeParse(input);  
-
-    if (!item.success) {
-      throw new Error(item.error.errors.map(err => err.message).join(', '));
-    }
- 
-
-    const dbrecord = {...item.data,tenant:"",searchindex:"",id:id}
-  return execute(
-      authtoken, // <-- this is the authentication token containing the user's credentials - the upn will be used as "actor" name
-      "${databaseName}", // <-- this is a reference to a record in the connections table in the mix database
-      "magic-mix.app", // <-- this is the service name processing the request
-      "${procedureName}", // <-- this is the name of the procedure in the database pointed to by the connection
-      dbrecord // <-- this is the data to be sent to the procedure
-    );
-
+  if (!item.success) {
+    throw new Error(item.error.errors.map(err => err.message).join(', '));
   }
+
+  const dbrecord = {...item.data,tenant:"",searchindex:"",id:id}
+  const result = await execute(
+    authtoken, // <-- this is the authentication token containing the user's credentials - the upn will be used as "actor" name
+    "${databaseName}", // <-- this is a reference to a record in the connections table in the mix database
+    "magic-mix.app", // <-- this is the service name processing the request
+    "${procedureName}", // <-- this is the name of the procedure in the database pointed to by the connection
+    dbrecord // <-- this is the data to be sent to the procedure
+  );
+  if (result.hasError) {
+    throw new Error(result.errorMessage);
+  }
+  return result.data;
+
+}
 
   
 

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       res.timeout,
       res.transactionId
     );
-    return Response.json(result);
+    return new Response(JSON.stringify(result));
   } catch (error) {
     return Response.error();
   }

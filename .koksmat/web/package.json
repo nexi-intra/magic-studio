@@ -15,6 +15,7 @@
         "@ai-sdk/openai": "^0.0.14",
         "@azure/msal-browser": "^3.10.0",
         "@azure/msal-react": "^2.0.12",
+        "@faker-js/faker": "^8.4.1",
         "@hookform/resolvers": "^3.3.4",
         "@lucide/lab": "^0.1.1",
         "@monaco-editor/react": "^4.6.0",
@@ -45,6 +46,7 @@
         "@types/clipboard": "^2.0.7",
         "@types/react-syntax-highlighter": "^15.5.11",
         "ai": "^3.1.13",
+        "ajv": "^8.17.1",
         "ansi_up": "^6.0.2",
         "axios": "^1.6.7",
         "class-variance-authority": "^0.7.0",
@@ -53,9 +55,11 @@
         "cmdk": "^0.2.1",
         "date-fns": "^3.3.1",
         "dnd-core": "^16.0.1",
+        "faker": "^6.6.6",
         "form-urlencoded": "^6.1.4",
         "js-yaml": "^4.1.0",
         "json-refs": "^3.0.15",
+        "json-schema-faker": "^0.5.6",
         "json-schema-to-zod": "^2.3.0",
         "jsonwebtoken": "^9.0.2",
         "jwks-rsa": "^3.1.0",
@@ -86,7 +90,8 @@
         "tailwindcss": "^3.3.0",
         "tailwindcss-animate": "^1.0.7",
         "vaul": "^0.9.0",
-        "zod": "^3.22.4"
+        "zod": "^3.22.4",
+        "zod-schema-faker": "^1.0.0"
     },
     "devDependencies": {
         "@types/js-yaml": "^4.0.9",

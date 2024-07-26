@@ -27,6 +27,12 @@ import { DatabaseIcon } from "./icons/DatabaseIcon";
 import { buildInterface } from "@/lib/buildInterface";
 import { Code2Icon, Play, PlayIcon, SquareFunction } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { useRouter } from "next/navigation";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import {
@@ -38,6 +44,16 @@ import {
 import { generateDatabaseCallSourceCode } from "@/lib/generatevalidationfunction";
 import SourceCode from "./view-sourcecode";
 import WithClipboardCopy from "./with-clipboardcopy";
+import ExecuteProcedure from "./execute-procedure";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { StoredProcedureToolbar } from "./stored-procedure-toolbar";
 
 export interface Root {
   Result: Result[];
@@ -194,7 +210,7 @@ FROM
   const [functionCode, setfunctionCode] = useState("");
   const [importCode, setimportCode] = useState("");
   const [callCode, setcallCode] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
       setprocedureInfo(query.dataset[0].procedure_info);
@@ -277,10 +293,10 @@ FROM
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-40 border-b bg-background  py-3 shadow-sm sm:px-6">
-        <div className=" mx-auto flex items-center justify-between">
-          <div className="flex items-center ">
+    <div className="flex min-h-screen flex-col bg-background w-full">
+      <header className="sticky top-0 z-40 border-b bg-background  py-3 shadow-sm sm:px-6 w-full">
+        <div className=" mx-auto flex items-center justify-between w-full">
+          <div className="flex items-center  ">
             <span className="font-bold text-3xl">
               {procedure.toUpperCase()}
             </span>
