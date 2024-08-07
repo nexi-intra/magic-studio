@@ -1,4 +1,4 @@
-"use client";
+//"use client";
 import React, { Fragment, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -10,12 +10,14 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+
 interface BreadcrumbItem {
   name: string;
   href: string;
 }
 export default function GlobalBreadcrumb() {
   const pathname = usePathname();
+
   const [items, setitems] = useState<BreadcrumbItem[]>([]);
 
   useEffect(() => {

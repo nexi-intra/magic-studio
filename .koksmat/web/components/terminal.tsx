@@ -27,7 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MonacoEditor, { Monaco, useMonaco } from "@monaco-editor/react";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { AnsiUp } from "ansi_up";
 type Command = {
   timestamp: number;
@@ -45,12 +45,15 @@ import {
 } from "@/components/ui/resizable";
 import WithClipboardCopy from "./with-clipboardcopy";
 import TerminalEditor from "./terminal-editor";
-
+import CreateHistory from "@/actions/database/mix/create_history";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import { ensureUser } from "@/app/api/workspace";
 class CommandManager {
   private commands: Command[] = [];
 
   // Method to add a command
-  addCommand(
+  async addCommand(
+    accessToken: string,
     timestamp: number,
     cmd: string,
     command: string,
@@ -58,7 +61,7 @@ class CommandManager {
     isPreviewJson: boolean,
 
     error_message: string = ""
-  ): void {
+  ) {
     if (!this.commands) {
       this.commands = [];
     }
@@ -81,6 +84,18 @@ class CommandManager {
 
         error_message,
       });
+      //const user = await ensureUser(accessToken);
+      await CreateHistory(
+        accessToken,
+        cmd,
+        command,
+        13,
+        "shell",
+        false,
+        false,
+        command,
+        {}
+      );
     } else {
       existingCommand.timestamp = timestamp;
       console.log("Command already exists");
@@ -138,6 +153,7 @@ export function Terminal(props: {
   kitchen?: string;
 }) {
   const { workspace_id, kitchen_root, kitchen } = props;
+  const magicbox = useContext(MagicboxContext);
   const [cwd, setcwd] = useState(kitchen_root);
   const [cmd, setcmd] = useState("");
   const [output, setoutput] = useState<any>();
@@ -216,6 +232,7 @@ export function Terminal(props: {
         setoutput(json);
         setisJSON(true);
         commandHistory.addCommand(
+          magicbox.authtoken,
           Date.now(),
           cmd,
           command,
@@ -231,6 +248,8 @@ export function Terminal(props: {
         const htmlOutput = ansiUp.ansi_to_html(j.body);
         setoutput(j.body);
         commandHistory.addCommand(
+          magicbox.authtoken,
+
           Date.now(),
           cmd,
           command,
@@ -242,6 +261,8 @@ export function Terminal(props: {
       }
       localStorage.setItem("commands", commandHistory.unmarshal());
     }
+
+    //CreateHistory(magic)
     console.log(j);
     console.log(result);
   };

@@ -32,5 +32,11 @@ export const metadata: Metadata = {
 };
 export default function Layout(props: { children: any }) {
   const { children } = props;
-  return <ClientLayout>{children}</ClientLayout>;
+  
+  return (
+    <div>
+  
+      <ClientLayout>{children}</ClientLayout>
+    </div>
+  );
 }

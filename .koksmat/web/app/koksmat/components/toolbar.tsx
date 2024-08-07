@@ -6,6 +6,7 @@
 import { Button } from "@/components/ui/button";
 import Debugger from "./debugger";
 import DebuggerSheet from "./DebuggerSheet";
+import DevCurrentPage from "@/components/dev-current-page";
 
 export function Toolbar() {
   return (
@@ -17,6 +18,7 @@ export function Toolbar() {
           variant="ghost"
         >
           <MessageCircleIcon className="h-6 w-6 stroke-1" />
+
           <span className="sr-only">Create a comment</span>
         </Button>
         <div className="relative">
@@ -35,7 +37,7 @@ export function Toolbar() {
           size="icon"
           variant="ghost"
         >
-          <LayersIcon className="h-6 w-6 stroke-1" />
+          <DevCurrentPage />
           <span className="sr-only">Edit</span>
         </Button>
       </div>

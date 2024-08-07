@@ -34,28 +34,22 @@ export default function TerminalEditor(props: {
       onEnter();
     });
   };
-
   return (
-    <ResizablePanelGroup direction="vertical" className="min-h-full">
-      <ResizablePanel defaultSize={20}>
-        <MonacoEditor
-          width={"100%"}
-          defaultValue=""
-          height="100%"
-          language={language}
-          onChange={(value) => {
-            onCodeChange(value!);
-          }}
-          onMount={handleEditorDidMount}
-          value={editorText}
-          theme="vs-dark"
-          options={{
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-          }}
-        />
-      </ResizablePanel>
-      <ResizablePanel defaultSize={80}>dfds</ResizablePanel>
-    </ResizablePanelGroup>
+    <MonacoEditor
+      width={"100%"}
+      defaultValue=""
+      height="100%"
+      language={language}
+      onChange={(value) => {
+        onCodeChange(value!);
+      }}
+      onMount={handleEditorDidMount}
+      value={editorText}
+      theme="vs-dark"
+      options={{
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+      }}
+    />
   );
 }

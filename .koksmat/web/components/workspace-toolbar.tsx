@@ -19,7 +19,7 @@ To read more about using these font, please visit the Next.js documentation:
 **/
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -39,6 +39,9 @@ import { Kitchen } from "./hooks/use-kitchens";
 import { CommandSelector } from "./command-selector";
 import GitOrganizations from "./git-organisations";
 import GitRepos from "./git-repos";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import KoksmatInstallGuide from "./koksmat-install-guide";
+import { Terminal } from "./terminal";
 
 export type ConnectionStatusType = "connected" | "disconnected" | "unknown";
 
@@ -48,7 +51,7 @@ export function WorkspaceToolbar(props: {
   kitchens: Kitchen[];
 }) {
   const magicbox = useContext(MagicboxContext);
-
+  const [studioUrl, setstudioUrl] = useState("");
   const router = useRouter();
   const workspaces = useSQLSelect3(
     "mix",
@@ -69,6 +72,9 @@ WHERE U.email = '${magicbox?.user?.email}'`
     // const workspace = workspaces.dataset.find((workspace: any) => workspace.slug === slug);
     // console.log("workspace", workspace);
   };
+  useEffect(() => {
+    setstudioUrl(window.location.origin);
+  }, []);
 
   return (
     <div className="flex  justify-between p-2 border-b w-full">
@@ -119,7 +125,22 @@ WHERE U.email = '${magicbox?.user?.email}'`
             };
           })}
         />
-
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Connect</Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[500px]">
+            <KoksmatInstallGuide studioUrl={studioUrl} />
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Terminal</Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[90vw]">
+            <Terminal workspace_id={props.workspacekey} kitchen_root={""} />
+          </PopoverContent>
+        </Popover>
         <Separator orientation="vertical" className="h-6" />
       </div>
       <div className="grow"></div>
