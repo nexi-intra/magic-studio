@@ -10,6 +10,8 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import DevCurrentPage from "./dev-current-page";
+import { Edit3Icon, LayersIcon } from "lucide-react";
 
 interface BreadcrumbItem {
   name: string;
@@ -17,7 +19,7 @@ interface BreadcrumbItem {
 }
 export default function GlobalBreadcrumb() {
   const pathname = usePathname();
-
+  const [showEdit, setshowEdit] = useState(false);
   const [items, setitems] = useState<BreadcrumbItem[]>([]);
 
   useEffect(() => {
@@ -33,7 +35,11 @@ export default function GlobalBreadcrumb() {
   }, [pathname]);
 
   return (
-    <div>
+    <div
+      className="flex"
+      onMouseEnter={() => setshowEdit(true)}
+      onMouseLeave={() => setshowEdit(false)}
+    >
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
           {items.map((item, i) => (
@@ -50,6 +56,13 @@ export default function GlobalBreadcrumb() {
           ))}
         </BreadcrumbList>
       </Breadcrumb>
+      {showEdit && (
+        <DevCurrentPage>
+          <div className="cursor-pointer ml-1 mt-[3px]">
+            <Edit3Icon className="h-4 w-4 stroke-1 hover:stroke-2" />
+          </div>
+        </DevCurrentPage>
+      )}
     </div>
   );
 }

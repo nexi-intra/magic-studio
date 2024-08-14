@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import { WorkspaceContext, WorkspaceContextType } from "./workspacecontext";
 
-export const WorkspaceContextProvider = (props: {
-  workspace: string;
-  children: any;
-}) => {
+export const WorkspaceContextProvider = (props: { children: any }) => {
   const [kitchenRoot, setKitchenRoot] = useState<any>();
+  const [workspaceId, setworkspaceId] = useState("");
   const workspace: WorkspaceContextType = {
     kitchenroot: kitchenRoot!,
+    setWorkspaceId: function (workspaceId: string): void {
+      setworkspaceId(workspaceId);
+    },
+    workspaceId,
   };
 
   useEffect(() => {
-    if (!props.workspace) return;
+    if (!workspaceId) return;
     const load = async () => {
       const getKitchenRoot = await fetch(
-        `/api/exec/remote/${props.workspace}/koksmat/context/kitchenRoot`
+        `/api/exec/remote/${workspaceId}/koksmat/context/kitchenRoot`
       );
 
       const kitchenRoot = await getKitchenRoot.text().catch((e) => {
@@ -27,7 +29,7 @@ export const WorkspaceContextProvider = (props: {
       setKitchenRoot((kitchenRoot as string).split("\n")[0]);
     };
     load();
-  }, [props.workspace]);
+  }, [workspaceId]);
 
   return (
     <WorkspaceContext.Provider value={workspace}>

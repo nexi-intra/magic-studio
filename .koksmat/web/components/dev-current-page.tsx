@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 
 import { https } from "@/app/koksmat/httphelper";
 import { LayersIcon, MessageCircleIcon } from "lucide-react";
-export default function DevCurrentPage() {
+export default function DevCurrentPage(props: { children: React.ReactNode }) {
+  const children = props.children;
   const pathname = usePathname();
 
   const [pageName, setPageName] = useState("");
@@ -40,7 +41,7 @@ export default function DevCurrentPage() {
 
     fetchPageName();
   }, [pathname]);
-
+  if (process.env.NODE_ENV === "production") return null;
   return (
     <div>
       <div
@@ -48,7 +49,7 @@ export default function DevCurrentPage() {
           openInVSCode(pageName);
         }}
       >
-        <LayersIcon className="h-6 w-6 stroke-1" />
+        {children}
       </div>
     </div>
   );

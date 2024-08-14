@@ -5,7 +5,7 @@ import { GenericTableActions } from "./components/GenericTableActions";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { DataTableColumnHeader } from "./components/data-table-column-header";
-import { GenericItem } from "./data/schema";
+import { GenericItem } from "@/app/koksmat/table/data/schema";
 import { useMemo } from "react";
 
 export interface GenericTableProps {
@@ -17,10 +17,10 @@ export interface GenericTableProps {
 }
 
 export function GenericTable(params: GenericTableProps) {
-  const { data, addtionalColumns } = params;
+  const { actions, data, addtionalColumns } = params;
   const instanceColumns = [...columns];
-  if (params.addtionalColumns) {
-    params.addtionalColumns.forEach((c) =>
+  if (addtionalColumns) {
+    addtionalColumns.forEach((c) =>
       instanceColumns.splice(columns.length - 1, 0, c)
     );
   }
@@ -42,7 +42,7 @@ export function GenericTable(params: GenericTableProps) {
         <DataTable
           data={tableData}
           columns={instanceColumns}
-          actions={params.actions}
+          actions={actions}
         />
       </div>
     </>

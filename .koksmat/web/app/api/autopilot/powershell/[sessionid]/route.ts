@@ -4,16 +4,19 @@ import { log } from "@/lib/log";
 import { NatsMessageReceiver } from "@/lib/nats-message-receiver";
 import { getDate } from "date-fns";
 import { NatsConnection, connect, StringCodec } from "nats";
+import { NatsRPC } from "@/lib/nats-rpc";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
-export async function GET(
+export async function POST(
   request: Request,
   { params }: { params: { sessionid: string } }
 ) {
-  log("GET /autopilot/session/[sessionid]");
-  const msg = await NatsMessageReceiver(params.sessionid);
+  const body = await request.text();
+  const args = body.split("\n");
 
-  return new Response(msg ? msg : JSON.stringify({ errormessage: "timeout" }));
+  const result = await NatsRPC(params.sessionid, "", "pwsh", args);
+
+  return new Response(result);
 }
 
 /**

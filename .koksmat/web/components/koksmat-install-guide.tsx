@@ -10,22 +10,21 @@ import {
 } from "@/components/ui/select";
 import { CheckIcon, CopyIcon } from "@radix-ui/react-icons";
 
-type ShellType = "bash" | "powershell" | "cmd";
+type ShellType = "bash" | "powershell";
 
-export default function KoksmatInstallGuide(props: { studioUrl: string }) {
-  const { studioUrl } = props;
+export default function KoksmatInstallGuide(props: {
+  studioUrl: string;
+  id: string;
+}) {
+  const { studioUrl, id } = props;
   const [copied, setCopied] = useState(false);
   const [shellType, setShellType] = useState<ShellType>("powershell");
 
-  const baseCommand =
-    "$env:STUDIO_URL=" +
-    studioUrl +
-    ";$env:GOBIN=(Get-Location).Path; go install github.com/koksmat-com/koksmat@v2.1.11.25; ./koksmat";
+  const baseCommand = `$env:STUDIO_URL="${studioUrl};$env:GOBIN=(Get-Location).Path; go install github.com/koksmat-com/koksmat@v2.1.11.25; ./koksmat auto run ${id}`;
 
   const commands: Record<ShellType, string> = {
-    bash: baseCommand,
+    bash: baseCommand.replace(/;/g, " && ").replace(/\$env:/g, "export "),
     powershell: baseCommand,
-    cmd: baseCommand,
   };
 
   const currentCommand = commands[shellType];
@@ -43,7 +42,8 @@ export default function KoksmatInstallGuide(props: { studioUrl: string }) {
   return (
     <Card className="w-full max-w-2xl">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4 hidden">
+        <div className="flex items-center justify-between mb-4 ">
+          Shell Type
           <Select
             value={shellType}
             onValueChange={(value: ShellType) => setShellType(value)}
@@ -54,7 +54,6 @@ export default function KoksmatInstallGuide(props: { studioUrl: string }) {
             <SelectContent>
               <SelectItem value="bash">Bash</SelectItem>
               <SelectItem value="powershell">PowerShell</SelectItem>
-              <SelectItem value="cmd">CMD</SelectItem>
             </SelectContent>
           </Select>
         </div>

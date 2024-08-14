@@ -35,23 +35,26 @@ import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useRouter } from "next/navigation";
 import { APPNAME } from "@/app/global";
 import { ConnectionStatus } from "./connection-status";
-import { Kitchen } from "./hooks/use-kitchens";
+import useKitchens, { Kitchen } from "./hooks/use-kitchens";
 import { CommandSelector } from "./command-selector";
 import GitOrganizations from "./git-organisations";
 import GitRepos from "./git-repos";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import KoksmatInstallGuide from "./koksmat-install-guide";
 import { Terminal } from "./terminal";
+import useWorkspaceConnectionStatus from "./hooks/use-workspace-connectionstatus";
+import { WorkspaceContext } from "./contexts/workspacecontext";
+import Link from "next/link";
 
 export type ConnectionStatusType = "connected" | "disconnected" | "unknown";
 
-export function WorkspaceToolbar(props: {
-  workspacekey: string;
-  connectionStatus: ConnectionStatusType;
-  kitchens: Kitchen[];
-}) {
+export function WorkspaceToolbar() {
   const magicbox = useContext(MagicboxContext);
+  const workspaceContext = useContext(WorkspaceContext);
+  const workspacekey = workspaceContext.workspaceId;
   const [studioUrl, setstudioUrl] = useState("");
+  const connectionStatus = useWorkspaceConnectionStatus(workspacekey);
+  const kitchens = useKitchens(workspacekey);
   const router = useRouter();
   const workspaces = useSQLSelect3(
     "mix",
@@ -59,12 +62,6 @@ export function WorkspaceToolbar(props: {
 SELECT W.name as title, W.description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
 WHERE U.email = '${magicbox?.user?.email}'`
   );
-
-  const [connectionStatus, setConnectionStatus] =
-    React.useState<ConnectionStatusType>("unknown");
-  React.useEffect(() => {
-    setConnectionStatus(props.connectionStatus);
-  }, [props.connectionStatus]);
 
   const handleWorkspaceClick = (slug: string) => {
     router.push("/" + APPNAME + "/workspace/" + slug);
@@ -104,19 +101,20 @@ WHERE U.email = '${magicbox?.user?.email}'`
           </DropdownMenuContent>
         </DropdownMenu>
         <CommandSelector
-          placeholder="Search workspace"
+          placeholder="Kitchens"
           onSelect={(command) => {
+            debugger;
             router.push(
               "/" +
                 APPNAME +
                 "/workspace/" +
-                magicbox.currentWorkspace +
+                workspacekey +
                 "/kitchen/" +
                 command.slug
             );
             //handleWorkspaceClick(command.slug);
           }}
-          commands={props.kitchens.map((kitchen) => {
+          commands={kitchens.map((kitchen) => {
             return {
               id: kitchen.name,
               title: kitchen.name,
@@ -125,22 +123,22 @@ WHERE U.email = '${magicbox?.user?.email}'`
             };
           })}
         />
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline">Connect</Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[500px]">
-            <KoksmatInstallGuide studioUrl={studioUrl} />
-          </PopoverContent>
-        </Popover>
+        {InstallGuide()}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline">Terminal</Button>
           </PopoverTrigger>
           <PopoverContent className="w-[90vw]">
-            <Terminal workspace_id={props.workspacekey} kitchen_root={""} />
+            <Terminal workspace_id={workspacekey} kitchen_root={""} />
           </PopoverContent>
         </Popover>
+        <Button variant="outline">
+          <Link
+            href={"/" + APPNAME + "/workspace/" + workspacekey + "/kubernetes"}
+          >
+            Kubernetes
+          </Link>
+        </Button>
         <Separator orientation="vertical" className="h-6" />
       </div>
       <div className="grow"></div>
@@ -148,13 +146,26 @@ WHERE U.email = '${magicbox?.user?.email}'`
       <Button
         className="ml-3"
         onClick={() => {
-          magicbox.setCurrentWorkspace(props.workspacekey);
+          magicbox.setCurrentWorkspace(workspacekey);
         }}
       >
         Set as current
       </Button>
     </div>
   );
+
+  function InstallGuide() {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Connect</Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[500px]">
+          <KoksmatInstallGuide studioUrl={studioUrl} id={workspacekey} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
 }
 
 function ChevronDownIcon(props: any) {

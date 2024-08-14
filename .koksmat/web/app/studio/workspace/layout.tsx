@@ -9,22 +9,13 @@ import {
 } from "@/components/workspace-toolbar";
 import { useEffect, useState } from "react";
 
-export default function Layout(props: {
-  children: React.ReactNode;
-  params: { workspaceid: string };
-}) {
+export default function Layout(props: { children: React.ReactNode }) {
   const { children } = props;
-  const { workspaceid } = props.params;
-  const connectionStatus = useWorkspaceConnectionStatus(workspaceid);
-  const kitchens = useKitchens(workspaceid);
+
   return (
     <div>
-      <WorkspaceContextProvider workspace={workspaceid}>
-        <WorkspaceToolbar
-          connectionStatus={connectionStatus}
-          workspacekey={workspaceid}
-          kitchens={kitchens}
-        />
+      <WorkspaceContextProvider>
+        <WorkspaceToolbar />
         {children}
       </WorkspaceContextProvider>
     </div>

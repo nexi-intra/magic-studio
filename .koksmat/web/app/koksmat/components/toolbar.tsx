@@ -37,7 +37,9 @@ export function Toolbar() {
           size="icon"
           variant="ghost"
         >
-          <DevCurrentPage />
+          <DevCurrentPage>
+            <LayersIcon className="h-6 w-6 stroke-1" />
+          </DevCurrentPage>
           <span className="sr-only">Edit</span>
         </Button>
       </div>

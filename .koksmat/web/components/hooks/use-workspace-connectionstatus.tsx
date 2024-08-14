@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ConnectionStatusType,
-  WorkspaceToolbar,
-} from "@/components/workspace-toolbar";
+import { ConnectionStatusType } from "@/components/workspace-toolbar";
 import { useEffect, useState } from "react";
 
 export default function useWorkspaceConnectionStatus(workspaceid: string) {
