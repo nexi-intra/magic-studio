@@ -13,6 +13,7 @@ import path from "path";
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { APPNAME } from "@/app/global";
+import TreeView from "@/components/treeview";
 function extractOrgAndRepo(
   gitHubUrl: string
 ): { organization: string; repository: string } | null {
@@ -140,8 +141,12 @@ function Loaded(props: {
         </div>
 
         <div className="mx-4"> Active branch: {activeBranch} </div>
-
-        {children}
+        <div className="flex">
+          <div>
+            <TreeView />
+          </div>
+          <div> {children}</div>
+        </div>
       </div>
     </div>
   );

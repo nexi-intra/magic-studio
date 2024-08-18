@@ -31,6 +31,7 @@ export const MagicboxProvider = ({ children }: Props) => {
   const [currentOrganization, setcurrentOrganization] = useState("");
   const [currentRepository, setcurrentRepository] = useState("");
   const [currentBranch, setcurrentBranch] = useState("");
+  const [treeView, settreeView] = useState<React.ReactNode>();
   const { toast } = useToast();
   const servicecalllog = useMemo<ServiceCallLogEntry[]>(() => {
     return [];
@@ -143,6 +144,11 @@ export const MagicboxProvider = ({ children }: Props) => {
     setCurrentBranch: function (branch: string): void {
       localStorage.setItem("currentBranch", branch);
       setcurrentBranch(branch);
+    },
+    treeView,
+    setTreeView: function (treeView: React.ReactNode): void {
+      settreeView(treeView);
+      //throw new Error("Function not implemented.");
     },
   };
 

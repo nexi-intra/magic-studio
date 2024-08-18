@@ -51,6 +51,7 @@ import { AppWindowMac } from "lucide-react";
 import useWorkspaceConnectionStatus from "./hooks/use-workspace-connectionstatus";
 import { ConnectionStatus } from "./connection-status";
 import { KoksmatChef } from "./icons/KoksmatChef";
+import TreeView from "./treeview";
 
 export namespace href {
   export const HOME = "/" + APPNAME;
@@ -230,6 +231,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <NavigationItems withCaptions={false} />
         </nav>
+
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
             <Tooltip>
@@ -248,6 +250,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
           </TooltipProvider>
         </nav>
       </aside>
+      {magicbox.treeView}
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Sheet>
