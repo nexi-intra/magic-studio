@@ -143,7 +143,13 @@ function Loaded(props: {
       appname
     ),
     (data) => {
-      return data;
+      debugger;
+      const lines = data.split("\n");
+      const nodot = lines
+        .map((line) => line.substring(2))
+        .filter((line) => line.length > 0)
+        .sort((a, b) => a.localeCompare(b));
+      return nodot.join("\n");
     }
   );
   useEffect(() => {

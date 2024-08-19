@@ -9,7 +9,7 @@ export default function Page(props: {
 }) {
   const workspaceContext = useContext(WorkspaceContext);
   return (
-    <div>
+    <div className="w-full">
       <Terminal
         workspace_id={props.params.workspaceid}
         kitchen_root={path.join(

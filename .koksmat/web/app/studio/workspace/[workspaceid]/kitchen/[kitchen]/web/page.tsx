@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext } from "react";
 import useWorkspaceExec from "@/components/hooks/use-workspace-exec";
 import path from "path";

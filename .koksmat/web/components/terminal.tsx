@@ -268,8 +268,11 @@ export function Terminal(props: {
   };
 
   return (
-    <div className="flex  w-full bg-background h-full h-[calc(100vh-200px)]">
-      <ResizablePanelGroup direction="horizontal" className="min-h-full">
+    <div className="flex  w-full bg-background h-[calc(100vh-200px)]">
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="min-h-full min-w-full"
+      >
         <ResizablePanel
           defaultSize={30}
           className="overflow-auto max-h-full min-h-full"
@@ -302,8 +305,11 @@ export function Terminal(props: {
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel className="min-h-full">
-          <ResizablePanelGroup direction="vertical" className="min-h-full">
+        <ResizablePanel className="min-h-full w-full">
+          <ResizablePanelGroup
+            direction="vertical"
+            className="min-h-full  w-full"
+          >
             <ResizablePanel defaultSize={20}>
               {/* <div className="flex h-16 items-center gap-4 border-b bg-background px-4">
                 <Button variant="ghost" size="icon" className="rounded-full">
@@ -324,7 +330,7 @@ export function Terminal(props: {
                 />
               </div>
               <div className="ml-4">Command to run</div>
-              <div className="flex items-center gap-2 border-t bg-background px-4 py-2 h-full max-w-[calc(80vw-100px)]">
+              <div className="flex  gap-2 border-t bg-background px-4 py-2 h-full max-w-[calc(80vw-100px)]">
                 <TerminalEditor
                   language="bash"
                   onEnter={() => {
