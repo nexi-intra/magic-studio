@@ -15,7 +15,7 @@ export default function Layout(props: {
   const kitchens = useKitchens(workspaceid);
   return (
     <div>
-      <WorkspaceContextProvider workspace={workspaceid}>
+      <WorkspaceContextProvider>
         <GitHubToolbar
           connectionStatus={connectionStatus}
           workspacekey={workspaceid}

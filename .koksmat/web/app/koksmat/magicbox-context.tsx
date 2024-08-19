@@ -60,8 +60,6 @@ export type MagicboxContextType = {
   setCurrentRepository: (repository: string) => void;
   currentBranch: string;
   setCurrentBranch: (branch: string) => void;
-  treeView: React.ReactNode;
-  setTreeView: (treeView: React.ReactNode) => void;
 };
 export const MagicboxContext = createContext<MagicboxContextType>({
   session: {
@@ -125,10 +123,6 @@ export const MagicboxContext = createContext<MagicboxContextType>({
   },
   currentBranch: "",
   setCurrentBranch: function (branch: string): void {
-    throw new Error("Function not implemented.");
-  },
-  treeView: undefined,
-  setTreeView: function (treeView: React.ReactNode): void {
     throw new Error("Function not implemented.");
   },
 });

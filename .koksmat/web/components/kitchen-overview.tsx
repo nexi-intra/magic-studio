@@ -37,7 +37,7 @@ export function KitchenOverview(props: KitchenOverviewProps) {
   return (
     <div className="w-full mx-auto py-12 md:py-20 lg:py-24">
       <div className="px-4 md:px-6">
-        <div className="grid gap-8 md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_350px] xl:grid-cols-[1fr_400px]">
+        <div>
           <div>
             <div className="space-y-6">
               <div>
@@ -283,39 +283,6 @@ export function KitchenOverview(props: KitchenOverviewProps) {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-lg border bg-background p-6">
-            <h2 className="text-xl font-bold">Project Navigation</h2>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <FolderIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">src</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FolderIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">components</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FileIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">Header.tsx</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FileIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">Footer.tsx</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FolderIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">pages</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FileIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">index.tsx</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <FileIcon className="h-5 w-5 text-muted-foreground" />
-                <div className="font-medium">about.tsx</div>
               </div>
             </div>
           </div>

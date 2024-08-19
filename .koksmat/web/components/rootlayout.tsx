@@ -250,7 +250,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
           </TooltipProvider>
         </nav>
       </aside>
-      {magicbox.treeView}
+
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Sheet>
@@ -266,8 +266,8 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
               </nav>
             </SheetContent>
           </Sheet>
-          {breadcrumb}
-          <div className="flex space-x-2  ">
+          <div className="">{breadcrumb}</div>
+          {/* <div className="flex space-x-2  ">
             {magicbox.currentWorkspace && (
               <Link
                 href={"/" + APPNAME + "/workspace/" + magicbox.currentWorkspace}
@@ -275,7 +275,7 @@ export function RootLayout(props: { breadcrumb: any; children: any }) {
                 <ConnectionStatus connectionStatus={connectionStatus} />
               </Link>
             )}
-          </div>
+          </div> */}
           <div className="relative ml-auto flex-1 md:grow-0">
             <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input

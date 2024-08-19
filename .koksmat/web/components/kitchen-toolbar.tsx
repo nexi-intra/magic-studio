@@ -31,6 +31,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { ListTreeIcon } from "lucide-react";
 
 export function KitchenToolbar(props: {
   gitOrganisation: string;
@@ -42,8 +43,10 @@ export function KitchenToolbar(props: {
   onOpenIssues: () => void;
   onOpenPackages: () => void;
   onOpenFileExplorer: () => void;
+  onViewWebNavigation: () => void;
 }) {
   const {
+    onViewWebNavigation,
     onOpenFileExplorer,
     onOpenGitHub,
     onOpenEditor,
@@ -61,6 +64,15 @@ export function KitchenToolbar(props: {
           <div className="font-bold text-lg">
             {gitOrganisation}/{gitRepository}
           </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={onViewWebNavigation}>
+                <ListTreeIcon className="h-5 w-5" />
+                <span className="sr-only">Navigation</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Web Navigation</TooltipContent>
+          </Tooltip>
           <Separator orientation="vertical" className="h-6" />
           <Tooltip>
             <TooltipTrigger asChild>

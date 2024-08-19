@@ -15,6 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePathname, useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
 import { se } from "date-fns/locale";
+import { Delete, DeleteIcon, Pin, X } from "lucide-react";
+import TabNavigatorWithReorder from "@/components/tab-navigator-with-reorder";
 
 interface SavedPage {
   pathname: string;
@@ -47,7 +49,10 @@ export default function ClientLayout(props: { children: any }) {
         {/* <div className="ml-16">
           <MenuRoot />
         </div> */}
-        <Tabs
+        <div className="ml-[64px] top-0 sticky z-10 bg-white dark:bg-black w-full">
+          <TabNavigatorWithReorder />
+        </div>
+        {/* <Tabs
           defaultValue={pathname}
           className="ml-[64px] sticky top-0 bg-white dark:bg-black"
         >
@@ -61,6 +66,15 @@ export default function ClientLayout(props: { children: any }) {
                 }}
               >
                 {path.title}
+                <X
+                  className="ml-2 h-3 w-3"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    paths.splice(key, 1);
+                    setversion(version + 1);
+                    sessionStorage.setItem("paths", JSON.stringify(paths));
+                  }}
+                />
               </TabsTrigger>
             ))}
             {paths.find((path) => path.pathname === pathname) ? null : (
@@ -70,7 +84,8 @@ export default function ClientLayout(props: { children: any }) {
                   addPath(pathname, pathname);
                 }}
               >
-                New
+                {pathname}
+                <Pin className="ml-2 h-3 w-3" />
               </TabsTrigger>
             )}
           </TabsList>
@@ -78,10 +93,12 @@ export default function ClientLayout(props: { children: any }) {
             Make changes to your account here.
           </TabsContent>
           <TabsContent value="password">Change your password here.</TabsContent>
-        </Tabs>
-        <RootLayout breadcrumb={<GlobalBreadcrumb />}>
-          <div className="px-4">{children}</div>
-        </RootLayout>
+        </Tabs> */}
+        <div className="w-full h-full z-0">
+          <RootLayout breadcrumb={<GlobalBreadcrumb />}>
+            <div className="px-4">{children}</div>
+          </RootLayout>
+        </div>
       </Authenticate>
     </AppProvider>
   );

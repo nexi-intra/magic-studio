@@ -33,7 +33,7 @@ export default function useWorkspaceExec<T>(
     };
     if (!workspaceid) return;
     load();
-  }, [workspaceid, command]);
+  }, [workspaceid, command, args, cwd]);
 
   return response;
 }

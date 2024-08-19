@@ -9,11 +9,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import WorkspaceResult from "@/components/workspace-result";
-import path from "path";
-import React, { useContext, useEffect, useState } from "react";
+
+import React, { use, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { APPNAME } from "@/app/global";
-import TreeView from "@/components/treeview";
+import TreeView, {
+  parsePathsToTree,
+  TreeNodeProps,
+} from "@/components/treeview";
+import { set } from "date-fns";
+import { pathJoin } from "@/lib/pathjoin";
 function extractOrgAndRepo(
   gitHubUrl: string
 ): { organization: string; repository: string } | null {
@@ -42,6 +47,7 @@ function Loaded(props: {
   const [connectionReady, setconnectionReady] = useState(false);
   const [gitorg, setgitorg] = useState("");
   const [gitrepo, setgitrepo] = useState("");
+  const [appname, setappname] = useState("");
   const router = useRouter();
   const openKitchenInVSCode = async () => {
     const body = JSON.stringify({
@@ -49,7 +55,7 @@ function Loaded(props: {
       action: "open",
       command: "code",
       args: ["."],
-      cwd: path.join(workspaceContext.kitchenroot, kitchen),
+      cwd: pathJoin(workspaceContext.kitchenroot, kitchen),
     });
     const result = await fetch("/api/autopilot/exec", {
       method: "POST",
@@ -76,16 +82,17 @@ function Loaded(props: {
     workspaceid,
     "git",
     ["branch", "--show-current"],
-    path.join(kitchenroot, kitchen),
+    pathJoin(kitchenroot, kitchen),
     (data) => {
       return data;
     }
   );
+
   const remoteOrigin = useWorkspaceExec<string>(
     workspaceid,
     "git",
     ["remote", "get-url", "origin"],
-    path.join(kitchenroot, kitchen),
+    pathJoin(kitchenroot, kitchen),
     (data) => {
       const result = extractOrgAndRepo(data);
       if (result) {
@@ -95,22 +102,62 @@ function Loaded(props: {
       return data;
     }
   );
+  const [webAppFilesTreeNodes, setwebAppFilesTreeNodes] = useState<
+    TreeNodeProps[]
+  >([]);
 
-  // useEffect(() => {
-  //   // Example usage:
-  //   debugger;
-  //   if (!remoteOrigin) return;
-  //   const result = extractOrgAndRepo(remoteOrigin!);
-  //   if (result) {
-  //     setgitorg(result.organization);
-  //     setgitrepo(result.repository);
-  //   }
-  // }, [remoteOrigin]);
+  const webAppRoot = useWorkspaceExec<string>(
+    workspaceid,
+    "cat",
+    ["global.ts"],
+    pathJoin(workspaceContext.kitchenroot, kitchen, ".koksmat", "web", "app"),
+    (data) => {
+      if (!data) return "";
+      // Regular expression to match and capture the value of APPNAME
+      const appNameMatch = data.match(/export const APPNAME = "([^"]+)";/);
 
+      if (appNameMatch && appNameMatch[1]) {
+        const appName = appNameMatch[1];
+        console.log(appName); // Output: meeting
+        return appName;
+      } else {
+        console.log("APPNAME not found");
+        return "";
+      }
+    }
+  );
+  useEffect(() => {
+    setappname(webAppRoot!);
+  }, [webAppRoot]);
+
+  const webAppFiles = useWorkspaceExec<string>(
+    workspaceid,
+    "find",
+    [".", "-name", "page.tsx", "-o", "-name", "layout.tsx"],
+    pathJoin(
+      workspaceContext.kitchenroot,
+      kitchen,
+      ".koksmat",
+      "web",
+      "app",
+      appname
+    ),
+    (data) => {
+      return data;
+    }
+  );
+  useEffect(() => {
+    if (webAppFiles) {
+      const paths = webAppFiles.split("\n").filter((p) => p.length > 0);
+      const tree = parsePathsToTree(paths);
+      setwebAppFilesTreeNodes(tree);
+    }
+  }, [webAppFiles]);
   return (
     <div>
       <div>
         <div>
+          {webAppRoot}
           <KitchenToolbar
             gitOrganisation={gitorg}
             gitRepository={gitrepo}
@@ -137,13 +184,18 @@ function Loaded(props: {
             onOpenFileExplorer={function (): void {
               throw new Error("Function not implemented.");
             }}
+            onViewWebNavigation={function (): void {
+              router.push(
+                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web/navigation`
+              );
+            }}
           />
         </div>
 
         <div className="mx-4"> Active branch: {activeBranch} </div>
         <div className="flex">
           <div>
-            <TreeView />
+            <TreeView treeData={webAppFilesTreeNodes} />
           </div>
           <div> {children}</div>
         </div>

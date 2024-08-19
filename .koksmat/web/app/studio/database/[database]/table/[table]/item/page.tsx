@@ -25,6 +25,7 @@ SELECT name as title,
         id as slug
 FROM ${table}
 ORDER BY name
+LIMIT 1000
 
     
     `}
