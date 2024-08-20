@@ -49,6 +49,7 @@ function Loaded(props: {
   const [gitrepo, setgitrepo] = useState("");
   const [appname, setappname] = useState("");
   const router = useRouter();
+
   const openKitchenInVSCode = async () => {
     const body = JSON.stringify({
       sessionid: "sessionid",
@@ -143,7 +144,7 @@ function Loaded(props: {
       appname
     ),
     (data) => {
-      debugger;
+      if (!data) return "";
       const lines = data.split("\n");
       const nodot = lines
         .map((line) => line.substring(2))
@@ -159,6 +160,7 @@ function Loaded(props: {
       setwebAppFilesTreeNodes(tree);
     }
   }, [webAppFiles]);
+
   return (
     <div>
       <div>

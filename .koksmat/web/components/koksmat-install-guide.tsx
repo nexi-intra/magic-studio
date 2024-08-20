@@ -20,7 +20,7 @@ export default function KoksmatInstallGuide(props: {
   const [copied, setCopied] = useState(false);
   const [shellType, setShellType] = useState<ShellType>("powershell");
 
-  const baseCommand = `$env:STUDIO_URL="${studioUrl};$env:GOBIN=(Get-Location).Path; go install github.com/koksmat-com/koksmat@v2.1.11.25; ./koksmat auto run ${id}`;
+  const baseCommand = `$env:GOBIN=(Get-Location).Path; go install github.com/koksmat-com/koksmat@v2.1.13.27; ./koksmat auto run ${id} ${studioUrl}`;
 
   const commands: Record<ShellType, string> = {
     bash: baseCommand.replace(/;/g, " && ").replace(/\$env:/g, "export "),

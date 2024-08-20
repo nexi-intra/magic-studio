@@ -230,7 +230,7 @@ export default function TabNavigatorWithReorder() {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-          <Button
+          {/* <Button
             variant="outline"
             size="icon"
             className="absolute left-0 top-0 bottom-0 bg-background"
@@ -251,7 +251,7 @@ export default function TabNavigatorWithReorder() {
           >
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Scroll right</span>
-          </Button>
+          </Button> */}
         </div>
       </div>
       <DragOverlay>
