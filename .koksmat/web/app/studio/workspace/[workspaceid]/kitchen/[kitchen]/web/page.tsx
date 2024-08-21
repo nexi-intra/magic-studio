@@ -6,6 +6,7 @@ import { WorkspaceContext } from "@/components/contexts/workspacecontext";
 import { pathJoin } from "@/lib/pathjoin";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import IframeWithScalingTools from "@/components/iframe";
+
 export default function Page(props: {
   params: {
     workspaceid: string;
@@ -15,6 +16,7 @@ export default function Page(props: {
   const { workspaceid, kitchen } = props.params;
   const magicboxcontext = useContext(MagicboxContext);
   const workspaceContext = useContext(WorkspaceContext);
+
   const packageJson = useWorkspaceExec<string>(
     workspaceid,
     "cat",
@@ -43,13 +45,7 @@ export default function Page(props: {
 
   return (
     <div className="w-full h-full ">
-      {appUrl && (
-        <IframeWithScalingTools url={appUrl} />
-        // <iframe
-        //   src={appUrl}
-        //   style={{ width: "100%", height: "100vh", border: "1px solid red" }}
-        // />
-      )}
+      {appUrl && <IframeWithScalingTools url={appUrl} />}
     </div>
   );
 }

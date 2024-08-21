@@ -19,6 +19,24 @@ import TreeView, {
 } from "@/components/treeview";
 import { set } from "date-fns";
 import { pathJoin } from "@/lib/pathjoin";
+import KoksmatServer from "@/components/koksmat-server";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { tree } from "next/dist/build/templates/app-page";
+
 function extractOrgAndRepo(
   gitHubUrl: string
 ): { organization: string; repository: string } | null {
@@ -31,6 +49,10 @@ function extractOrgAndRepo(
   }
 
   return null;
+}
+interface TreeAction {
+  node: TreeNodeProps;
+  action: "add" | "delete";
 }
 
 function Loaded(props: {
@@ -47,15 +69,16 @@ function Loaded(props: {
   const [connectionReady, setconnectionReady] = useState(false);
   const [gitorg, setgitorg] = useState("");
   const [gitrepo, setgitrepo] = useState("");
-  const [appname, setappname] = useState("");
+
   const router = useRouter();
+  const [treePath, settreePath] = useState("");
 
   const openKitchenInVSCode = async () => {
     const body = JSON.stringify({
       sessionid: "sessionid",
       action: "open",
       command: "code",
-      args: ["."],
+      args: [".", "--add"],
       cwd: pathJoin(workspaceContext.kitchenroot, kitchen),
     });
     const result = await fetch("/api/autopilot/exec", {
@@ -128,20 +151,21 @@ function Loaded(props: {
     }
   );
   useEffect(() => {
-    setappname(webAppRoot!);
+    workspaceContext.setAppName(webAppRoot!);
+    //setappname(webAppRoot!);
   }, [webAppRoot]);
 
   const webAppFiles = useWorkspaceExec<string>(
     workspaceid,
     "find",
-    [".", "-name", "page.tsx", "-o", "-name", "layout.tsx"],
+    [".", "-name", "page.tsx"], //, "-o", "-name", "layout.tsx"],
     pathJoin(
       workspaceContext.kitchenroot,
       kitchen,
       ".koksmat",
       "web",
       "app",
-      appname
+      workspaceContext.appName
     ),
     (data) => {
       if (!data) return "";
@@ -160,12 +184,39 @@ function Loaded(props: {
       setwebAppFilesTreeNodes(tree);
     }
   }, [webAppFiles]);
-
+  const [treeAction, settreeAction] = useState<TreeAction>();
   return (
     <div>
+      {treeAction && (
+        <Dialog
+          open={true}
+          onOpenChange={() => {
+            settreeAction(undefined);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{treeAction.node.path}</DialogTitle>
+              {/* <DialogDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </DialogDescription> */}
+            </DialogHeader>
+          </DialogContent>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => settreeAction(undefined)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </Dialog>
+      )}
       <div>
         <div>
-          {webAppRoot}
+          <KoksmatServer />
+
           <KitchenToolbar
             gitOrganisation={gitorg}
             gitRepository={gitrepo}
@@ -194,16 +245,47 @@ function Loaded(props: {
             }}
             onViewWebNavigation={function (): void {
               router.push(
-                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web/navigation`
+                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web`
+              );
+            }}
+            onViewComponents={function (): void {
+              router.push(
+                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web/components`
               );
             }}
           />
         </div>
 
-        <div className="mx-4"> Active branch: {activeBranch} </div>
+        {/* <div className="mx-4"> Active branch: {activeBranch} </div> */}
         <div className="flex">
           <div>
-            <TreeView treeData={webAppFilesTreeNodes} />
+            <TreeView
+              treeData={webAppFilesTreeNodes}
+              onSelect={(path) => {
+                settreePath(path);
+              }}
+              renderNode={(node) => {
+                return (
+                  <div>
+                    <ContextMenu>
+                      <ContextMenuTrigger> {node.name}</ContextMenuTrigger>
+                      <ContextMenuContent>
+                        <ContextMenuItem>
+                          <span
+                            onClick={() => {
+                              settreeAction({ node, action: "add" });
+                            }}
+                          >
+                            {" "}
+                            New folder
+                          </span>
+                        </ContextMenuItem>
+                      </ContextMenuContent>
+                    </ContextMenu>
+                  </div>
+                );
+              }}
+            />
           </div>
           <div> {children}</div>
         </div>

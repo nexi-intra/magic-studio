@@ -31,7 +31,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ListTreeIcon } from "lucide-react";
+import { Component, ListTreeIcon, View } from "lucide-react";
 
 export function KitchenToolbar(props: {
   gitOrganisation: string;
@@ -44,6 +44,7 @@ export function KitchenToolbar(props: {
   onOpenPackages: () => void;
   onOpenFileExplorer: () => void;
   onViewWebNavigation: () => void;
+  onViewComponents: () => void;
 }) {
   const {
     onViewWebNavigation,
@@ -54,6 +55,7 @@ export function KitchenToolbar(props: {
     onOpenPackages,
     onOpenReleases,
     onOpenTerminal,
+    onViewComponents,
     gitOrganisation,
     gitRepository,
   } = props;
@@ -67,7 +69,7 @@ export function KitchenToolbar(props: {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" onClick={onViewWebNavigation}>
-                <ListTreeIcon className="h-5 w-5" />
+                <View className="h-5 w-5" />
                 <span className="sr-only">Navigation</span>
               </Button>
             </TooltipTrigger>
@@ -100,6 +102,16 @@ export function KitchenToolbar(props: {
               </Button>
             </TooltipTrigger>
             <TooltipContent>Terminal Window</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={onViewComponents}>
+                <Component className="h-5 w-5" />
+
+                <span className="sr-only">Web Components</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Web Components</TooltipContent>
           </Tooltip>
           {/* <Tooltip>
             <TooltipTrigger asChild>

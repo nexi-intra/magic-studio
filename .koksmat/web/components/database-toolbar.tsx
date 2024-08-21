@@ -108,8 +108,11 @@ export function DatabaseToolbar(props: { database: string }) {
                 visualisation={"combobox"}
               />
             </TooltipTrigger>
-            <TooltipContent>Procedures</TooltipContent>
+            <TooltipContent>Queries</TooltipContent>
           </Tooltip>
+          <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
+            <Button className="h-9 px-6">New Query</Button>
+          </Link>
         </TooltipProvider>
       </div>
       {/* <Link href={"/" + APPNAME + "/database/" + database + "/query"}>

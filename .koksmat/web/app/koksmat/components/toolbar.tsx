@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import Debugger from "./debugger";
 import DebuggerSheet from "./DebuggerSheet";
 import DevCurrentPage from "@/components/dev-current-page";
+import { GalleryThumbnails, GalleryThumbnailsIcon } from "lucide-react";
+import { APPNAME } from "@/app/global";
+import Link from "next/link";
 
 export function Toolbar() {
   return (
@@ -21,17 +24,19 @@ export function Toolbar() {
 
           <span className="sr-only">Create a comment</span>
         </Button>
-        <div className="relative">
+
+        <Link href={"/" + APPNAME + "/gallery"}>
           <Button
             className="text-zinc-100 relative rounded-full hover:bg-gray-600 hover:text-zinc-100"
             size="icon"
-            variant="ghost"
+            variant="default"
           >
-            <InboxIcon className="h-6 w-6 stroke-1" />
-            <span className="sr-only">Open inbox</span>
+            <GalleryThumbnails className="h-6 w-6 stroke-1" />
+            <span className="sr-only">Open gallery</span>
             <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-blue-500" />
           </Button>
-        </div>
+        </Link>
+
         <Button
           className="text-zinc-100 rounded-full hover:bg-gray-600 hover:text-zinc-100"
           size="icon"

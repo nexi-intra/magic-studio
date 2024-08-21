@@ -79,8 +79,10 @@ export default function IframeWithScalingTools(props: { url: string }) {
   return (
     <div
       className={
-        "transition-transform w-full  mx-auto p-4 space-y-4 fixed " +
-        (fullscreen ? "fixed top-0 left-0 z-50" : "")
+        "transition-all  duration-300 ease-in-out  w-full  mx-auto p-4 space-y-4  bg-white" +
+        (fullscreen
+          ? " top-0 left-0 right-0 bottom-0 z-50 fixed"
+          : "top-auto left-auto right-auto bottom-auto h-auto")
       }
     >
       <div className="flex justify-center space-x-2 bg-secondary p-2 rounded-md">

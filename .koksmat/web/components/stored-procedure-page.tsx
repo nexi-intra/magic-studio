@@ -423,8 +423,9 @@ export async function POST(request: Request) {
                         Copy this prompt:
                         <SourceCode language="text" isDark>
                           {`
-like to have a component which can be used to get data from a zod schema. 
-The input values shall be kept using state variables. Like to have a cancel button and a submit button
+like to have a typescript safe component which can be used to get data from a zod schema. 
+The input values shall be kept using state variables. Like to have a cancel button and a submit button. 
+Please ignore the fields named id, created_at, tenant and searchindex
 
  ${zodSchema}
 
