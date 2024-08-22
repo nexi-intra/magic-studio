@@ -343,8 +343,8 @@ FROM
                       </SourceCode>
                       <div className="flex gap-1 items-center">
                         Ensure that you have the file
-                        <WithClipboardCopy text={`/app/api/run/route.ts`}>
-                          <b>/app/api/run/route.ts</b>{" "}
+                        <WithClipboardCopy text={`app/api/run/route.ts`}>
+                          <b>app/api/run/route.ts</b>{" "}
                         </WithClipboardCopy>
                       </div>
                       <SourceCode language="typescript" isDark>

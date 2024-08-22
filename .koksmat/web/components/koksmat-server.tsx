@@ -9,9 +9,8 @@ export default function KoksmatServer() {
   const router = useRouter();
   useEffect(() => {
     const eventHandler = (event: any) => {
-      console.log("Server", "Recieved message", event);
-
       if (event.data.koksmat) {
+        console.log("Server", "Recieved message", event);
         const message = event.data.message;
         switch (message.type) {
           case "ping":

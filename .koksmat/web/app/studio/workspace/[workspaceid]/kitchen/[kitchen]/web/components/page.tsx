@@ -36,7 +36,13 @@ export default function ComponentPage(props: {
             "components"
           );
 
-          const args = ["-c", `echo "` + data.sourceCode + `" > ` + filename];
+          const args = [
+            "-c",
+            `echo "` +
+              data.sourceCode.replaceAll(`"`, `\"`) +
+              `" > ` +
+              filename,
+          ];
           const command = "bash";
 
           const request1 = new Request(`/api/autopilot/exec`, {

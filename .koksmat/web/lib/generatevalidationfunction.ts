@@ -96,7 +96,7 @@ export default async function ${className(procedureName)} (${"\n authtoken : str
 
   return {
     source: classSource,
-    import: `import { ${className(procedureName)}Props } from "/@/actions/database/${databaseName}/${procedureName}";`,
+    import: `import { ${className(procedureName)} } from "/@/actions/database/${databaseName}/${procedureName}";`,
     call: `const result = await ${className(procedureName)}(authtoken, ${properties.join(", ")},id)`,
   };
 }

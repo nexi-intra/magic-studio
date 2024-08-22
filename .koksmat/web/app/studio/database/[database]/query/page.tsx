@@ -26,26 +26,7 @@ export default function Page(props: { params: { database: string } }) {
   const magicbox = useContext(MagicboxContext);
   const [error, seterror] = useState("");
   return (
-    <div className="h-full">
-      <Sheet open={showSheet} onOpenChange={setshowSheet}>
-        {/* <SheetTrigger>Open</SheetTrigger> */}
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>New Query</SheetTitle>
-            <SheetDescription>
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setname(e.target.value)}
-              />
-            </SheetDescription>
-            <SheetFooter>
-              <Button onClick={() => setshowSheet(false)}>Create</Button>
-            </SheetFooter>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-
+    <div className="h-full min-h-full">
       <SqlQueryEditor
         database={database}
         name={name}

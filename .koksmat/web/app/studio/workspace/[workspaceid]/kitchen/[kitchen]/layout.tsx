@@ -245,7 +245,7 @@ function Loaded(props: {
             }}
             onViewWebNavigation={function (): void {
               router.push(
-                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web`
+                `/${APPNAME}/workspace/${workspaceid}/kitchen/${kitchen}/web/app`
               );
             }}
             onViewComponents={function (): void {
@@ -262,7 +262,8 @@ function Loaded(props: {
             <TreeView
               treeData={webAppFilesTreeNodes}
               onSelect={(path) => {
-                settreePath(path);
+                workspaceContext.setTreePathname(path);
+                //settreePath(path);
               }}
               renderNode={(node) => {
                 return (
