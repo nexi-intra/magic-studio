@@ -46,6 +46,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "./ui/button";
+import { FolderSyncIcon } from "lucide-react";
 
 export function TablePage(props: { database: string; table: string }) {
   const { database, table } = props;
@@ -75,6 +76,22 @@ export function TablePage(props: { database: string; table: string }) {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Link
+            href={
+              "/" +
+              APPNAME +
+              "/database/" +
+              database +
+              "/table/" +
+              table +
+              "/sync"
+            }
+          >
+            <Button variant={"outline"} className="h-9 px-6">
+              <FolderSyncIcon className="w-4 h-4 mr-2" />
+              Sync
+            </Button>
+          </Link>
           <Link
             href={
               "/" +

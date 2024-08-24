@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useContext } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -11,25 +11,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { XYCoord } from "dnd-core";
-import { PopUp } from "@/app/officeaddin/components/popup2";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Label } from "@radix-ui/react-label";
-import { Input } from "./ui/input";
-import WorkflowSectionEditor from "./workflow-section-add";
-import { Sheet, SheetContent, SheetHeader } from "./ui/sheet";
+import WorkflowSectionEditor from "../workflow-section-add";
+import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
 import { SaveIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import WorkCreateActivityModel from "./actions/work-create-activitymodel";
-import { EditTitleDescription } from "./edit-title-description";
-import { set } from "date-fns";
-import { MagicboxContext } from "@/app/koksmat/magicbox-context";
-import { https } from "@/app/koksmat/httphelper";
+import { EditTitleDescription } from "../edit-title-description";
 
-interface Section {
+export interface Section {
   id: string;
   title: string;
   content: string;
@@ -42,7 +29,7 @@ interface Column {
   items: ActivityIcon[];
 }
 
-interface ActivityIcon {
+export interface ActivityIcon {
   id: string;
   type: string;
 }
@@ -59,50 +46,25 @@ interface CollectedProps {
   handlerId: string | symbol | null;
 }
 
-const initialSections: Section[] = [
-  {
-    id: "section-1",
-    title: "Section 1",
-    content: "This is the content for Section 1.",
-    collapsed: false,
-    columns: Array.from({ length: 4 }, (_, i) => ({
-      id: `column-1-${i + 1}`,
-      items: [],
-    })),
-  },
-  {
-    id: "section-2",
-    title: "Section 2",
-    content: "This is the content for Section 2.",
-    collapsed: false,
-    columns: Array.from({ length: 4 }, (_, i) => ({
-      id: `column-2-${i + 1}`,
-      items: [],
-    })),
-  },
-  {
-    id: "section-3",
-    title: "Section 3",
-    content: "This is the content for Section 3.",
-    collapsed: false,
-    columns: Array.from({ length: 4 }, (_, i) => ({
-      id: `column-3-${i + 1}`,
-      items: [],
-    })),
-  },
-];
-
 export interface WorkflowMetadata {
   title: string;
   description: string;
 }
-export default function Component() {
-  const [metadata, setmetadata] = useState<WorkflowMetadata>({
-    title: "",
-    description: "",
-  });
-  const magicbox = useContext(MagicboxContext);
-  const [sections, setSections] = useState<Section[]>(initialSections);
+
+export interface EditorCanvasProps {
+  handleSave: (
+    sections: Section[],
+    metadata: WorkflowMetadata
+  ) => () => Promise<void>;
+  handleAddSection: () => Promise<Section>;
+  activityIcons: ActivityIcon[];
+  initialSections: Section[];
+  metadata: WorkflowMetadata;
+}
+export default function EditorCanvas(props: EditorCanvasProps) {
+  const [metadata, setmetadata] = useState<WorkflowMetadata>(props.metadata);
+
+  const [sections, setSections] = useState<Section[]>(props.initialSections);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [isDetailsPanel, setIsDetailsPanel] = useState(false);
@@ -131,18 +93,12 @@ export default function Component() {
     }
   };
 
-  const handleAddSection = () => {
-    //setisAddingSection(true);
-    const newSection: Section = {
-      id: `section-${sections.length + 1}`,
-      title: `New Section ${sections.length + 1}`,
-      content: "This is the content for the new section.",
-      collapsed: false,
-      columns: Array.from({ length: 4 }, (_, i) => ({
-        id: `column-${sections.length + 1}-${i + 1}`,
-        items: [],
-      })),
-    };
+  const handleAddSection = async () => {
+    const newSection = await props
+      .handleAddSection()
+      .catch((e) => console.error(e));
+    if (!newSection) return; // error occurred most likely
+
     setSections((prevSections) => [...prevSections, newSection]);
   };
 
@@ -232,42 +188,18 @@ export default function Component() {
     );
   };
 
-  const handleSave = async () => {
-    const payload = {
-      activity: "",
-      data: sections,
-      description: metadata.description,
-      name: metadata.title,
-      searchindex: "name:" + metadata.title,
-      tenant: "",
-    };
-    const args = [
-      "execute",
-      "works",
-      "update_activitymodel",
-      magicbox.authtoken,
-      JSON.stringify(payload),
-    ];
-
-    const result = await https("", "POST", "/api/run", {
-      args,
-      channel: "x",
-      timeout: 600,
-    });
-    alert(result.hasError ? result.errorMessage : "Saved successfully");
-  };
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen w-full">
         <div className="w-40 bg-muted p-4">
           <h2 className="text-xl font-bold mb-4">Activity Icons</h2>
-          <ActivityPanel />
+          <ActivityPanel activityIcons={props.activityIcons} />
         </div>
         <div className="flex-1 bg-background p-6">
           <div className="flex items-center space-x-3 mb-4">
             <h1 className="text-2xl font-bold">Manage Sections</h1>
             <div className="flex items-center gap-2">
-              <Button onClick={handleSave}>
+              <Button onClick={() => props.handleSave(sections, metadata)}>
                 <SaveIcon className="w-4 h-4 mr-2" />
                 Save
               </Button>
@@ -609,12 +541,8 @@ const ActivityIcon: React.FC<ActivityIconProps> = ({
   );
 };
 
-const ActivityPanel: React.FC = () => {
-  const activityIcons: ActivityIcon[] = [
-    { id: "activity-1", type: "Activity 1" },
-    { id: "activity-2", type: "Activity 2" },
-    { id: "activity-3", type: "Activity 3" },
-  ];
+function ActivityPanel(props: { activityIcons: ActivityIcon[] }) {
+  const { activityIcons } = props;
 
   return (
     <div className="grid gap-2">
@@ -623,7 +551,7 @@ const ActivityPanel: React.FC = () => {
       ))}
     </div>
   );
-};
+}
 
 interface DraggableActivityIconProps {
   icon: ActivityIcon;

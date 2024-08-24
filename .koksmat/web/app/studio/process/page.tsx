@@ -9,11 +9,11 @@ export default function Page() {
   const magicbox = useContext(MagicboxContext);
   return (
     <div>
-      workspaces
+      Processes
       {/* <pre>{JSON.stringify(magicbox, null, 2)}</pre> */}
       <SQLCards
         Icon={CardStackIcon}
-        slugPrefix={"/" + APPNAME + "/kitchen/recipe/"}
+        slugPrefix={"/" + APPNAME + "/process/recipe/"}
         database={"works"}
         sql={`
 SELECT W.name as title, '' as description, W.id as slug FROM activitymodel as W 

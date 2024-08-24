@@ -37,22 +37,13 @@ export default function Page(props: {
     if (!slug) return;
     const browserPath = slug.join("/");
     setcurrentPath("/" + browserPath);
-    console.log("browserPath", browserPath);
+
     //debugger;
   }, [slug]);
 
   useEffect(() => {
-    //debugger;
-    console.log("workspaceContext.webPathname", workspaceContext.webPathname);
     setcurrentPath(workspaceContext.webPathname);
   }, [workspaceContext.webPathname]);
-
-  useEffect(() => {
-    //debugger;
-    console.log("workspaceContext.treePathname", workspaceContext.treePathname);
-
-    //setcurrentPath(workspaceContext.webPathname);
-  }, [workspaceContext.treePathname]);
 
   return (
     <div>

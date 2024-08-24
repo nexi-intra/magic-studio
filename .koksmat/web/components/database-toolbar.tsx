@@ -33,6 +33,7 @@ import DatabaseProcedures from "./database-procedures";
 import Databases from "./database-databases";
 import { useRouter } from "next/navigation";
 import DatabaseQueries from "./database-queries";
+import { FolderSyncIcon } from "lucide-react";
 
 export function DatabaseToolbar(props: { database: string }) {
   const { database } = props;
@@ -75,7 +76,7 @@ export function DatabaseToolbar(props: { database: string }) {
             </TooltipTrigger>
             <TooltipContent>Tables</TooltipContent>
           </Tooltip>
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <DatabaseProcedures
                 database={database}
@@ -109,7 +110,7 @@ export function DatabaseToolbar(props: { database: string }) {
               />
             </TooltipTrigger>
             <TooltipContent>Queries</TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
           <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
             <Button className="h-9 px-6">New Query</Button>
           </Link>

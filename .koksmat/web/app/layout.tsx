@@ -17,7 +17,7 @@ import { ServiceInspector } from "@/app/koksmat/components/service-inspector";
 
 import { Toaster } from "@/components/ui/toaster";
 import { CLARITY } from "./global";
-import { CookiesProvider } from "react-cookie";
+import KoksmatClient from "@/components/koksmat-client";
 export default function RootLayout2({
   children,
 }: Readonly<{
@@ -47,6 +47,7 @@ export default function RootLayout2({
               <TailwindIndicator />
               <ServiceInspector />
               <Toaster />
+              <KoksmatClient />
             </MSALWrapper>
           </MagicboxProvider>
         </ThemeProvider>

@@ -47,7 +47,7 @@ import { Fragment, useContext } from "react";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import Tracer from "@/app/koksmat/components/tracer";
 import { ChefHatIcon } from "./icons/ChefHatIcon";
-import { AppWindowMac } from "lucide-react";
+import { AppWindowMac, ImportIcon } from "lucide-react";
 import useWorkspaceConnectionStatus from "./hooks/use-workspace-connectionstatus";
 import { ConnectionStatus } from "./connection-status";
 import { KoksmatChef } from "./icons/KoksmatChef";
@@ -61,7 +61,8 @@ export namespace href {
   export const DATABASE = "/" + APPNAME + "/database";
   export const ADMIN = "/" + APPNAME + "/admin";
   export const ACCESS = "/" + APPNAME + "/access";
-  export const KITCHEN = "/" + APPNAME + "/kitchen";
+  export const PROCESS = "/" + APPNAME + "/process";
+  export const SHARE = "/" + APPNAME + "/share";
 }
 export function NavigationItems(props: { withCaptions: boolean }) {
   const withCaptions = props.withCaptions;
@@ -93,15 +94,15 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={href.KITCHEN}
+              href={href.PROCESS}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               prefetch={false}
             >
               <CookingPotIcon className="h-5 w-5" />
-              <span className="sr-only">Workspaces</span>
+              <span className="sr-only">Processes</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Workspaces</TooltipContent>
+          <TooltipContent side="right">Processes</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -119,15 +120,15 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href="#"
+              href={href.SHARE}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               prefetch={false}
             >
               <ShareIcon className="h-5 w-5" />
-              <span className="sr-only">Shared</span>
+              <span className="sr-only">Share</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Shared</TooltipContent>
+          <TooltipContent side="right">Share</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -170,7 +171,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         </Link>
 
         <Link
-          href={href.KITCHEN}
+          href={href.PROCESS}
           className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           prefetch={false}
         >

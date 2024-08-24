@@ -407,7 +407,7 @@ export default function KubernetesList(props: {
                 status: item.status.phase,
               };
             });
-          case "deployment":
+          case "deployments":
             return data?.items.map((item: any) => {
               return {
                 name: item.metadata.name,

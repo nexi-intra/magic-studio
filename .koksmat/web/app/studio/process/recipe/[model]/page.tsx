@@ -1,6 +1,6 @@
 "use client";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
-import WorkflowEditor from "@/components/workflow-editor2";
+import WorkflowEditor from "@/components/workflow/workflow-editor2";
 import React, { use, useEffect, useState } from "react";
 
 export default function Page(props: { params: { model: string } }) {
