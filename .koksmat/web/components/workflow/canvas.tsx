@@ -13,7 +13,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { XYCoord } from "dnd-core";
 import WorkflowSectionEditor from "../workflow-section-add";
 import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
-import { SaveIcon } from "lucide-react";
+import { Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
 import { EditTitleDescription } from "../edit-title-description";
 
 export interface Section {
@@ -32,6 +32,7 @@ interface Column {
 export interface ActivityIcon {
   id: string;
   type: string;
+  component?: JSX.Element;
 }
 
 interface DragItem {
@@ -40,6 +41,7 @@ interface DragItem {
   type: string;
   columnId?: string;
   sectionId?: string;
+  component?: JSX.Element;
 }
 
 interface CollectedProps {
@@ -61,17 +63,47 @@ export interface EditorCanvasProps {
   initialSections: Section[];
   metadata: WorkflowMetadata;
 }
-export default function EditorCanvas(props: EditorCanvasProps) {
-  const [metadata, setmetadata] = useState<WorkflowMetadata>(props.metadata);
 
+export default function EditorCanvas(props: EditorCanvasProps) {
+  const [metadata, setMetadata] = useState<WorkflowMetadata>(props.metadata);
   const [sections, setSections] = useState<Section[]>(props.initialSections);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [isDetailsPanel, setIsDetailsPanel] = useState(false);
+  const [isAddingSection, setIsAddingSection] = useState(false);
 
-  const [isAddingSection, setisAddingSection] = useState(false);
+  const [undoStack, setUndoStack] = useState<
+    { sections: Section[]; metadata: WorkflowMetadata }[]
+  >([]);
+  const [redoStack, setRedoStack] = useState<
+    { sections: Section[]; metadata: WorkflowMetadata }[]
+  >([]);
+
+  const pushToUndoStack = useCallback(() => {
+    setUndoStack((prevStack) => [...prevStack, { sections, metadata }]);
+    setRedoStack([]); // Clear redo stack on new change
+  }, [sections, metadata]);
+
+  const undo = useCallback(() => {
+    if (undoStack.length === 0) return;
+    const previousState = undoStack[undoStack.length - 1];
+    setRedoStack((prevStack) => [...prevStack, { sections, metadata }]);
+    setSections(previousState.sections);
+    setMetadata(previousState.metadata);
+    setUndoStack(undoStack.slice(0, -1));
+  }, [undoStack, sections, metadata]);
+
+  const redo = useCallback(() => {
+    if (redoStack.length === 0) return;
+    const nextState = redoStack[redoStack.length - 1];
+    setUndoStack((prevStack) => [...prevStack, { sections, metadata }]);
+    setSections(nextState.sections);
+    setMetadata(nextState.metadata);
+    setRedoStack(redoStack.slice(0, -1));
+  }, [redoStack, sections, metadata]);
 
   const handleSectionCollapse = (id: string) => {
+    pushToUndoStack();
     setSections((prevSections) =>
       prevSections.map((section) =>
         section.id === id
@@ -81,24 +113,15 @@ export default function EditorCanvas(props: EditorCanvasProps) {
     );
   };
 
-  const handleSectionSelect = (id: string) => {
-    if (isSelectionMode) {
-      setSelectedSections((prevSelectedSections) => {
-        if (prevSelectedSections.includes(id)) {
-          return prevSelectedSections.filter((sectionId) => sectionId !== id);
-        } else {
-          return [...prevSelectedSections, id];
-        }
-      });
-    }
-  };
+  const handleSectionSelect = (id: string) => {};
 
   const handleAddSection = async () => {
     const newSection = await props
       .handleAddSection()
       .catch((e) => console.error(e));
-    if (!newSection) return; // error occurred most likely
+    if (!newSection) return;
 
+    pushToUndoStack();
     setSections((prevSections) => [...prevSections, newSection]);
   };
 
@@ -111,20 +134,25 @@ export default function EditorCanvas(props: EditorCanvasProps) {
     setIsDetailsPanel((prevState) => !prevState);
   };
 
-  const moveSection = useCallback((dragIndex: number, hoverIndex: number) => {
-    setSections((prevSections) => {
-      const updatedSections = [...prevSections];
-      const [draggedSection] = updatedSections.splice(dragIndex, 1);
-      updatedSections.splice(hoverIndex, 0, draggedSection);
-      return updatedSections;
-    });
-  }, []);
+  const moveSection = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      pushToUndoStack();
+      setSections((prevSections) => {
+        const updatedSections = [...prevSections];
+        const [draggedSection] = updatedSections.splice(dragIndex, 1);
+        updatedSections.splice(hoverIndex, 0, draggedSection);
+        return updatedSections;
+      });
+    },
+    [pushToUndoStack]
+  );
 
   const addActivityIconToColumn = (
     columnId: string,
     sectionId: string,
     icon: ActivityIcon
   ) => {
+    pushToUndoStack();
     setSections((prevSections) =>
       prevSections.map((section) => {
         if (section.id === sectionId) {
@@ -147,6 +175,7 @@ export default function EditorCanvas(props: EditorCanvasProps) {
     hoverColumnId: string,
     hoverSectionId: string
   ) => {
+    pushToUndoStack();
     setSections((prevSections) => {
       const updatedSections = [...prevSections];
       const sourceSectionIndex = updatedSections.findIndex(
@@ -171,23 +200,6 @@ export default function EditorCanvas(props: EditorCanvasProps) {
     });
   };
 
-  const renderSection = (section: Section, index: number) => {
-    return (
-      <DraggableSection
-        key={section.id}
-        index={index}
-        section={section}
-        moveSection={moveSection}
-        handleSectionCollapse={handleSectionCollapse}
-        handleSectionSelect={handleSectionSelect}
-        isSelectionMode={isSelectionMode}
-        selectedSections={selectedSections}
-        addActivityIconToColumn={addActivityIconToColumn}
-        moveActivityIcon={moveActivityIcon}
-      />
-    );
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen w-full">
@@ -203,12 +215,28 @@ export default function EditorCanvas(props: EditorCanvasProps) {
                 <SaveIcon className="w-4 h-4 mr-2" />
                 Save
               </Button>
-
+              <Button
+                onClick={undo}
+                variant="outline"
+                disabled={undoStack.length === 0}
+              >
+                <Undo2Icon className="w-4 h-4 mr-2" />
+                Undo
+              </Button>
+              <Button
+                onClick={redo}
+                variant="outline"
+                disabled={redoStack.length === 0}
+              >
+                <Redo2Icon className="w-4 h-4 mr-2" />
+                Redo
+              </Button>
               <EditTitleDescription
                 title={metadata.title}
                 description={metadata.description}
-                onSave={function (title: string, description: string): void {
-                  setmetadata({ title, description });
+                onSave={(title: string, description: string): void => {
+                  pushToUndoStack();
+                  setMetadata({ title, description });
                 }}
                 onCancel={function (): void {}}
               />
@@ -230,7 +258,20 @@ export default function EditorCanvas(props: EditorCanvasProps) {
             </div>
           </div>
           <div className="grid gap-4">
-            {sections.map((section, index) => renderSection(section, index))}
+            {sections.map((section, index) => (
+              <DraggableSection
+                key={section.id}
+                index={index}
+                section={section}
+                moveSection={moveSection}
+                handleSectionCollapse={handleSectionCollapse}
+                handleSectionSelect={handleSectionSelect}
+                isSelectionMode={isSelectionMode}
+                selectedSections={selectedSections}
+                addActivityIconToColumn={addActivityIconToColumn}
+                moveActivityIcon={moveActivityIcon}
+              />
+            ))}
           </div>
         </div>
         {isDetailsPanel && (
@@ -255,7 +296,7 @@ export default function EditorCanvas(props: EditorCanvasProps) {
           </div>
         )}
         {isAddingSection && (
-          <Sheet open={isAddingSection} onOpenChange={setisAddingSection}>
+          <Sheet open={isAddingSection} onOpenChange={setIsAddingSection}>
             <SheetHeader></SheetHeader>
             <SheetContent className="w-[90vw] max-w-[90vw] min-w-[90vw] h-[100vh] overflow-scroll">
               <WorkflowSectionEditor />
@@ -429,6 +470,7 @@ const Column: React.FC<ColumnProps> = ({
         addActivityIconToColumn(column.id, sectionId, {
           id: item.id,
           type: item.type,
+          component: item.component,
         });
       } else if (item.type === "COLUMN_ITEM") {
         moveActivityIcon(item, column.id, sectionId);
@@ -535,7 +577,8 @@ const ActivityIcon: React.FC<ActivityIconProps> = ({
       data-handler-id={handlerId}
       className={`p-2 border mb-2 ${isDragging ? "bg-gray-400" : "bg-gray-200"} cursor-move`}
     >
-      {item.type}
+      {item.component ?? item.type}
+
       {/* <pre>{JSON.stringify(item)}</pre> */}
     </div>
   );
@@ -562,7 +605,7 @@ const DraggableActivityIcon: React.FC<DraggableActivityIconProps> = ({
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "ACTIVITY_ICON",
-    item: { id: icon.id, type: "ACTIVITY_ICON" },
+    item: { id: icon.id, type: "ACTIVITY_ICON", component: icon.component },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
