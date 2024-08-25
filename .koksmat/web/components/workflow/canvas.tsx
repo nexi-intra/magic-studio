@@ -15,6 +15,7 @@ import WorkflowSectionEditor from "../workflow-section-add";
 import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
 import { Redo2Icon, SaveIcon, Undo2Icon } from "lucide-react";
 import { EditTitleDescription } from "../edit-title-description";
+import EditableText from "../editable-text";
 
 export interface Section {
   id: string;
@@ -407,7 +408,12 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                 onClick={() => handleSectionCollapse(section.id)}
                 className="text-lg font-semibold"
               >
-                {section.title}
+                <EditableText
+                  initialText={section.title}
+                  onSave={async (text) => {
+                    return true;
+                  }}
+                />
               </h3>
             </CollapsibleTrigger>
           </div>

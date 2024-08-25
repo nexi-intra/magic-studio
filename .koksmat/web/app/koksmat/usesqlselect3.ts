@@ -3,7 +3,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 
 import { run } from "@/app/koksmat/magicservices";
-import { Result } from "./httphelper";
 import { MagicboxContext } from "./magicbox-context";
 
 export const version = 1;

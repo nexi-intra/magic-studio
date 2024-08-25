@@ -14,9 +14,9 @@ import { Button } from "./ui/button";
 import { ToolContextProvider } from "./contexts/toolcontextprovider";
 import ToolRunProgram from "./tool-run-program";
 import { WorkflowFile } from "@/lib/workflow-utils";
-import { se } from "date-fns/locale";
+import { DatabaseMethods } from "@/actions/model";
 
-export default function WorkflowEditor(props: {
+export default function WorkflowEditor<T>(props: {
   flow: WorkflowFile | undefined;
 }) {
   const magicbox = useContext(MagicboxContext);
@@ -55,38 +55,7 @@ export default function WorkflowEditor(props: {
     { id: "activity-2", type: "Activity 2" },
     { id: "activity-3", type: "Activity 3" },
   ]);
-  const [initialSections, setinitialSections] = useState<Section[]>([
-    // {
-    //   id: "section-A",
-    //   title: "Section A",
-    //   content: "This is the content for Section 1.",
-    //   collapsed: false,
-    //   columns: Array.from({ length: 4 }, (_, i) => ({
-    //     id: `column-1-${i + 1}`,
-    //     items: [],
-    //   })),
-    // },
-    // {
-    //   id: "section-2",
-    //   title: "Section 2",
-    //   content: "This is the content for Section 2.",
-    //   collapsed: false,
-    //   columns: Array.from({ length: 4 }, (_, i) => ({
-    //     id: `column-2-${i + 1}`,
-    //     items: [],
-    //   })),
-    // },
-    // {
-    //   id: "section-3",
-    //   title: "Section 3",
-    //   content: "This is the content for Section 3.",
-    //   collapsed: false,
-    //   columns: Array.from({ length: 4 }, (_, i) => ({
-    //     id: `column-3-${i + 1}`,
-    //     items: [],
-    //   })),
-    // },
-  ]);
+  const [initialSections, setinitialSections] = useState<Section[]>([]);
 
   useEffect(() => {
     if (!props.flow) return;
@@ -115,7 +84,7 @@ export default function WorkflowEditor(props: {
 
   return (
     <ToolContextProvider>
-      <pre>{JSON.stringify(props.flow, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(props.flow, null, 2)}</pre> */}
       <EditorCanvas
         handleSave={handleSave}
         activityIcons={activityIcons}
