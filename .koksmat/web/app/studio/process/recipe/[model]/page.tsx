@@ -4,6 +4,7 @@ import {
   useActivityModelItem,
   useActivityModelItems,
 } from "@/actions/database/works/activityModel";
+import DynamicIcon from "@/components/dynamic-icon";
 
 import WorkflowEditor from "@/components/workflow-editor2";
 import { parseWorkflowYaml, WorkflowFile } from "@/lib/workflow-utils";
@@ -30,12 +31,12 @@ workflow:
     - id: "choose_pizza"
       name: "Choose Pizza"
       description: "Select a pizza from the Wolt app."
-      icon: "pizza" # LucideReact icon reference
+      icon: "Pizza" # LucideReact icon reference
 
     - id: "place_order"
       name: "Place Order"
       description: "Confirm the order and pay for the pizza through the Wolt app."
-      icon: "shopping-cart" # LucideReact icon reference
+      icon: "ShoppingCart" # LucideReact icon reference
 
     - id: "track_delivery"
       name: "Track Delivery"

@@ -58,7 +58,7 @@ export default function EditableText({
   const handleMouseLeave = () => {
     leaveTimeoutRef.current = setTimeout(() => {
       setIsHovered(false);
-    }, 2000); // 1 second delay
+    }, 1000); // 1 second delay
   };
 
   if (isEditing) {
@@ -100,19 +100,18 @@ export default function EditableText({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {showCheckmark ? (
+      {showCheckmark && (
         <Check className="absolute -right-6 top-1/2 h-5 w-5 -translate-y-1/2 text-green-500" />
-      ) : (
-        isHovered && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute -right-10 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
-            onClick={() => setIsEditing(true)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
-        )
+      )}
+      {isHovered && (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute -right-10 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
+          onClick={() => setIsEditing(true)}
+        >
+          <Edit2 className="h-4 w-4" />
+        </Button>
       )}
       <span>{text}</span>
     </div>

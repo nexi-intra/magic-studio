@@ -13,7 +13,7 @@ export default function Page() {
       {/* <pre>{JSON.stringify(magicbox, null, 2)}</pre> */}
       <SQLCards
         Icon={CardStackIcon}
-        slugPrefix={"/" + APPNAME + "/kitchen/recipe/"}
+        slugPrefix={"/" + APPNAME + "/process/recipe/"}
         database={"works"}
         sql={`
 SELECT W.name as title, '' as description, W.name as slug FROM activitymodel as W 

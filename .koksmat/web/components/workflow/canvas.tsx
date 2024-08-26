@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -67,11 +67,16 @@ export interface EditorCanvasProps {
 
 export default function EditorCanvas(props: EditorCanvasProps) {
   const [metadata, setMetadata] = useState<WorkflowMetadata>(props.metadata);
-  const [sections, setSections] = useState<Section[]>(props.initialSections);
+  const [sections, setSections] = useState<Section[]>([]);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [isDetailsPanel, setIsDetailsPanel] = useState(false);
   const [isAddingSection, setIsAddingSection] = useState(false);
+
+  useEffect(() => {
+    if (!props.initialSections) return;
+    setSections(props.initialSections);
+  }, [props.initialSections]);
 
   const [undoStack, setUndoStack] = useState<
     { sections: Section[]; metadata: WorkflowMetadata }[]
@@ -201,6 +206,19 @@ export default function EditorCanvas(props: EditorCanvasProps) {
     });
   };
 
+  const handleTitleSave = async (sectionId: string, text: string) => {
+    // Push current state to undo stack before making changes
+    pushToUndoStack();
+
+    // Update the section title
+    setSections((prevSections) =>
+      prevSections.map((sec) =>
+        sec.id === sectionId ? { ...sec, title: text } : sec
+      )
+    );
+
+    return true; // Indicate that the save was successful
+  };
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-screen w-full">
@@ -271,6 +289,7 @@ export default function EditorCanvas(props: EditorCanvasProps) {
                 selectedSections={selectedSections}
                 addActivityIconToColumn={addActivityIconToColumn}
                 moveActivityIcon={moveActivityIcon}
+                handleTitleChange={handleTitleSave}
               />
             ))}
           </div>
@@ -327,6 +346,7 @@ interface DraggableSectionProps {
     hoverColumnId: string,
     hoverSectionId: string
   ) => void;
+  handleTitleChange: (id: string, title: string) => Promise<boolean>;
 }
 
 const DraggableSection: React.FC<DraggableSectionProps> = ({
@@ -339,6 +359,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   selectedSections,
   addActivityIconToColumn,
   moveActivityIcon,
+  handleTitleChange,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<DragItem, void, CollectedProps>({
@@ -411,7 +432,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                 <EditableText
                   initialText={section.title}
                   onSave={async (text) => {
-                    return true;
+                    return handleTitleChange(section.id, text);
                   }}
                 />
               </h3>

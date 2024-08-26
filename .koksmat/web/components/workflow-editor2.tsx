@@ -16,6 +16,8 @@ import ToolRunProgram from "./tool-run-program";
 import { WorkflowFile } from "@/lib/workflow-utils";
 import { DatabaseMethods } from "@/actions/model";
 
+import DynamicIcon from "@/components/dynamic-icon";
+
 export default function WorkflowEditor<T>(props: {
   flow: WorkflowFile | undefined;
 }) {
@@ -64,6 +66,12 @@ export default function WorkflowEditor<T>(props: {
     const activityIcons: ActivityIcon[] = workflow.actions.map((action) => ({
       id: action.id,
       type: action.name,
+      component: (
+        <div>
+          <DynamicIcon iconName={action.icon as any} />
+          {action.name}{" "}
+        </div>
+      ),
     }));
     setactivityIcons(activityIcons);
     const sections = workflow.sections.map((section) => {
