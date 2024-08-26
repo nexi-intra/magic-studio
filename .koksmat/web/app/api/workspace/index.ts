@@ -1,7 +1,10 @@
 import { run } from "@/app/koksmat/magicservices";
 import { th } from "date-fns/locale";
+import { jwtDecode } from "jwt-decode";
 export async function getUPNfromToken(token: string) {
-  return "niels.johansen@nexigroup.com";
+  const jwt: any = jwtDecode(token!);
+  // debugger;
+  return jwt.upn; // "niels.johansen@nexigroup.com";
 }
 export async function getWorkspaces(upn: string) {
   const result = await run<any>(
