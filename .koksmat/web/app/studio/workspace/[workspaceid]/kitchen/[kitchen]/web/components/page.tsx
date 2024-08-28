@@ -7,6 +7,7 @@ import { pathJoin } from "@/lib/pathjoin";
 import { WorkspaceContext } from "@/components/contexts/workspacecontext";
 import { vsCodeOpen } from "@/lib/vscode-open";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import PromptSuggestions from "@/components/prompt-suggestions";
 /*
 //Example usage:
 const result = convertToDashCase("StudioWelcomePage");
@@ -24,63 +25,78 @@ export default function ComponentPage(props: {
   const magicbox = useContext(MagicboxContext);
   const { workspaceid, kitchen } = props.params;
   const workspaceContext = useContext(WorkspaceContext);
-
+  const initialSuggestions = [
+    {
+      id: "1",
+      title: "New Component",
+      description: "Generate a story opening",
+      prompt:
+        "like data to be isolated in state variables and a initial props passed to the component - everything should be made typescript safe",
+      url: "https://v0.dev/chat",
+    },
+    // ... more suggestions
+  ];
   return (
     <div>
-      <ComponentNew
-        onSubmitted={async (data) => {
-          const filename = convertToDashCase(data.componentName) + ".tsx";
-          const cwd = pathJoin(
-            workspaceContext.kitchenroot,
-            kitchen,
-            ".koksmat",
-            "web",
-            "components"
-          );
+      <h1 className="text-2xl font-bold mb-4  m-4">Create component</h1>
 
-          const args = [
-            "-c",
-            `echo "` +
-              data.sourceCode.replaceAll(`"`, `\"`) +
-              `" > ` +
-              filename,
-          ];
-          const command = "bash";
+      <div className="flex w-full h-full m-4">
+        <ComponentNew
+          onSubmitted={async (data) => {
+            const filename = convertToDashCase(data.componentName) + ".tsx";
+            const cwd = pathJoin(
+              workspaceContext.kitchenroot,
+              kitchen,
+              ".koksmat",
+              "web",
+              "components"
+            );
 
-          const request1 = new Request(`/api/autopilot/exec`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${magicbox.authtoken}`,
-            },
-            body: JSON.stringify({
-              sessionid: workspaceid,
-              action: "execute",
-              command,
-              args,
-              cwd,
-            }),
-          });
-          const result = await fetch(request1).catch((e) => {
-            console.error(e);
-            toast({
-              title: "Error",
-              description: "Failed to create component",
-              variant: "destructive",
+            const args = [
+              "-c",
+              `echo "` +
+                data.sourceCode.replaceAll(`"`, `\"`) +
+                `" > ` +
+                filename,
+            ];
+            const command = "bash";
+
+            const request1 = new Request(`/api/autopilot/exec`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${magicbox.authtoken}`,
+              },
+              body: JSON.stringify({
+                sessionid: workspaceid,
+                action: "execute",
+                command,
+                args,
+                cwd,
+              }),
             });
-          });
+            const result = await fetch(request1).catch((e) => {
+              console.error(e);
+              toast({
+                title: "Error",
+                description: "Failed to create component",
+                variant: "destructive",
+              });
+            });
 
-          if (!result) return;
-          vsCodeOpen(magicbox.authtoken, filename, cwd);
+            if (!result) return;
+            vsCodeOpen(magicbox.authtoken, filename, cwd);
 
-          toast({
-            title: "Component Created!",
-            description: `Your new component "${data.componentName}" has been created with the provided source code and saved to ${filename}.
+            toast({
+              title: "Component Created!",
+              description: `Your new component "${data.componentName}" has been created with the provided source code and saved to ${filename}.
             Have asked vs code to open the file
             `,
-          });
-        }}
-      />
+            });
+          }}
+        />
+        <PromptSuggestions initialSuggestions={initialSuggestions} />
+      </div>
     </div>
   );
 }
