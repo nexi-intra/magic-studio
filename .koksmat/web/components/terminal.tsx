@@ -219,6 +219,7 @@ export function Terminal(props: {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${magicbox.authtoken}`,
       },
       body,
     });

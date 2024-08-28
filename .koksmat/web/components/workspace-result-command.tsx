@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import React, { useContext, useEffect, useState } from "react";
 
 export default function WorkspaceResult(props: {
   workspaceid: string;
@@ -8,6 +9,7 @@ export default function WorkspaceResult(props: {
 
   parser: (response: string) => JSX.Element;
 }) {
+  const magicbox = useContext(MagicboxContext);
   const { workspaceid, folder, command, args } = props;
   const [items, setitems] = useState<JSX.Element[]>([]);
   const [error, seterror] = useState("");
@@ -16,6 +18,10 @@ export default function WorkspaceResult(props: {
       // post using fetch to get the connection status
       seterror("");
       const request1 = new Request(`/api/autopilot/exec`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${magicbox.authtoken}`,
+        },
         method: "POST",
         body: JSON.stringify({
           sessionid: workspaceid,

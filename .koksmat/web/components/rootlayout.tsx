@@ -81,19 +81,6 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={href.WORKSPACES}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              prefetch={false}
-            >
-              <AppWindowMac className="h-5 w-5" />
-              <span className="sr-only">Workspaces</span>
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="right">Workspaces</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
               href={href.PROCESS}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               prefetch={false}
@@ -107,17 +94,17 @@ export function NavigationItems(props: { withCaptions: boolean }) {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={href.DATABASE}
-              className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              href={href.WORKSPACES}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               prefetch={false}
             >
-              <DatabaseIcon className="h-5 w-5" />
-              <span className="sr-only">Databases</span>
+              <AppWindowMac className="h-5 w-5" />
+              <span className="sr-only">Workspaces</span>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">Databases</TooltipContent>
+          <TooltipContent side="right">Workspaces</TooltipContent>
         </Tooltip>
-        <Tooltip>
+        {/* <Tooltip>
           <TooltipTrigger asChild>
             <Link
               href={href.SHARE}
@@ -129,7 +116,21 @@ export function NavigationItems(props: { withCaptions: boolean }) {
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right">Share</TooltipContent>
+        </Tooltip> */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={href.DATABASE}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              prefetch={false}
+            >
+              <DatabaseIcon className="h-5 w-5" />
+              <span className="sr-only">Databases</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Databases</TooltipContent>
         </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Link

@@ -36,6 +36,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { tree } from "next/dist/build/templates/app-page";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 
 function extractOrgAndRepo(
   gitHubUrl: string
@@ -64,6 +65,7 @@ function Loaded(props: {
   };
 }) {
   const workspaceContext = useContext(WorkspaceContext);
+  const magicbox = useContext(MagicboxContext);
   const { workspaceid, kitchen } = props.params;
   const { children, kitchenroot } = props;
   const [connectionReady, setconnectionReady] = useState(false);
@@ -85,6 +87,7 @@ function Loaded(props: {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${magicbox.authtoken}`,
       },
       body,
     });

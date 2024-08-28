@@ -1,4 +1,5 @@
 export async function vsCodeOpen(
+  authtoken: string,
   filename: string,
   cwd: string
 ): Promise<boolean> {
@@ -7,6 +8,10 @@ export async function vsCodeOpen(
 
   const request1 = new Request(`/api/autopilot/exec`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authtoken}`,
+    },
     body: JSON.stringify({
       sessionid: "x",
       action: "execute",

@@ -76,6 +76,7 @@ export function DatabaseToolbar(props: { database: string }) {
             </TooltipTrigger>
             <TooltipContent>Tables</TooltipContent>
           </Tooltip>
+
           {/* <Tooltip>
             <TooltipTrigger asChild>
               <DatabaseProcedures

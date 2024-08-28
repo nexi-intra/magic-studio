@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 
-export async function getUPNfromToken(
+export async function getUPNfromBearer(
   request: Request
 ): Promise<{ upn: string; errorMessage: string }> {
   // Extract the Authorization header

@@ -1,7 +1,8 @@
 "use client";
 
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import { log } from "@/lib/log";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export interface Kitchen {
   name: string;
@@ -14,13 +15,20 @@ export interface Kitchen {
 }
 
 export default function useKitchens(workspaceid: string) {
+  const magicbox = useContext(MagicboxContext);
   const [response, setresponse] = useState<Kitchen[]>([]);
 
   useEffect(() => {
     const load = async () => {
+      if (!magicbox.authtoken) return;
+
       // post using fetch to get the connection status
       const request1 = new Request(`/api/autopilot/exec`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${magicbox.authtoken}`,
+        },
         body: JSON.stringify({
           sessionid: workspaceid,
           action: "execute",
@@ -39,7 +47,7 @@ export default function useKitchens(workspaceid: string) {
     };
     if (!workspaceid) return;
     load();
-  }, [workspaceid]);
+  }, [workspaceid, magicbox.authtoken]);
 
   return response;
 }

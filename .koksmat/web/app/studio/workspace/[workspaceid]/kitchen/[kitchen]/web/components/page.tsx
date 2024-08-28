@@ -6,6 +6,7 @@ import { workspaceExecute } from "@/lib/workspace";
 import { pathJoin } from "@/lib/pathjoin";
 import { WorkspaceContext } from "@/components/contexts/workspacecontext";
 import { vsCodeOpen } from "@/lib/vscode-open";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 /*
 //Example usage:
 const result = convertToDashCase("StudioWelcomePage");
@@ -20,6 +21,7 @@ function convertToDashCase(input: string): string {
 export default function ComponentPage(props: {
   params: { workspaceid: string; kitchen: string };
 }) {
+  const magicbox = useContext(MagicboxContext);
   const { workspaceid, kitchen } = props.params;
   const workspaceContext = useContext(WorkspaceContext);
 
@@ -47,6 +49,10 @@ export default function ComponentPage(props: {
 
           const request1 = new Request(`/api/autopilot/exec`, {
             method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${magicbox.authtoken}`,
+            },
             body: JSON.stringify({
               sessionid: workspaceid,
               action: "execute",
@@ -65,7 +71,7 @@ export default function ComponentPage(props: {
           });
 
           if (!result) return;
-          vsCodeOpen(filename, cwd);
+          vsCodeOpen(magicbox.authtoken, filename, cwd);
 
           toast({
             title: "Component Created!",

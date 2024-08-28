@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { WorkspaceContext, WorkspaceContextType } from "./workspacecontext";
 import { debug } from "console";
 import { set } from "date-fns";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 
 export const WorkspaceContextProvider = (props: { children: any }) => {
+  const magicbox = useContext(MagicboxContext);
   const [kitchenRoot, setKitchenRoot] = useState<any>();
   const [workspaceId, setworkspaceId] = useState("");
   const [webPathname, setPathname] = useState("");
@@ -44,10 +46,20 @@ export const WorkspaceContextProvider = (props: { children: any }) => {
 
   useEffect(() => {
     if (!workspaceId) return;
+    if (!magicbox.authtoken) return;
     const load = async () => {
-      const getKitchenRoot = await fetch(
-        `/api/exec/remote/${workspaceId}/koksmat/context/kitchenRoot`
+      const request1 = new Request(
+        `/api/exec/remote/${workspaceId}/koksmat/context/kitchenRoot`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${magicbox.authtoken}`,
+          },
+        }
       );
+
+      const getKitchenRoot = await fetch(request1);
 
       const kitchenRoot = await getKitchenRoot.text().catch((e) => {
         return { e };
@@ -57,7 +69,7 @@ export const WorkspaceContextProvider = (props: { children: any }) => {
       setKitchenRoot((kitchenRoot as string).split("\n")[0]);
     };
     load();
-  }, [workspaceId]);
+  }, [workspaceId, magicbox.authtoken]);
 
   return (
     <WorkspaceContext.Provider value={workspace}>
