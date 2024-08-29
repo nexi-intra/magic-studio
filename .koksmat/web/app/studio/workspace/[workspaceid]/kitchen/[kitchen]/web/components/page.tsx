@@ -8,6 +8,7 @@ import { WorkspaceContext } from "@/components/contexts/workspacecontext";
 import { vsCodeOpen } from "@/lib/vscode-open";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import PromptSuggestions from "@/components/prompt-suggestions";
+import { id } from "date-fns/locale";
 /*
 //Example usage:
 const result = convertToDashCase("StudioWelcomePage");
@@ -32,6 +33,14 @@ export default function ComponentPage(props: {
       description: "Generate a story opening",
       prompt:
         "like data to be isolated in state variables and a initial props passed to the component - everything should be made typescript safe",
+      url: "https://v0.dev/chat",
+    },
+    {
+      id: "2",
+      title: "High level  Component",
+      description: "Generate a story opening",
+      prompt:
+        "new component using - that will be a high level component having tabs for navigations and the 2 child components - one for contacts and one with a world map containing geo locations of the account",
       url: "https://v0.dev/chat",
     },
     // ... more suggestions

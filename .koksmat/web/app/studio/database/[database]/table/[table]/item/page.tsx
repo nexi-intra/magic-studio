@@ -15,6 +15,7 @@ export default function Page(props: {
 
       <SQLCards
         Icon={CardStackIcon}
+        filter={(item) => item.slug !== "new"}
         slugPrefix={
           "/" + APPNAME + "/database/" + database + "/table/" + table + "/item/"
         }

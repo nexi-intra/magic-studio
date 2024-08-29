@@ -33,7 +33,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { APPNAME } from "@/app/global";
 import {
   TableDetail,
@@ -46,9 +46,12 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Button } from "./ui/button";
-import { FolderSyncIcon } from "lucide-react";
+import { ArrowRight, FolderSyncIcon } from "lucide-react";
+import { hasField } from "@/lib/datamodel";
+import EditableText from "./editable-text";
 
 export function TablePage(props: { database: string; table: string }) {
+  const [mapfields, setmapfields] = useState(false);
   const { database, table } = props;
   const query = useSQLSelect3<TableDetail>(database, tableDetailsSql(table));
 
@@ -70,12 +73,24 @@ export function TablePage(props: { database: string; table: string }) {
     <div className="flex flex-col gap-8 p-6 md:p-8 lg:p-10">
       <div className="flex items-center justify-between">
         <div className="grid gap-2">
-          <h1 className="text-2xl font-bold">{tableMetadata.table_name}</h1>
+          <h1 className="text-2xl font-bold uppercase">
+            {tableMetadata.table_name}
+          </h1>
           <p className="text-muted-foreground">
             Detailed information about the table.
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button
+            variant={"outline"}
+            className="h-9 px-6"
+            onClick={() => setmapfields(!mapfields)}
+          >
+            <ArrowRight className="w-4 h-4 mr-2" />
+            {/* <FolderSyncIcon className="w-4 h-4 mr-2" /> */}
+            Map
+          </Button>
+
           <Link
             href={
               "/" +
@@ -111,16 +126,22 @@ export function TablePage(props: { database: string; table: string }) {
         </div>
       </div>
       <div className="grid gap-6 rounded-lg border bg-background p-6 md:p-8 lg:p-10">
-        <div className="grid gap-2">
+        <div className="grid gap-2 hidden">
           <h2 className="text-xl font-bold">Table Details</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            <div className="grid gap-1">
+            {/* <div className="grid gap-1">
               <p className="text-muted-foreground">Items</p>
               <p className="font-medium">{tableMetadata.row_count}</p>
-            </div>
+            </div> */}
             <div className="grid gap-1">
               <p className="text-muted-foreground">Columns</p>
-              <p className="font-medium">{tableMetadata.columns.length}</p>
+              <p className="font-medium">
+                {
+                  tableMetadata.columns.filter((column) =>
+                    hasField(column.column_name, "standard")
+                  ).length
+                }
+              </p>
             </div>
             <div className="grid gap-1">
               <p className="text-muted-foreground">Procedures</p>
@@ -140,28 +161,50 @@ export function TablePage(props: { database: string; table: string }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Nullable</TableHead>
-                <TableHead>Default</TableHead>
+                {mapfields && <TableCell>Map</TableCell>}
+                {!mapfields && (
+                  <>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Nullable</TableHead>
+                    <TableHead>Default</TableHead>
+                  </>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableMetadata.columns.map((column, index) => {
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
-                      {column.column_name}
-                    </TableCell>
-                    <TableCell>{column.data_type}</TableCell>
-                    <TableCell>{column.is_nullable}</TableCell>
-                    <TableCell>{column.column_default}</TableCell>
-                  </TableRow>
-                );
-              })}
+              {tableMetadata.columns
+                .filter((column) => hasField(column.column_name, "standard"))
+                .map((column, index) => {
+                  return (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        {column.column_name}
+                      </TableCell>
+                      {mapfields && (
+                        <TableCell>
+                          <EditableText
+                            fixed
+                            initialText={column.column_name}
+                            onSave={async (text: string) => {
+                              return true;
+                            }}
+                          />
+                        </TableCell>
+                      )}
+                      {!mapfields && (
+                        <>
+                          <TableCell>{column.data_type}</TableCell>
+                          <TableCell>{column.is_nullable}</TableCell>
+                          <TableCell>{column.column_default}</TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </div>
-        <div className="grid gap-2">
+        <div className="grid gap-2 hidden">
           <h2 className="text-xl font-bold">Functions &amp; Procedures</h2>
           <Table>
             <TableHeader>
