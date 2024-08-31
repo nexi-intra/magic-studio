@@ -91,6 +91,8 @@ export default function ResizableLayout(props: {
   topnav: any;
   shop: any;
   leftnav: any;
+  leftfooter?: any;
+  rightfooter?: any;
   children: React.ReactElement;
 }): React.ReactElement {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
@@ -125,11 +127,11 @@ export default function ResizableLayout(props: {
       <ResizablePanelGroup direction="horizontal" className="flex-grow">
         {/* Left Aside */}
         <ResizablePanel
-          defaultSize={5}
+          defaultSize={3}
           collapsible={true}
           minSize={15}
           maxSize={20}
-          collapsedSize={5}
+          collapsedSize={3}
           onCollapse={handleCollapse}
           onExpand={handleExpand}
           className="bg-muted"
@@ -188,7 +190,8 @@ export default function ResizableLayout(props: {
 
       {/* Footer */}
       <footer className="bg-muted border-t h-12 flex items-center justify-center">
-        <p>Footer</p>
+        <div>{props.leftfooter}</div>
+        <div>{props.rightfooter}</div>
       </footer>
     </div>
   );

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { APPNAME } from "@/app/global";
 import {
   Tooltip,
   TooltipContent,
@@ -6,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export interface NavItem {
   icon: React.ReactNode;
@@ -25,30 +28,42 @@ export default function LeftNavigation({
   bottomItems = [],
   isCollapsed,
 }: LeftNavigationProps) {
-  const NavButton: React.FC<NavItem> = ({ icon, label, info, href }) => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link href={href}>
-            <button className="w-full p-2 rounded-lg hover:bg-muted transition-colors flex items-center">
-              <span className="flex-shrink-0">{icon}</span>
-              {!isCollapsed && <span className="ml-2">{label}</span>}
-              {isCollapsed && <span className="sr-only">{label}</span>}
-            </button>
-          </Link>
-        </TooltipTrigger>
-        {isCollapsed && (
-          <TooltipContent side="right">
-            <p>{info}</p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
-  );
+  const pathname = usePathname();
+
+  const NavButton: React.FC<NavItem> = ({ icon, label, info, href }) => {
+    const isActive = pathname.startsWith(href) && href !== "/" + APPNAME;
+
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={href}>
+              <button
+                className={`w-full p-2 rounded-lg transition-colors flex items-center hover:text-slate-900 ${
+                  isActive ? "text-blue-700" : "text-slate-500 hover:bg-muted"
+                }`}
+              >
+                <span className="flex-shrink-0">{icon}</span>
+                {!isCollapsed && <span className="ml-2">{label}</span>}
+                {isCollapsed && <span className="sr-only">{label}</span>}
+              </button>
+            </Link>
+          </TooltipTrigger>
+          {isCollapsed && (
+            <TooltipContent side="right">
+              <p>{info}</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   return (
     <div
-      className={`h-full flex flex-col justify-between py-4 ${isCollapsed ? "items-center" : ""}`}
+      className={`h-full flex flex-col justify-between py-4 ${
+        isCollapsed ? "items-center" : ""
+      }`}
     >
       <div className="space-y-2 w-full">
         {topItems.map((item) => (

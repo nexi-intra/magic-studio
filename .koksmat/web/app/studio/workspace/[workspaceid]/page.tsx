@@ -30,6 +30,7 @@ export default function Page(props: { params: { workspaceid: string } }) {
     <div>
       {/* <div>{workspaceContext.kitchenroot}</div> */}
       <Input
+        autoFocus
         type="text"
         placeholder="Search kitchens..."
         value={searchTerm}

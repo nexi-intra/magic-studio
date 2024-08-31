@@ -47,38 +47,38 @@ interface SavedPage {
 }
 const topItems: NavItem[] = [
   {
-    icon: <KoksmatChef className="h-6 w-6" />,
+    icon: <KoksmatChef className="h-5 w-5" />,
     label: "Home",
     href: href.HOME,
     info: "Go to home page",
   },
 
   {
-    icon: <CookingPotIcon className="h-6 w-6" />,
+    icon: <CookingPotIcon className="h-5 w-5" />,
     href: href.PROCESS,
     label: "Processes",
     info: "Control and govern your app",
   },
   {
-    icon: <AppWindowMac className="h-6 w-6" />,
+    icon: <AppWindowMac className="h-5 w-5" />,
     href: href.WORKSPACES,
     label: "Workspace",
     info: "Connect with your workspace",
   },
   {
-    icon: <DatabaseIcon className="h-6 w-6" />,
+    icon: <DatabaseIcon className="h-5 w-5" />,
     label: "Databases",
     href: href.DATABASE,
     info: "Work with data",
   },
   {
-    icon: <Globe className="h-6 w-6" />,
+    icon: <Globe className="h-5 w-5" />,
     label: "APIs",
     href: href.APIS,
     info: "Browse available services",
   },
   {
-    icon: <Activity className="h-6 w-6" />,
+    icon: <Activity className="h-5 w-5" />,
     href: "/studio/workspace/auto/kubernetes",
     label: "Activity",
     info: "Monitor your services",
@@ -87,19 +87,19 @@ const topItems: NavItem[] = [
 
 const bottomItems: NavItem[] = [
   {
-    icon: <Settings className="h-6 w-6" />,
+    icon: <Settings className="h-5 w-5" />,
     label: "Settings",
     href: "#",
     info: "Adjust your settings",
   },
   {
-    icon: <HelpCircle className="h-6 w-6" />,
+    icon: <HelpCircle className="h-5 w-5" />,
     label: "Help",
     href: "#",
     info: "Get help and support",
   },
   {
-    icon: <LogOut className="h-6 w-6" />,
+    icon: <LogOut className="h-5 w-5" />,
     label: "Logout",
     href: "#",
     info: "Sign out of your account",
@@ -129,7 +129,7 @@ export default function ClientLayout(props: { children: any }) {
   return (
     <AppProvider>
       <Authenticate apiScope={UserProfileAPI}>
-        <GlobalPasteHandling />
+        {/* <GlobalPasteHandling /> */}
         <GlobalDropHandling />
         <ResizableLayout
           onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
@@ -143,6 +143,7 @@ export default function ClientLayout(props: { children: any }) {
           breadcrumb={<GlobalBreadcrumb />}
           topnav={<TabNavigatorWithReorder />}
           shop={<GlobalShopButton />}
+          leftfooter={<GlobalPasteHandling />}
         >
           {children}
         </ResizableLayout>
