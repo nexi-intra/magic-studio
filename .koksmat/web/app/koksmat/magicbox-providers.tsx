@@ -8,6 +8,7 @@ import {
   User,
   AuthSource,
   ServiceCallLogEntry,
+  Product,
 } from "./magicbox-context";
 import { IPublicClientApplication, PopupRequest } from "@azure/msal-browser";
 import { MagicRequest } from "./magicservices";
@@ -31,6 +32,7 @@ export const MagicboxProvider = ({ children }: Props) => {
   const [currentOrganization, setcurrentOrganization] = useState("");
   const [currentRepository, setcurrentRepository] = useState("");
   const [currentBranch, setcurrentBranch] = useState("");
+  const [basket, setbasket] = useState<Product[]>([]);
 
   const { toast } = useToast();
   const servicecalllog = useMemo<ServiceCallLogEntry[]>(() => {
@@ -38,7 +40,13 @@ export const MagicboxProvider = ({ children }: Props) => {
   }, []);
 
   const [showtracer, setshowtracer] = useState(false);
-
+  const handlePaste = (data: string) => {
+    setbasket([...basket, { type: "text", data }]);
+    setversion(version + 1);
+    toast({
+      title: "Added text to basket",
+    });
+  };
   const magicbox: MagicboxContextType = {
     currentWorkspace,
     setCurrentWorkspace: (workspace: string) => {
@@ -144,6 +152,14 @@ export const MagicboxProvider = ({ children }: Props) => {
     setCurrentBranch: function (branch: string): void {
       localStorage.setItem("currentBranch", branch);
       setcurrentBranch(branch);
+    },
+    handlePaste,
+    basket,
+    handleFileDrop: function (data: any): void {
+      handlePaste(data);
+    },
+    handleTextDrop: function (data: string): void {
+      handlePaste(data);
     },
   };
 

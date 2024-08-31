@@ -71,7 +71,7 @@ export default function EditableText({
       <div className="flex items-center space-x-2">
         <Input
           value={text}
-          onChange={(e) => {
+          onChange={(e: any) => {
             setText(e.target.value);
             setchanged(true);
           }}

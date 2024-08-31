@@ -11,6 +11,11 @@ export interface Session {
   accessToken: string;
 }
 
+export interface Product {
+  type: string;
+  data: any;
+}
+
 export interface User {
   name: string;
   email: string;
@@ -60,6 +65,10 @@ export type MagicboxContextType = {
   setCurrentRepository: (repository: string) => void;
   currentBranch: string;
   setCurrentBranch: (branch: string) => void;
+  handlePaste: (data: string) => void;
+  handleFileDrop: (data: any) => void;
+  handleTextDrop: (data: string) => void;
+  basket: Product[];
 };
 export const MagicboxContext = createContext<MagicboxContextType>({
   session: {
@@ -123,6 +132,16 @@ export const MagicboxContext = createContext<MagicboxContextType>({
   },
   currentBranch: "",
   setCurrentBranch: function (branch: string): void {
+    throw new Error("Function not implemented.");
+  },
+  handlePaste: function (data: string): void {
+    throw new Error("Function not implemented.");
+  },
+  basket: [],
+  handleFileDrop: function (data: any): void {
+    throw new Error("Function not implemented.");
+  },
+  handleTextDrop: function (data: string): void {
     throw new Error("Function not implemented.");
   },
 });
