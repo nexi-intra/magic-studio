@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { CardStackIcon } from "@radix-ui/react-icons";
 import { ReactElement } from "react";
-import ItemCard from "./ItemCard";
+import ItemCard from "./item-card";
 
 export interface Item {
   id: number;

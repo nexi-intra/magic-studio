@@ -12,13 +12,47 @@ import {
 import Link from "next/link";
 import DevCurrentPage from "./dev-current-page";
 import { Edit3Icon, LayersIcon } from "lucide-react";
+import { DropdownMenuIcon } from "@radix-ui/react-icons";
+import { useBreadcrumbContext } from "./contexts/breadcrumb-context";
 
 interface BreadcrumbItem {
   name: string;
   href: string;
 }
+
+function GlobalBreadcrumbItem(props: {
+  item: BreadcrumbItem;
+  hasChilds: boolean;
+  key: any;
+}) {
+  const [mouseover, setmouseover] = useState(false);
+  const { item, hasChilds, key } = props;
+  return (
+    <BreadcrumbItem
+      key={key}
+      onMouseEnter={() => setmouseover(true)}
+      onMouseLeave={() => setmouseover(false)}
+    >
+      <BreadcrumbLink asChild>
+        <Link href={item.href} prefetch={false}>
+          {item.name}
+        </Link>
+      </BreadcrumbLink>
+      {hasChilds && !mouseover && <BreadcrumbSeparator />}
+      {hasChilds && mouseover && <DropdownMenuIcon />}
+      {/* {hasChilds ? null : (
+        <Fragment>
+          {mouseover ? <DropdownMenuIcon /> : <BreadcrumbSeparator />}
+          <BreadcrumbSeparator />
+        </Fragment>
+      )} */}
+    </BreadcrumbItem>
+  );
+}
+
 export default function GlobalBreadcrumb() {
   const pathname = usePathname();
+  const breadcrumbContext = useBreadcrumbContext();
   const [showEdit, setshowEdit] = useState(false);
   const [items, setitems] = useState<BreadcrumbItem[]>([]);
 
@@ -43,16 +77,11 @@ export default function GlobalBreadcrumb() {
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
           {items.map((item, i) => (
-            <BreadcrumbItem key={i}>
-              <Fragment>
-                <BreadcrumbLink asChild>
-                  <Link href={item.href} prefetch={false}>
-                    {item.name}
-                  </Link>
-                </BreadcrumbLink>
-                {i === items.length - 1 ? null : <BreadcrumbSeparator />}
-              </Fragment>
-            </BreadcrumbItem>
+            <GlobalBreadcrumbItem
+              key={i}
+              item={item}
+              hasChilds={i !== items.length - 1}
+            />
           ))}
         </BreadcrumbList>
       </Breadcrumb>

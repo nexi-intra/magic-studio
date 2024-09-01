@@ -7,44 +7,28 @@ keep: false
 
 */
 import { AppProvider } from "@/components/appcontextprovider";
-import { href, RootLayout } from "@/components/rootlayout";
+import { href } from "@/components/rootlayout";
 import GlobalBreadcrumb from "@/components/global-breadcrumb";
 import Authenticate, { UserProfileAPI } from "../koksmat/authenticate";
-import MenuRoot from "@/components/menu-root";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePathname, useRouter } from "next/navigation";
-import { use, useEffect, useMemo, useState } from "react";
-import { se } from "date-fns/locale";
+import { useState } from "react";
+import { BreadcrumbProvider } from "@/components/contexts/breadcrumb-context";
+
 import {
   Activity,
   AppWindowMac,
   CookingPotIcon,
   DatabaseIcon,
-  Delete,
-  DeleteIcon,
   Globe,
-  Pin,
-  X,
 } from "lucide-react";
 import TabNavigatorWithReorder from "@/components/tab-navigator-with-reorder";
 import GlobalPasteHandling from "@/components/global-paste-handling";
 import { GlobalDropHandling } from "@/components/global-drop-handling";
 import ResizableLayout from "@/components/layout-left-aside";
 import LeftNavigation, { NavItem } from "@/components/left-navigation";
-import {
-  ChevronRight,
-  Home,
-  LayoutDashboard,
-  Settings,
-  HelpCircle,
-  LogOut,
-} from "lucide-react";
+import { Settings, HelpCircle, LogOut } from "lucide-react";
 import { KoksmatChef } from "@/components/icons/KoksmatChef";
 import GlobalShopButton from "@/components/global-shop-button";
-interface SavedPage {
-  pathname: string;
-  title: any;
-}
+
 const topItems: NavItem[] = [
   {
     icon: <KoksmatChef className="h-5 w-5" />,
@@ -106,60 +90,33 @@ const bottomItems: NavItem[] = [
   },
 ];
 export default function ClientLayout(props: { children: any }) {
-  const paths = useMemo<SavedPage[]>(() => {
-    let paths: SavedPage[] = [];
-    const storedPaths = sessionStorage.getItem("paths");
-    if (storedPaths) {
-      let stored = JSON.parse(storedPaths);
-      paths.push(...stored);
-    }
-    return paths;
-  }, []);
-  const pathname = usePathname();
-  const router = useRouter();
-  const [version, setversion] = useState(0);
   const { children } = props;
-
-  const addPath = (pathname: string, title: string) => {
-    paths.push({ pathname, title });
-    setversion(version + 1);
-    sessionStorage.setItem("paths", JSON.stringify(paths));
-  };
   const [leftNavCollapsed, setleftNavCollapsed] = useState(false);
+  const [ismobile, setismobile] = useState(false);
   return (
     <AppProvider>
       <Authenticate apiScope={UserProfileAPI}>
-        {/* <GlobalPasteHandling /> */}
-        <GlobalDropHandling />
-        <ResizableLayout
-          onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
-          leftnav={
-            <LeftNavigation
-              topItems={topItems}
-              bottomItems={bottomItems}
-              isCollapsed={leftNavCollapsed}
-            />
-          }
-          breadcrumb={<GlobalBreadcrumb />}
-          topnav={<TabNavigatorWithReorder />}
-          shop={<GlobalShopButton />}
-          leftfooter={<GlobalPasteHandling />}
-        >
-          {children}
-        </ResizableLayout>
-
-        {/* <div className="ml-16">
-          <MenuRoot />
-        </div> */}
-        {/* <div className="ml-[64px] top-0 sticky z-10 bg-white dark:bg-black w-full">
-          <TabNavigatorWithReorder />
-        </div>
-
-        <div className="w-full h-full z-0">
-          <RootLayout breadcrumb={<GlobalBreadcrumb />}>
-            <div className="px-4">{children}</div>
-          </RootLayout>
-        </div> */}
+        <BreadcrumbProvider>
+          <GlobalDropHandling />
+          <ResizableLayout
+            onMobileChange={(ismobile) => setismobile(ismobile)}
+            onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
+            leftnav={
+              <LeftNavigation
+                topItems={topItems}
+                bottomItems={bottomItems}
+                isCollapsed={leftNavCollapsed}
+                isMobile={ismobile}
+              />
+            }
+            breadcrumb={<GlobalBreadcrumb />}
+            topnav={<TabNavigatorWithReorder />}
+            shop={<GlobalShopButton />}
+            centerfooter={<GlobalPasteHandling />}
+          >
+            {children}
+          </ResizableLayout>
+        </BreadcrumbProvider>
       </Authenticate>
     </AppProvider>
   );

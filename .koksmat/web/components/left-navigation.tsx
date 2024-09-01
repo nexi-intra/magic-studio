@@ -21,12 +21,14 @@ interface LeftNavigationProps {
   topItems?: NavItem[];
   bottomItems?: NavItem[];
   isCollapsed: boolean;
+  isMobile: boolean;
 }
 
 export default function LeftNavigation({
   topItems = [],
   bottomItems = [],
   isCollapsed,
+  isMobile,
 }: LeftNavigationProps) {
   const pathname = usePathname();
 
@@ -44,12 +46,19 @@ export default function LeftNavigation({
                 }`}
               >
                 <span className="flex-shrink-0">{icon}</span>
-                {!isCollapsed && <span className="ml-2">{label}</span>}
-                {isCollapsed && <span className="sr-only">{label}</span>}
+                {!isCollapsed && !isMobile && (
+                  <span className="ml-2">{label}</span>
+                )}
+                {isMobile && <span className="ml-2">{label}</span>}
               </button>
             </Link>
           </TooltipTrigger>
-          {isCollapsed && (
+          {isMobile && (
+            <TooltipContent side="right">
+              <p>{info}</p>
+            </TooltipContent>
+          )}
+          {isCollapsed && !isMobile && (
             <TooltipContent side="right">
               <p>{info}</p>
             </TooltipContent>
