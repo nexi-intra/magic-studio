@@ -30,7 +30,7 @@ export default function GitOrganizations(props: {
       return items.sort((a, b) => a.title.localeCompare(b.title));
     }
   );
-
+  if (!organizations) return <div>Loading...</div>;
   return (
     <ItemsViewer
       visualisation={props.visualisation}

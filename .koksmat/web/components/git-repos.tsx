@@ -46,7 +46,7 @@ export default function GitRepos(props: {
       return items.sort((a: any, b: any) => a.title.localeCompare(b.title));
     }
   );
-
+  if (!organizations) return <div>Loading...</div>;
   return (
     <ItemsViewer
       visualisation={props.visualisation}
