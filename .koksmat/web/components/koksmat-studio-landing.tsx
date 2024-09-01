@@ -11,6 +11,8 @@ import {
   Lock,
   LucideIcon,
 } from "lucide-react";
+import { href } from "./rootlayout";
+import Link from "next/link";
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -101,9 +103,11 @@ export default function LandingPage() {
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
             Explore Koksmat Studio today and elevate your digital craftsmanship.
           </p>
-          <Button className="mt-8 text-lg" size="lg">
-            Get Started
-          </Button>
+          <Link href={href.ROLE}>
+            <Button className="mt-8 text-lg" size="lg">
+              Get Started
+            </Button>
+          </Link>
         </section>
       </main>
 

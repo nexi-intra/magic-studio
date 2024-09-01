@@ -29,6 +29,7 @@ export namespace href {
   export const ACCESS = "/" + APPNAME + "/access";
   export const PROCESS = "/" + APPNAME + "/process";
   export const SHARE = "/" + APPNAME + "/share";
+  export const ROLE = "/" + APPNAME + "/role";
 }
 export function NavigationItems(props: { withCaptions: boolean }) {
   const withCaptions = props.withCaptions;
