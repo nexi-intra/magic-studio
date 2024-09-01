@@ -6,25 +6,33 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import { UsePathLookupHook } from "../providers/lookup-provider";
+import path from "path";
+import { get } from "http";
+import { DropdownMenuIcon } from "@radix-ui/react-icons";
+import { Popover } from "@radix-ui/react-popover";
+import { PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 
+export interface BreadcrumbItemProps {
+  name: string;
+  href: string;
+}
 interface BreadcrumbOptions {
   title?: string;
   [key: string]: any; // Add any additional options as key-value pairs
 }
 
-interface Breadcrumb {
+interface BreadcrumbLookupHandlers {
   path: string;
   options?: BreadcrumbOptions;
 }
 
 interface BreadcrumbContextType {
-  breadcrumbs: Breadcrumb[];
-  registerBreadcrumb: (path: string, options?: BreadcrumbOptions) => void;
-  deregisterBreadcrumb: (path: string) => void;
-  updateBreadcrumbOptions: (
-    path: string,
-    newOptions: BreadcrumbOptions
-  ) => void;
+  breadcrumbs: BreadcrumbLookupHandlers[];
+  setPath: (path: string) => void;
+  items: BreadcrumbItemProps[];
+  getDropdownHandler: (path: string) => React.ReactNode | null;
 }
 
 const BreadcrumbContext = createContext<BreadcrumbContextType | null>(null);
@@ -41,14 +49,20 @@ export const useBreadcrumbContext = (): BreadcrumbContextType => {
 
 interface BreadcrumbProviderProps {
   children: ReactNode;
+  lookupHandlers: UsePathLookupHook[];
 }
 
 export const BreadcrumbProvider: React.FC<BreadcrumbProviderProps> = ({
   children,
+  lookupHandlers,
 }) => {
-  const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([]);
+  const [providers, setproviders] = useState<UsePathLookupHook[]>([]);
+  const [items, setitems] = useState<BreadcrumbItemProps[]>([]);
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbLookupHandlers[]>(
+    []
+  );
 
-  const registerBreadcrumb = useCallback(
+  const registerBreadcrumbLookupProvider = useCallback(
     (path: string, options: BreadcrumbOptions = {}) => {
       setBreadcrumbs((prevBreadcrumbs) => {
         const existing = prevBreadcrumbs.find((b) => b.path === path);
@@ -63,61 +77,36 @@ export const BreadcrumbProvider: React.FC<BreadcrumbProviderProps> = ({
     []
   );
 
-  const deregisterBreadcrumb = useCallback((path: string) => {
-    setBreadcrumbs((prevBreadcrumbs) =>
-      prevBreadcrumbs.filter((b) => b.path !== path)
-    );
+  const setPath = useCallback((pathname: string) => {
+    const path = pathname.split("/").filter(Boolean);
+
+    const items = path.map((_, i) => {
+      const href = "/" + path.slice(0, i + 1).join("/");
+      return {
+        name: path[i],
+        href,
+      };
+    });
+    setitems(items);
   }, []);
 
-  const updateBreadcrumbOptions = useCallback(
-    (path: string, newOptions: BreadcrumbOptions) => {
-      setBreadcrumbs((prevBreadcrumbs) => {
-        return prevBreadcrumbs.map((b) =>
-          b.path === path
-            ? { ...b, options: { ...b.options, ...newOptions } }
-            : b
-        );
-      });
-    },
-    []
-  );
+  const getDropdownHandler = (path: string) => {
+    const handler = lookupHandlers.find((provider) => {
+      return provider.match(path);
+    });
+    return handler?.lookup;
+  };
 
   return (
     <BreadcrumbContext.Provider
       value={{
         breadcrumbs,
-        registerBreadcrumb,
-        deregisterBreadcrumb,
-        updateBreadcrumbOptions,
+        setPath,
+        items,
+        getDropdownHandler,
       }}
     >
       {children}
     </BreadcrumbContext.Provider>
   );
-};
-
-export const useRegisterBreadcrumb = (
-  path: string,
-  options?: BreadcrumbOptions
-) => {
-  const { registerBreadcrumb, deregisterBreadcrumb } = useBreadcrumbContext();
-
-  useEffect(() => {
-    registerBreadcrumb(path, options);
-
-    return () => {
-      deregisterBreadcrumb(path);
-    };
-  }, [path, options, registerBreadcrumb, deregisterBreadcrumb]);
-};
-
-export const useUpdateBreadcrumbOptions = (
-  path: string,
-  newOptions: BreadcrumbOptions
-) => {
-  const { updateBreadcrumbOptions } = useBreadcrumbContext();
-
-  useEffect(() => {
-    updateBreadcrumbOptions(path, newOptions);
-  }, [path, newOptions, updateBreadcrumbOptions]);
 };

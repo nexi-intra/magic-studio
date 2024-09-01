@@ -14,9 +14,9 @@ export default function Layout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (
-    <div>
+    <div className="w-full">
       <WorkspaceContextProvider>
-        <WorkspaceToolbar />
+        {/* <WorkspaceToolbar /> */}
         {children}
       </WorkspaceContextProvider>
     </div>

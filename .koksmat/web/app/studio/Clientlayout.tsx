@@ -19,6 +19,7 @@ import {
   CookingPotIcon,
   DatabaseIcon,
   Globe,
+  Home,
 } from "lucide-react";
 import TabNavigatorWithReorder from "@/components/tab-navigator-with-reorder";
 import GlobalPasteHandling from "@/components/global-paste-handling";
@@ -28,10 +29,13 @@ import LeftNavigation, { NavItem } from "@/components/left-navigation";
 import { Settings, HelpCircle, LogOut } from "lucide-react";
 import { KoksmatChef } from "@/components/icons/KoksmatChef";
 import GlobalShopButton from "@/components/global-shop-button";
+import { APPNAME } from "../global";
+import Link from "next/link";
+import { useExampleHook } from "@/components/providers/lookup-provider";
 
 const topItems: NavItem[] = [
   {
-    icon: <KoksmatChef className="h-5 w-5" />,
+    icon: <Home className="h-5 w-5" />,
     label: "Home",
     href: href.HOME,
     info: "Go to home page",
@@ -96,9 +100,14 @@ export default function ClientLayout(props: { children: any }) {
   return (
     <AppProvider>
       <Authenticate apiScope={UserProfileAPI}>
-        <BreadcrumbProvider>
+        <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
           <GlobalDropHandling />
           <ResizableLayout
+            logo={
+              <Link href={"/" + APPNAME}>
+                <KoksmatChef className="h-7 w-7 mr-1" />
+              </Link>
+            }
             onMobileChange={(ismobile) => setismobile(ismobile)}
             onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
             leftnav={

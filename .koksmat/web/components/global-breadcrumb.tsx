@@ -4,29 +4,46 @@ import { usePathname } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbList,
-  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
+  BreadcrumbItem,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import DevCurrentPage from "./dev-current-page";
 import { Edit3Icon, LayersIcon } from "lucide-react";
 import { DropdownMenuIcon } from "@radix-ui/react-icons";
-import { useBreadcrumbContext } from "./contexts/breadcrumb-context";
-
-interface BreadcrumbItem {
-  name: string;
-  href: string;
-}
+import {
+  useBreadcrumbContext,
+  BreadcrumbItemProps,
+} from "./contexts/breadcrumb-context";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 function GlobalBreadcrumbItem(props: {
-  item: BreadcrumbItem;
+  item: BreadcrumbItemProps;
   hasChilds: boolean;
   key: any;
+  path: string;
 }) {
   const [mouseover, setmouseover] = useState(false);
-  const { item, hasChilds, key } = props;
+  const { item, hasChilds, key, path } = props;
+  const breadcrumbContext = useBreadcrumbContext();
+  const dropdown = breadcrumbContext.getDropdownHandler(path);
+  const icon = mouseover ? (
+    dropdown ? (
+      <DropdownMenuIcon />
+    ) : (
+      <BreadcrumbSeparator />
+    )
+  ) : (
+    <BreadcrumbSeparator />
+  );
+
   return (
     <BreadcrumbItem
       key={key}
@@ -38,14 +55,15 @@ function GlobalBreadcrumbItem(props: {
           {item.name}
         </Link>
       </BreadcrumbLink>
-      {hasChilds && !mouseover && <BreadcrumbSeparator />}
-      {hasChilds && mouseover && <DropdownMenuIcon />}
-      {/* {hasChilds ? null : (
-        <Fragment>
-          {mouseover ? <DropdownMenuIcon /> : <BreadcrumbSeparator />}
-          <BreadcrumbSeparator />
-        </Fragment>
-      )} */}
+
+      {hasChilds && (
+        <HoverCard openDelay={50} closeDelay={50}>
+          <HoverCardTrigger asChild>{icon}</HoverCardTrigger>
+          <HoverCardContent className="z-auto w-[80vw]" collisionPadding={50}>
+            {dropdown}
+          </HoverCardContent>
+        </HoverCard>
+      )}
     </BreadcrumbItem>
   );
 }
@@ -54,20 +72,11 @@ export default function GlobalBreadcrumb() {
   const pathname = usePathname();
   const breadcrumbContext = useBreadcrumbContext();
   const [showEdit, setshowEdit] = useState(false);
-  const [items, setitems] = useState<BreadcrumbItem[]>([]);
 
   useEffect(() => {
-    const path = pathname.split("/").filter(Boolean);
-    const items = path.map((_, i) => {
-      const href = "/" + path.slice(0, i + 1).join("/");
-      return {
-        name: path[i],
-        href,
-      };
-    });
-    setitems(items);
+    breadcrumbContext.setPath(pathname);
   }, [pathname]);
-
+  let root = "";
   return (
     <div
       className="flex"
@@ -76,13 +85,17 @@ export default function GlobalBreadcrumb() {
     >
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
-          {items.map((item, i) => (
-            <GlobalBreadcrumbItem
-              key={i}
-              item={item}
-              hasChilds={i !== items.length - 1}
-            />
-          ))}
+          {breadcrumbContext.items.map((item, i) => {
+            root += "/" + item.name;
+            return (
+              <GlobalBreadcrumbItem
+                path={root}
+                key={i}
+                item={item}
+                hasChilds={i !== breadcrumbContext.items.length - 1}
+              />
+            );
+          })}
         </BreadcrumbList>
       </Breadcrumb>
       {showEdit && (

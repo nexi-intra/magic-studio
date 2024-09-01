@@ -32,11 +32,12 @@ export interface Table {
 }
 export default function Databases(props: {
   visualisation: Visualisation;
-
+  allowSwitch?: boolean;
+  allowedVisualizations?: Visualisation[];
   value: string;
   onChange: (value: string) => void;
 }) {
-  const { value, onChange } = props;
+  const { value, onChange, allowSwitch, allowedVisualizations } = props;
   const [tables, settables] = useState<CommandSelectorItem[]>([]);
 
   const query = useSQLSelect3<DatabaseProps>(
@@ -72,7 +73,9 @@ ORDER BY name
   }, [query.dataset]);
   return (
     <ItemsViewer
+      allowSwitch={allowSwitch}
       visualisation={props.visualisation}
+      allowedVisualizations={allowedVisualizations}
       value={value}
       placeholder="Databases"
       commands={tables ? tables : []}

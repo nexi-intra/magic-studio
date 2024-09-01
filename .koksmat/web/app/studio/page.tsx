@@ -2,5 +2,9 @@ import { DashboardHomepage } from "@/components/dashboard-homepage";
 import LandingPage from "@/components/koksmat-studio-landing";
 
 export default function Page() {
-  return <LandingPage />;
+  return (
+    <div className="container">
+      <LandingPage />
+    </div>
+  );
 }

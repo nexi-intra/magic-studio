@@ -3,6 +3,7 @@ import { APPNAME } from "@/app/global";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import SQLCards from "@/components/sql-cards";
 import { Button } from "@/components/ui/button";
+import { WorkspaceToolbar } from "@/components/workspace-toolbar";
 import { CardStackIcon } from "@radix-ui/react-icons";
 import React, { useContext } from "react";
 
@@ -11,7 +12,7 @@ export default function Page() {
 
   return (
     <div>
-      {/* <pre>{JSON.stringify(magicbox, null, 2)}</pre> */}
+      <WorkspaceToolbar />
       <SQLCards
         Icon={CardStackIcon}
         slugPrefix={"/" + APPNAME + "/workspace/"}

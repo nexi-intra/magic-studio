@@ -130,7 +130,7 @@ SELECT json_build_object(
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8 lg:p-10">
-      <header className="sticky top-0 z-40 border-b bg-background  py-3 shadow-sm sm:px-6">
+      <header className="border-b bg-background  py-3 shadow-sm sm:px-6">
         <div className=" mx-auto flex items-center justify-between">
           <div className="flex items-center ">
             <span className="font-bold text-3xl">{database.toUpperCase()}</span>
