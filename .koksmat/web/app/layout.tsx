@@ -44,7 +44,7 @@ export default function RootLayout2({
           <MagicboxProvider>
             <MSALWrapper>
               {children}
-              <TailwindIndicator />
+              {/* <TailwindIndicator /> */}
               <ServiceInspector />
               <Toaster />
               <KoksmatClient />

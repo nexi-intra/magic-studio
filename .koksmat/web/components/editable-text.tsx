@@ -3,17 +3,21 @@ import { Check, Edit2, Save, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { set } from "date-fns";
 
 interface EditableTextProps {
   initialText: string;
   onSave: (text: string) => Promise<boolean>;
+  fixed?: boolean;
 }
 
 export default function EditableText({
   initialText,
   onSave,
+  fixed,
 }: EditableTextProps) {
   const [text, setText] = useState(initialText);
+  const [changed, setchanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -26,6 +30,7 @@ export default function EditableText({
     try {
       const success = await onSave(text);
       if (success) {
+        setchanged(false);
         setShowCheckmark(true);
         setIsEditing(false);
         setTimeout(() => setShowCheckmark(false), 3000);
@@ -61,12 +66,15 @@ export default function EditableText({
     }, 1000); // 1 second delay
   };
 
-  if (isEditing) {
+  if (isEditing || fixed) {
     return (
       <div className="flex items-center space-x-2">
         <Input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e: any) => {
+            setText(e.target.value);
+            setchanged(true);
+          }}
           className="flex-grow"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -74,36 +82,38 @@ export default function EditableText({
             }
           }}
         />
-        <Button onClick={handleSave} disabled={isSaving}>
+        <Button onClick={handleSave} disabled={isSaving || !changed}>
           {isSaving ? (
             <span className="animate-spin">⏳</span>
           ) : (
             <Save className="h-4 w-4" />
           )}
         </Button>
-        <Button
-          onClick={() => {
-            setText(initialText);
-            setIsEditing(false);
-          }}
-          variant="outline"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        {!fixed && (
+          <Button
+            onClick={() => {
+              setText(initialText);
+              setIsEditing(false);
+            }}
+            variant="outline"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     );
   }
 
   return (
     <div
-      className="group relative inline-block"
+      className="group relative inline-block bg-red-400 "
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {showCheckmark && (
         <Check className="absolute -right-6 top-1/2 h-5 w-5 -translate-y-1/2 text-green-500" />
       )}
-      {isHovered && (
+      {/* {isHovered && (
         <Button
           size="icon"
           variant="ghost"
@@ -112,8 +122,16 @@ export default function EditableText({
         >
           <Edit2 className="h-4 w-4" />
         </Button>
-      )}
-      <span>{text}</span>
+      )} */}
+      <span>
+        xx{text}{" "}
+        {isHovered && (
+          <Edit2
+            onClick={() => setIsEditing(true)}
+            className="h-4 w-4 cursor-pointer"
+          />
+        )}
+      </span>
     </div>
   );
 }

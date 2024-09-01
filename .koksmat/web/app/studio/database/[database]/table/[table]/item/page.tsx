@@ -15,6 +15,7 @@ export default function Page(props: {
 
       <SQLCards
         Icon={CardStackIcon}
+        filter={(item) => item.slug !== "new"}
         slugPrefix={
           "/" + APPNAME + "/database/" + database + "/table/" + table + "/item/"
         }
@@ -22,7 +23,9 @@ export default function Page(props: {
         sql={`
 SELECT name as title, 
        description,
-        id as slug
+        id as slug,
+        koksmat_masterdataref as masterdataref
+
 FROM ${table}
 ORDER BY name
 LIMIT 1000

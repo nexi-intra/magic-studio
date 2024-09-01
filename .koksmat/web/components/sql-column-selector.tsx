@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useMemo } from "react";
 import {
   Collapsible,
@@ -17,16 +15,18 @@ import { Button } from "@/components/ui/button";
 import { CommandSelectorItem } from "./command-selector";
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import WithClipboardCopy from "./with-clipboardcopy";
-import { Table, Table2Icon } from "lucide-react";
+import { Table } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 function Column(props: { column: ColumnsInfo }) {
   const [copiedColumn, setCopiedColumn] = useState<string | null>(null);
   const [hoovering, sethoovering] = useState(false);
-  const handleCopy = (columnName: string) => {
-    navigator.clipboard.writeText(columnName);
-    setCopiedColumn(columnName);
-    setTimeout(() => setCopiedColumn(null), 2000);
-  };
+
   const { column } = props;
   return (
     <div
@@ -35,7 +35,6 @@ function Column(props: { column: ColumnsInfo }) {
       onMouseLeave={() => sethoovering(false)}
     >
       <div className="flex items-center gap-2">
-        {/* <span>{column.icon}</span> */}
         <WithClipboardCopy text={column.column_name}>
           {column.column_name}
         </WithClipboardCopy>
@@ -43,6 +42,7 @@ function Column(props: { column: ColumnsInfo }) {
     </div>
   );
 }
+
 export interface Root {
   Result: Result[];
 }
@@ -61,41 +61,74 @@ export interface ColumnsInfo {
   numeric_scale?: number;
 }
 
-export default function SqlColumnSelector(props: { database: string }) {
-  const { database } = props;
-  const sql = `
+export default function SqlColumnSelector(props: {
+  database: string;
+  schemas: string[];
+}) {
+  const { database, schemas } = props;
+  const [selectedSchema, setSelectedSchema] = useState<string>("");
+
+  const sql = useMemo(
+    () => `
+    SELECT
+  table_name,
+  columns_info
+FROM (
   SELECT
     table_name,
-        columns_info
-  
-FROM (
-    SELECT
-        table_name,
-        json_agg(json_build_object(
-            'column_name', column_name,
-            'data_type', data_type,
-            'is_nullable', is_nullable,
-            'character_maximum_length', character_maximum_length,
-            'numeric_precision', numeric_precision,
-            'numeric_scale', numeric_scale
-        )) AS columns_info
-    FROM
-        information_schema.columns
-    WHERE
-        table_schema = 'public' -- replace with your schema if different
-    GROUP BY
-        table_name
+    json_agg(json_build_object(
+      'column_name', column_name,
+      'data_type', data_type,
+      'is_nullable', is_nullable,
+      'character_maximum_length', character_maximum_length,
+      'numeric_precision', numeric_precision,
+      'numeric_scale', numeric_scale
+    )) AS columns_info
+  FROM
+    information_schema.columns
+  WHERE
+    table_schema = '${selectedSchema}'
+  AND
+    table_name IN (
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = '${selectedSchema}' 
+      AND table_type IN ('BASE TABLE', 'VIEW')
+    )
+  GROUP BY
+    table_name
 ) subquery
 
-  
-    
-    `;
+  `,
+    [selectedSchema]
+  );
+
   const query = useSQLSelect3<Result>(database, sql);
 
   return (
     <aside className="flex flex-col gap-4 bg-muted/40 p-4 rounded-lg max-h-full overflow-scroll">
+      <div className="mb-4">
+        <label htmlFor="schema-select" className="mr-2">
+          Select Schema:
+        </label>
+        <Select
+          value={selectedSchema}
+          onValueChange={(value) => setSelectedSchema(value)}
+        >
+          <SelectTrigger className="w-full p-2 border rounded">
+            {selectedSchema}
+          </SelectTrigger>
+          <SelectContent>
+            {schemas?.map((schema, index) => (
+              <SelectItem key={index} value={schema}>
+                {schema}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <Accordion type="multiple">
-        {query.dataset.map((table, index) => (
+        {query.dataset?.map((table, index) => (
           <AccordionItem value={table.table_name} key={index}>
             <AccordionTrigger>
               <div className="flex ">

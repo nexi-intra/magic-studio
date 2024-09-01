@@ -9,7 +9,7 @@ export default function Layout(props: {
   const { database, query } = props.params;
   const { children } = props;
   return (
-    <div>
+    <div className="w-full h-full bg-fuchsia-500">
       <QueryEditorToolbar database={database} />
       {children}
     </div>
