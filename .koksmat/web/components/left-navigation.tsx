@@ -70,7 +70,7 @@ export default function LeftNavigation({
 
   return (
     <div
-      className={`h-full flex flex-col justify-between py-4 ${
+      className={`h-full flex flex-col justify-between py-3 ${
         isCollapsed ? "items-center" : ""
       }`}
     >

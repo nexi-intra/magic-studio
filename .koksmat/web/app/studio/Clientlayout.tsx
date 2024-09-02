@@ -35,7 +35,7 @@ import { useExampleHook } from "@/components/providers/lookup-provider";
 
 const topItems: NavItem[] = [
   {
-    icon: <Home className="h-5 w-5" />,
+    icon: <KoksmatChef className="h-5 w-5" />,
     label: "Home",
     href: href.HOME,
     info: "Go to home page",
@@ -103,11 +103,7 @@ export default function ClientLayout(props: { children: any }) {
         <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
           <GlobalDropHandling />
           <ResizableLayout
-            logo={
-              <Link href={"/" + APPNAME}>
-                <KoksmatChef className="h-7 w-7 mr-1" />
-              </Link>
-            }
+            logo={<Link href={"/" + APPNAME}></Link>}
             onMobileChange={(ismobile) => setismobile(ismobile)}
             onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
             leftnav={

@@ -28,7 +28,7 @@ SELECT name as title,
 
 FROM ${table}
 ORDER BY name
-LIMIT 1000
+
 
     
     `}

@@ -11,7 +11,13 @@ import {
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { CardStackIcon } from "@radix-ui/react-icons";
 import { ReactElement } from "react";
-import { ClipboardIcon, CheckIcon } from "lucide-react";
+import {
+  ClipboardIcon,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export interface Item {
   id: number;
@@ -23,13 +29,30 @@ export interface Item {
   data?: string;
 }
 
+export interface PagingObject {
+  prevPage: () => void;
+  nextPage: () => void;
+  pageSize: number;
+  maxPages: number;
+  currentPage: number;
+  totalRecords: number;
+}
+
 interface ShowItemsProps {
   Icon: React.ComponentType<{ className?: string }>;
   slugPrefix: string;
   items: Item[];
+  paging?: PagingObject;
+  onPageChange?: (newPage: number) => void;
 }
 
-export function ShowItems({ Icon, slugPrefix, items }: ShowItemsProps) {
+export function ShowItems({
+  Icon,
+  slugPrefix,
+  items,
+  paging,
+  onPageChange,
+}: ShowItemsProps) {
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -54,9 +77,21 @@ export function ShowItems({ Icon, slugPrefix, items }: ShowItemsProps) {
     }
   };
 
+  const handlePrevPage = () => {
+    if (paging && onPageChange) {
+      onPageChange(paging.currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (paging && onPageChange) {
+      onPageChange(paging.currentPage + 1);
+    }
+  };
+
   return (
-    <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <main className="flex flex-col items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
         {items?.map((item) => (
           <Card key={item.id} className="relative">
             <Link
@@ -90,6 +125,29 @@ export function ShowItems({ Icon, slugPrefix, items }: ShowItemsProps) {
           </Card>
         ))}
       </div>
+      {paging && (
+        <div className="flex justify-between items-center w-full mt-4">
+          <Button
+            onClick={handlePrevPage}
+            disabled={paging.currentPage === 1}
+            variant="outline"
+          >
+            <ChevronLeftIcon className="h-4 w-4 mr-2" />
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {paging.currentPage} of {paging.maxPages}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={paging.currentPage === paging.maxPages}
+            variant="outline"
+          >
+            Next
+            <ChevronRightIcon className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
+      )}
     </main>
   );
 }
@@ -101,6 +159,45 @@ interface SQLCardsProps<T> {
   sql: string;
   filter?: (item: T) => boolean;
   parse?: (item: T) => Item;
+  pageSize?: number;
+  totalRecords?: number;
+}
+
+/**
+ * Adds pagination control to a SQL query.
+ * 
+ * @param sqlQuery - The original SQL query string.
+ * @param pageNumber - The current page number (1-based index).
+ * @param pageSize - The number of items per page.
+ * @returns The SQL query string with pagination added.
+ 
+
+// Example usage:
+const originalQuery = "SELECT * FROM users WHERE active = true";
+const pageNumber = 2;
+const pageSize = 10;
+
+const paginatedQuery = addPagination(originalQuery, pageNumber, pageSize);
+console.log(paginatedQuery);
+// Output: "SELECT * FROM users WHERE active = true LIMIT 10 OFFSET 10;"
+
+*/
+function addPagination(
+  sqlQuery: string,
+  pageNumber: number,
+  pageSize: number
+): string {
+  // Ensure pageNumber is at least 1
+  const page = pageNumber > 0 ? pageNumber : 1;
+
+  // Calculate the OFFSET and LIMIT for the pagination
+  const offset = (page - 1) * pageSize;
+  const limit = pageSize;
+
+  // Append the LIMIT and OFFSET to the original query
+  const paginatedQuery = `${sqlQuery} LIMIT ${limit} OFFSET ${offset};`;
+
+  return paginatedQuery;
 }
 
 export default function SQLCards<T extends Item = Item>({
@@ -110,8 +207,22 @@ export default function SQLCards<T extends Item = Item>({
   sql,
   filter,
   parse,
+  totalRecords,
+  pageSize = 4,
 }: SQLCardsProps<T>) {
-  const { dataset } = useSQLSelect3<T>(database, sql);
+  const [pagedSQL, setpagedSQL] = useState(sql);
+  useEffect(() => {
+    const newSQL = sql;
+    if (newSQL.toUpperCase().includes("LIMIT")) {
+      setpagedSQL(newSQL);
+      return;
+    }
+
+    setpagedSQL(addPagination(newSQL, 1, pageSize));
+  }, [sql]);
+
+  const { dataset } = useSQLSelect3<T>(database, pagedSQL);
+  const [currentPage, setCurrentPage] = useState(1);
 
   let processedItems = dataset;
 
@@ -126,5 +237,35 @@ export default function SQLCards<T extends Item = Item>({
     displayItems = processedItems as Item[];
   }
 
-  return <ShowItems Icon={Icon} slugPrefix={slugPrefix} items={displayItems} />;
+  const maxPages = Math.ceil(totalRecords || displayItems.length / pageSize);
+
+  const paginatedItems = displayItems.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paging: PagingObject = {
+    prevPage: () => setCurrentPage((prev) => Math.max(prev - 1, 1)),
+    nextPage: () => setCurrentPage((prev) => Math.min(prev + 1, maxPages)),
+    pageSize,
+    maxPages,
+    currentPage,
+    totalRecords: totalRecords || displayItems.length,
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  return (
+    <div>
+      <ShowItems
+        Icon={Icon}
+        slugPrefix={slugPrefix}
+        items={paginatedItems}
+        paging={paging}
+        onPageChange={handlePageChange}
+      />
+    </div>
+  );
 }

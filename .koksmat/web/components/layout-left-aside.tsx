@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { usePathname } from "next/navigation";
 
 export default function ResizableLayout(props: {
@@ -28,6 +28,9 @@ export default function ResizableLayout(props: {
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [burgermenuOpen, setburgermenuOpen] = useState(false);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(64); // Initial height of 64px (h-16)
+  const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setburgermenuOpen(false);
@@ -35,17 +38,29 @@ export default function ResizableLayout(props: {
 
   useEffect(() => {
     props.onMobileChange(isMobile);
-  }, [isMobile]);
+  }, [isMobile, props]);
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px is typically the breakpoint for medium screens
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
 
     return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (mainRef.current) {
+        const scrollPosition = mainRef.current.scrollTop;
+        setHeaderHeight(Math.max(0, 64 - scrollPosition));
+      }
+    };
+
+    mainRef.current?.addEventListener("scroll", handleScroll);
+    return () => mainRef.current?.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleCollapse = () => {
@@ -60,33 +75,6 @@ export default function ResizableLayout(props: {
 
   return (
     <div className="h-screen flex flex-col">
-      <header className="sticky top-0 z-50 bg-background border-b h-16 flex items-center px-2">
-        {isMobile && (
-          <Fragment>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-2"
-              onClick={() => setburgermenuOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            <Sheet
-              onOpenChange={(open) => setburgermenuOpen(open)}
-              open={burgermenuOpen}
-            >
-              <SheetContent side="left" className="w-[80%] sm:w-[385px]">
-                <div className="h-full py-6 pr-6">{props.leftnav}</div>
-              </SheetContent>
-            </Sheet>
-          </Fragment>
-        )}
-        {!isMobile && <div className="w-8">{props.logo}</div>}
-
-        {props.topnav}
-        {props.shop}
-      </header>
-
       <ResizablePanelGroup direction="horizontal" className="flex-grow">
         {!isMobile && (
           <>
@@ -109,21 +97,58 @@ export default function ResizableLayout(props: {
         )}
 
         <ResizablePanel defaultSize={isMobile ? 100 : 80}>
-          <main className="h-full overflow-auto relative w-full">
-            <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-              <div className="px-4 py-3 ">{props.breadcrumb}</div>
-            </div>
+          <div className="flex flex-col h-full">
+            <header
+              ref={headerRef}
+              className="sticky top-0 z-50 bg-background transition-all duration-200 ease-in-out"
+              style={{ height: `${headerHeight}px` }}
+            >
+              <div className="flex items-center px-2 h-full">
+                {isMobile && (
+                  <Fragment>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="mr-2"
+                      onClick={() => setburgermenuOpen(true)}
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                    <Sheet
+                      onOpenChange={(open) => setburgermenuOpen(open)}
+                      open={burgermenuOpen}
+                    >
+                      <SheetContent
+                        side="left"
+                        className="w-[80%] sm:w-[385px]"
+                      >
+                        <div className="h-full py-6 pr-6">{props.leftnav}</div>
+                      </SheetContent>
+                    </Sheet>
+                  </Fragment>
+                )}
+                {props.topnav}
+                {props.shop}
+              </div>
+              <div className="sticky top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-4">
+                {props.breadcrumb}
+              </div>
+            </header>
 
-            <div className="p-4 flex">{props.children}</div>
-          </main>
+            <main
+              ref={mainRef}
+              className="flex-grow overflow-auto relative w-full"
+            >
+              <div className="p-4 flex">{props.children}</div>
+            </main>
+            <footer className="bg-muted border-t h-12 flex items-center justify-between px-4">
+              <div>{props.leftfooter}</div>
+              <div>{props.centerfooter}</div>
+              <div>{props.rightfooter}</div>
+            </footer>
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
-
-      <footer className="bg-muted border-t h-12 flex items-center justify-between px-4">
-        <div>{props.leftfooter}</div>
-        <div>{props.centerfooter}</div>
-        <div>{props.rightfooter}</div>
-      </footer>
     </div>
   );
 }

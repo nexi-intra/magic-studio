@@ -28,7 +28,7 @@ import {
 
 export type Visualisation = "combobox" | "list" | "table" | "cards";
 
-interface PagingObject {
+export interface PagingObject {
   prevPage: () => void;
   nextPage: () => void;
   pageSize: number;
