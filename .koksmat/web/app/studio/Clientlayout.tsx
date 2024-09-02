@@ -32,6 +32,7 @@ import GlobalShopButton from "@/components/global-shop-button";
 import { APPNAME } from "../global";
 import Link from "next/link";
 import { useExampleHook } from "@/components/providers/lookup-provider";
+import ErrorBoundary from "@/components/error-boundary";
 
 const topItems: NavItem[] = [
   {
@@ -99,30 +100,32 @@ export default function ClientLayout(props: { children: any }) {
   const [ismobile, setismobile] = useState(false);
   return (
     <AppProvider>
-      <Authenticate apiScope={UserProfileAPI}>
-        <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
-          <GlobalDropHandling />
-          <ResizableLayout
-            logo={<Link href={"/" + APPNAME}></Link>}
-            onMobileChange={(ismobile) => setismobile(ismobile)}
-            onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
-            leftnav={
-              <LeftNavigation
-                topItems={topItems}
-                bottomItems={bottomItems}
-                isCollapsed={leftNavCollapsed}
-                isMobile={ismobile}
-              />
-            }
-            breadcrumb={<GlobalBreadcrumb />}
-            topnav={<TabNavigatorWithReorder />}
-            shop={<GlobalShopButton />}
-            centerfooter={<GlobalPasteHandling />}
-          >
-            {children}
-          </ResizableLayout>
-        </BreadcrumbProvider>
-      </Authenticate>
+      <ErrorBoundary>
+        <Authenticate apiScope={UserProfileAPI}>
+          <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
+            <GlobalDropHandling />
+            <ResizableLayout
+              logo={<Link href={"/" + APPNAME}></Link>}
+              onMobileChange={(ismobile) => setismobile(ismobile)}
+              onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
+              leftnav={
+                <LeftNavigation
+                  topItems={topItems}
+                  bottomItems={bottomItems}
+                  isCollapsed={leftNavCollapsed}
+                  isMobile={ismobile}
+                />
+              }
+              breadcrumb={<GlobalBreadcrumb />}
+              topnav={<TabNavigatorWithReorder />}
+              shop={<GlobalShopButton />}
+              centerfooter={<GlobalPasteHandling />}
+            >
+              {children}
+            </ResizableLayout>
+          </BreadcrumbProvider>
+        </Authenticate>
+      </ErrorBoundary>
     </AppProvider>
   );
 }

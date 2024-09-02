@@ -20,5 +20,9 @@ ORDER BY name
 
     `
   );
-  return <DashboardDatabases databases={databases.dataset} />;
+  return (
+    <div className="container ">
+      <DashboardDatabases databases={databases.dataset} />;
+    </div>
+  );
 }
