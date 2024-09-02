@@ -208,7 +208,7 @@ export default function SQLCards<T extends Item = Item>({
   filter,
   parse,
   totalRecords,
-  pageSize = 4,
+  pageSize = 16,
 }: SQLCardsProps<T>) {
   const [pagedSQL, setpagedSQL] = useState(sql);
   useEffect(() => {

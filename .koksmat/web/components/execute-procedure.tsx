@@ -286,7 +286,7 @@ export default function ExecuteProcedure(props: {
   // };
 
   return (
-    <div className="flex  w-full bg-background h-full h-[calc(100vh-200px)]">
+    <div className="flex  w-[calc(100vw-200px)] bg-background  h-[calc(100vh-200px)]">
       <ResizablePanelGroup direction="horizontal" className="min-h-full">
         <ResizablePanel
           defaultSize={20}

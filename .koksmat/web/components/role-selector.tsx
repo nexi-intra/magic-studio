@@ -31,23 +31,23 @@ const roles = [
     color: "from-green-500 to-green-600",
     pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20L0 20z' fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
   },
+  // {
+  //   title: "Business Analyst",
+  //   description: "Analyze business processes and recommend improvements",
+  //   icon: BarChart,
+  //   color: "from-purple-500 to-purple-600",
+  //   pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h20v20H0V0zm10 17L0 7v10h10zM10 3L0 13V3h10z'/%3E%3C/g%3E%3C/svg%3E")`,
+  // },
+  // {
+  //   title: "End User",
+  //   description: "Utilize software applications in day-to-day operations",
+  //   icon: Users,
+  //   color: "from-yellow-500 to-yellow-600",
+  //   pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0v20L0 10h20L10 0z' fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+  // },
   {
-    title: "Business Analyst",
-    description: "Analyze business processes and recommend improvements",
-    icon: BarChart,
-    color: "from-purple-500 to-purple-600",
-    pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h20v20H0V0zm10 17L0 7v10h10zM10 3L0 13V3h10z'/%3E%3C/g%3E%3C/svg%3E")`,
-  },
-  {
-    title: "End User",
-    description: "Utilize software applications in day-to-day operations",
-    icon: Users,
-    color: "from-yellow-500 to-yellow-600",
-    pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0v20L0 10h20L10 0z' fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-  },
-  {
-    title: "CXO",
-    description: "Executive-level decision making and strategy",
+    title: "Operator",
+    description: "Keep software applications running smoothly",
     icon: LineChart,
     color: "from-red-500 to-red-600",
     pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h20L0 20z'/%3E%3Cpath d='M20 0v20H0z'/%3E%3C/g%3E%3C/svg%3E")`,
@@ -59,13 +59,13 @@ const roles = [
     color: "from-indigo-500 to-indigo-600",
     pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20L0 20z' fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
   },
-  {
-    title: "Designer",
-    description: "Create user-friendly and visually appealing interfaces",
-    icon: Paintbrush,
-    color: "from-pink-500 to-pink-600",
-    pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M10 0v20L0 10h20L10 0z'/%3E%3C/g%3E%3C/svg%3E")`,
-  },
+  // {
+  //   title: "Designer",
+  //   description: "Create user-friendly and visually appealing interfaces",
+  //   icon: Paintbrush,
+  //   color: "from-pink-500 to-pink-600",
+  //   pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M10 0v20L0 10h20L10 0z'/%3E%3C/g%3E%3C/svg%3E")`,
+  // },
 ];
 
 export default function Component() {
