@@ -85,7 +85,7 @@ WHERE U.email = '${magicbox?.user?.email}'`
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {workspaces.dataset.map((workspace: any, key) => {
+            {workspaces?.dataset?.map((workspace: any, key) => {
               return (
                 <DropdownMenuItem
                   key={key}

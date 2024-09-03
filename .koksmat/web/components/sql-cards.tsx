@@ -237,9 +237,9 @@ export default function SQLCards<T extends Item = Item>({
     displayItems = processedItems as Item[];
   }
 
-  const maxPages = Math.ceil(totalRecords || displayItems.length / pageSize);
+  const maxPages = Math.ceil(totalRecords || displayItems?.length / pageSize);
 
-  const paginatedItems = displayItems.slice(
+  const paginatedItems = displayItems?.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -250,7 +250,7 @@ export default function SQLCards<T extends Item = Item>({
     pageSize,
     maxPages,
     currentPage,
-    totalRecords: totalRecords || displayItems.length,
+    totalRecords: totalRecords || displayItems?.length,
   };
 
   const handlePageChange = (newPage: number) => {

@@ -74,7 +74,7 @@ export function SqlQueryEditor(props: {
       setlog([...log, logEntry]);
       return;
     }
-    logEntry.result = JSON.stringify(result.data, null, 2);
+    logEntry.result = JSON.stringify(result.data.Result, null, 2);
     setlog([...log, logEntry]);
     setSqlResult(logEntry.result);
   };

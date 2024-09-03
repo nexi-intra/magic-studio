@@ -64,7 +64,11 @@ export default function LayoutThreeRowsLeftPanelAndResults(
                     </ResizablePanel>
                     <ResizableHandle withHandle />
                     {/* Logging panel */}
-                    <ResizablePanel defaultSize={50}>
+                    <ResizablePanel
+                      defaultSize={50}
+                      collapsible
+                      collapsedSize={5}
+                    >
                       <div className="h-full p-0">{loggingPanel}</div>
                     </ResizablePanel>
                   </ResizablePanelGroup>
