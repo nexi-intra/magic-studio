@@ -22,6 +22,7 @@ import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import * as monacoEditor from "monaco-editor";
 import { format } from "sql-formatter";
 import { run } from "@/actions/server";
+import LayoutThreeRowsLeftPanelAndResults from "./layout-three-rows-left-panel-and-results";
 
 export interface SqlQueryEditorOptions {}
 
@@ -31,10 +32,11 @@ export function SqlQueryEditor(props: {
   name: string;
   onSave: (sql: string, name: string) => void;
   options?: SqlQueryEditorOptions;
+  toolbar: React.ReactNode;
 }) {
   const monacoInstance = useMonaco();
   const magicbox = useContext(MagicboxContext);
-  const { database } = props;
+  const { database, toolbar } = props;
   const [error, setError] = useState("");
   const [sqlExpression, setSqlExpression] = useState(props.sql);
   const [sqlResult, setSqlResult] = useState<any>();
@@ -49,6 +51,7 @@ export function SqlQueryEditor(props: {
   const handleRun = async () => {
     if (!sqlExpression) return;
 
+    setError("");
     const result = await run(
       "magic-mix.app",
       ["query", database, sqlExpression],
@@ -68,6 +71,72 @@ export function SqlQueryEditor(props: {
     props.onSave(sqlExpression, name);
   };
 
+  const rightPanel = (
+    <div className="h-full">
+      <div className="p-1 flex ">
+        <div></div>
+        <div className="flex">
+          <Button onClick={handleRun}>Run</Button>
+          {error && <div className="text-red-500">{error}</div>}
+        </div>
+      </div>
+      <MonacoEditor
+        defaultValue={props.sql}
+        height="100%"
+        language="postgres"
+        onChange={(value) => {
+          setSqlExpression(value!!);
+        }}
+        theme="vs-dark"
+        options={{
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+        }}
+      />
+    </div>
+  );
+  const resultPanel = (
+    <div className="h-full">
+      <div className="p-1">Result</div>
+      <MonacoEditor
+        defaultValue={JSON.stringify(sqlResult, null, 2)}
+        height="100%"
+        language="json"
+        theme="vs-dark"
+        options={{
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+        }}
+      />
+    </div>
+  );
+  const loggingPanel = (
+    <div className="h-full">
+      <div className="p-1">Log</div>
+      <MonacoEditor
+        defaultValue={props.sql}
+        height="100%"
+        language="text"
+        theme="vs-dark"
+        options={{
+          minimap: { enabled: false },
+          scrollBeyondLastLine: false,
+        }}
+      />
+    </div>
+  );
+  const leftPanel = (
+    <SqlColumnSelector database={database} schemas={["public", "sharepoint"]} />
+  );
+  return (
+    <LayoutThreeRowsLeftPanelAndResults
+      toolbar={toolbar}
+      leftPanel={leftPanel}
+      rightPanel={rightPanel}
+      resultPanel={resultPanel}
+      loggingPanel={loggingPanel}
+    ></LayoutThreeRowsLeftPanelAndResults>
+  );
   return (
     <div className="flex h-full w-full overflow-hidden bg-green-500">
       <div className="flex-1 flex flex-col h-full">

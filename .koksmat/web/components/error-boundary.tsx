@@ -30,10 +30,13 @@ interface ErrorBoundaryProps {
  */
 export default function ErrorBoundary({ children }: ErrorBoundaryProps) {
   const [hasError, setHasError] = useState(false);
+  const [errorDetails, seterrorDetails] = useState<ErrorEvent>();
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
     const errorHandler = (error: ErrorEvent) => {
       console.error("Uncaught error:", error);
+      seterrorDetails(error);
       setHasError(true);
     };
 
@@ -53,6 +56,9 @@ export default function ErrorBoundary({ children }: ErrorBoundaryProps) {
         </div>
         <p className="mt-2 text-sm">
           An error occurred in this section. We apologize for the inconvenience.
+        </p>
+        <p>
+          <pre>{JSON.stringify(errorDetails, null, 2)}</pre>
         </p>
         <Button
           onClick={() => setHasError(false)}

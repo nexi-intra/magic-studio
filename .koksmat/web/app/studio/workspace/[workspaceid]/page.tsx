@@ -32,7 +32,11 @@ export default function Page(props: { params: { workspaceid: string } }) {
       <Input
         autoFocus
         type="text"
-        placeholder="Search kitchens..."
+        placeholder={
+          filteredKitchens.length < 1
+            ? "Loading ..."
+            : "Search " + filteredKitchens.length + " kitchens..."
+        }
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className={
@@ -41,6 +45,7 @@ export default function Page(props: { params: { workspaceid: string } }) {
             : "max-w-md ml-auto mr-auto mt-[30vh]"
         }
       />
+
       {searchTerm && (
         <div className="flex flex-wrap ">
           {filteredKitchens.map((kitchen: Kitchen) => (

@@ -38,6 +38,7 @@ import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
 import { ERDiagram } from "./mermaid-diagram";
+import { DatabaseToolbar } from "./database-toolbar";
 
 export interface Root {
   Result: Result[];
@@ -133,8 +134,8 @@ SELECT json_build_object(
       <header className="border-b bg-background  py-3 shadow-sm sm:px-6">
         <div className=" mx-auto flex items-center justify-between">
           <div className="flex items-center ">
-            <span className="font-bold text-3xl">{database.toUpperCase()}</span>
-
+            {/* <span className="font-bold text-3xl">{database.toUpperCase()}</span> */}
+            <DatabaseToolbar database={database} />
             {/* <span className="text-muted-foreground">Procedure Name</span> */}
           </div>
           <div className="flex items-center gap-4">
