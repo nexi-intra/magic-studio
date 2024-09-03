@@ -93,7 +93,10 @@ export const MagicboxProvider = ({ children }: Props) => {
       }
     },
     signOut: function (): void {
-      pca?.loginRedirect();
+      pca?.logoutPopup();
+      setuser(undefined);
+      setauthSource("");
+      setauthtoken("");
     },
     setAccount: function (
       username: string,

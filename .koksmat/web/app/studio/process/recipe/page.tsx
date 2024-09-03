@@ -9,7 +9,6 @@ export default function Page() {
   const magicbox = useContext(MagicboxContext);
   return (
     <div>
-      workspaces
       {/* <pre>{JSON.stringify(magicbox, null, 2)}</pre> */}
       <SQLCards
         Icon={CardStackIcon}

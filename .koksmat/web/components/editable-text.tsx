@@ -106,7 +106,7 @@ export default function EditableText({
 
   return (
     <div
-      className="group relative inline-block bg-red-400 "
+      className="group relative inline-block  "
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -124,7 +124,7 @@ export default function EditableText({
         </Button>
       )} */}
       <span>
-        xx{text}{" "}
+        {text}{" "}
         {isHovered && (
           <Edit2
             onClick={() => setIsEditing(true)}

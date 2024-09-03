@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Database, GitBranch, GitMerge } from "lucide-react";
+import Link from "next/link";
 
-export default function ProcessManagementHero() {
+export default function ProcessManagementHero(props: {
+  getStartedHref: string;
+  learnMoreHref: string;
+}) {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
       <div className="container px-4 md:px-6">
@@ -57,11 +61,15 @@ export default function ProcessManagementHero() {
             </p>
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center lg:justify-start">
-            <Button className="inline-flex items-center justify-center">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button variant="outline">Learn More</Button>
+            <Link href={props.getStartedHref}>
+              <Button className="inline-flex items-center justify-center">
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href={props.learnMoreHref}>
+              <Button variant="outline">Learn More</Button>
+            </Link>
           </div>
         </div>
       </div>

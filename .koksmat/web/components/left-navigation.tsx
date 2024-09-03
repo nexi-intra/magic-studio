@@ -15,6 +15,7 @@ export interface NavItem {
   label: string;
   info: string;
   href: string;
+  onClick?: () => void;
 }
 
 interface LeftNavigationProps {
@@ -32,7 +33,13 @@ export default function LeftNavigation({
 }: LeftNavigationProps) {
   const pathname = usePathname();
 
-  const NavButton: React.FC<NavItem> = ({ icon, label, info, href }) => {
+  const NavButton: React.FC<NavItem> = ({
+    icon,
+    label,
+    info,
+    href,
+    onClick,
+  }) => {
     const isActive = pathname.startsWith(href) && href !== "/" + APPNAME;
 
     return (
@@ -41,6 +48,7 @@ export default function LeftNavigation({
           <TooltipTrigger asChild>
             <Link href={href}>
               <button
+                onClick={onClick}
                 className={`w-full p-2 rounded-lg transition-colors flex items-center hover:text-slate-900 ${
                   isActive ? "text-blue-700" : "text-slate-500 hover:bg-muted"
                 }`}
