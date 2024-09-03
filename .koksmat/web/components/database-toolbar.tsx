@@ -39,87 +39,11 @@ export function DatabaseToolbar(props: { database: string }) {
   const { database } = props;
   const router = useRouter();
   return (
-    <div className="flex items-center justify-between bg-background px-4 py-2 border-b">
-      <div className="flex items-center gap-4">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Databases
-                visualisation="combobox"
-                value={database}
-                onChange={function (value: string): void {
-                  router.push("/" + APPNAME + "/database/" + value);
-                  // throw new Error("Function not implemented.");
-                }}
-              />
-            </TooltipTrigger>
-            <TooltipContent>Database</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DatabaseTables
-                visualisation="combobox"
-                database={database}
-                value={""}
-                onChange={function (value: string): void {
-                  router.push(
-                    "/" +
-                      APPNAME +
-                      "/database/" +
-                      database +
-                      "/table/" +
-                      value +
-                      "/item"
-                  );
-                }}
-              />
-            </TooltipTrigger>
-            <TooltipContent>Tables</TooltipContent>
-          </Tooltip>
-
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <DatabaseProcedures
-                database={database}
-                value=""
-                onChange={function (value: string): void {
-                  router.push(
-                    "/" +
-                      APPNAME +
-                      "/database/" +
-                      database +
-                      "/procedure/" +
-                      value
-                  );
-                }}
-                visualisation={"combobox"}
-              />
-            </TooltipTrigger>
-            <TooltipContent>Procedures</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DatabaseQueries
-                database={database}
-                value=""
-                onChange={function (value: string): void {
-                  router.push(
-                    "/" + APPNAME + "/database/" + database + "/query/" + value
-                  );
-                }}
-                visualisation={"combobox"}
-              />
-            </TooltipTrigger>
-            <TooltipContent>Queries</TooltipContent>
-          </Tooltip> */}
-          <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
-            <Button className="h-9 px-6">New Query</Button>
-          </Link>
-        </TooltipProvider>
-      </div>
-      {/* <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
+    <div className="flex w-full">
+      <div className="flex-grow"></div>
+      <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
         <Button className="h-9 px-6">New Query</Button>
-      </Link> */}
+      </Link>
     </div>
   );
 }

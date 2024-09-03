@@ -53,7 +53,7 @@ export function SqlQueryEditor(props: {
     if (!sqlExpression) return;
 
     setError("");
-    const result = await run(
+    const result = await run<any>(
       "magic-mix.app",
       ["query", database, sqlExpression],
       "",
@@ -65,6 +65,7 @@ export function SqlQueryEditor(props: {
       title: "Running query",
       detail: sqlExpression,
       error: "",
+      result: "",
     };
 
     if (result.hasError) {
@@ -73,9 +74,9 @@ export function SqlQueryEditor(props: {
       setlog([...log, logEntry]);
       return;
     }
-
+    logEntry.result = JSON.stringify(result.data, null, 2);
     setlog([...log, logEntry]);
-    setSqlResult(result.data);
+    setSqlResult(logEntry.result);
   };
 
   const handleSave = () => {
@@ -109,8 +110,10 @@ export function SqlQueryEditor(props: {
   const resultPanel = (
     <div className="h-full">
       <div className="p-1">Result</div>
+
       <MonacoEditor
-        defaultValue={JSON.stringify(sqlResult, null, 2)}
+        //defaultValue={sqlResult}
+        value={sqlResult}
         height="100%"
         language="json"
         theme="vs-dark"
@@ -139,98 +142,5 @@ export function SqlQueryEditor(props: {
       resultPanel={resultPanel}
       loggingPanel={loggingPanel}
     ></LayoutThreeRowsLeftPanelAndResults>
-  );
-  return (
-    <div className="flex h-full w-full overflow-hidden bg-green-500">
-      <div className="flex-1 flex flex-col h-full">
-        <div className="flex items-center gap-2 border-b bg-green-800 p-2">
-          <LabelWithEditor
-            initialValue={name}
-            onSave={(value) => {
-              setName(value);
-            }}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8"
-            onClick={handleSave}
-          >
-            <SaveIcon className="mr-2 h-4 w-4" />
-            Save
-          </Button>
-          {error && <div className="text-red-500">{error}</div>}
-        </div>
-        <div className="flex-1 h-full overflow-hidden">
-          <ResizablePanelGroup direction="horizontal" className="h-full">
-            <ResizablePanel defaultSize={20} className="overflow-auto h-full">
-              <SqlColumnSelector
-                database={database}
-                schemas={["public", "sharepoint"]}
-              />
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel className="h-full">
-              <ResizablePanelGroup direction="vertical" className="h-full">
-                <ResizablePanel defaultSize={60}>
-                  <MonacoEditor
-                    defaultValue={props.sql}
-                    height="100%"
-                    language="postgres"
-                    onChange={(value) => {
-                      setSqlExpression(value!);
-                    }}
-                    theme="vs-dark"
-                    options={{
-                      minimap: { enabled: false },
-                      scrollBeyondLastLine: false,
-                    }}
-                  />
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel>
-                  <div className="flex flex-col h-full">
-                    <div className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8"
-                          onClick={handleRun}
-                        >
-                          <PlayIcon className="mr-2 h-4 w-4" />
-                          Run
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-8">
-                          <CircleStopIcon className="mr-2 h-4 w-4" />
-                          Stop
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-8">
-                          <Maximize2Icon className="mr-2 h-4 w-4" />
-                          Maximize
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="h-8">
-                          <FileMinusIcon className="mr-2 h-4 w-4" />
-                          Clear
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-8">
-                          <FileCodeIcon className="mr-2 h-4 w-4" />
-                          Explain
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex-1 overflow-auto border rounded-md p-4 m-4 font-mono text-sm">
-                      {JSON.stringify(sqlResult, null, 2)}
-                    </div>
-                  </div>
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </div>
-      </div>
-    </div>
   );
 }

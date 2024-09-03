@@ -10,14 +10,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, ChevronDown, ChevronUp, X } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export interface LogObject {
   time: Date;
   title: string;
   detail: string;
   error: string;
+  result: string;
 }
 
 interface LogTableProps {
@@ -29,13 +37,9 @@ export default function LogViewer({
   logs: initialLogs,
   onClear,
 }: LogTableProps) {
-  //const [logs, setLogs] = useState(initialLogs);
   const [sortAscending, setSortAscending] = useState(false);
   const [expandedLog, setExpandedLog] = useState<LogObject | null>(null);
-  // useEffect(() => {
-  //   setLogs(initialLogs);
-  // }, [initialLogs]);
-
+  const [clock, setclock] = useState(0);
   const sortedLogs = useMemo(() => {
     return [...initialLogs].sort((a, b) => {
       return sortAscending
@@ -63,6 +67,15 @@ export default function LogViewer({
     setSortAscending(!sortAscending);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setclock(clock + 1);
+    }, 1000);
+
+    // Cleanup function to clear the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -71,70 +84,66 @@ export default function LogViewer({
             Clear Logs
           </Button>
         )}
-        <Button onClick={toggleSort} variant="secondary">
-          Sort {sortAscending ? "Descending" : "Ascending"}
-          {sortAscending ? (
-            <ChevronUp className="ml-2 h-4 w-4" />
-          ) : (
-            <ChevronDown className="ml-2 h-4 w-4" />
-          )}
-        </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Time</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedLogs.map((log, index) => (
-            <TableRow
-              key={index}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => setExpandedLog(expandedLog === log ? null : log)}
-            >
-              <TableCell>{formatTimeSince(log.time)}</TableCell>
-              <TableCell>{log.title}</TableCell>
-              <TableCell>
-                {log.error && (
-                  <AlertCircle className="h-5 w-5 text-destructive" />
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      {expandedLog && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold">{expandedLog.title}</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setExpandedLog(null)}
+      <div className="border rounded-md">
+        <Table>
+          <TableHeader className="sticky top-0 bg-background z-10">
+            <TableRow>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={toggleSort}
               >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <p>
-              <strong>Time:</strong> {expandedLog.time.toLocaleString()}
-            </p>
-            <p>
-              <strong>Detail:</strong> {expandedLog.detail}
-            </p>
-            {expandedLog.error && (
-              <p className="text-destructive">
-                <strong>Error:</strong> {expandedLog.error}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                Time
+                {sortAscending ? (
+                  <ChevronUp className="inline ml-2 h-4 w-4" />
+                ) : (
+                  <ChevronDown className="inline ml-2 h-4 w-4" />
+                )}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <ScrollArea className="h-[400px]">
+            <div className="">{clock}</div>
+            <TableBody>
+              {sortedLogs.map((log, index) => (
+                <Sheet key={index}>
+                  <SheetTrigger asChild>
+                    <TableRow className="cursor-pointer hover:bg-muted/50">
+                      <TableCell>{formatTimeSince(log.time)}</TableCell>
+                      <TableCell>{log.title}</TableCell>
+                      <TableCell>
+                        {log.error && (
+                          <AlertCircle className="h-5 w-5 text-destructive" />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>{log.title}</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4 space-y-4">
+                      <p>
+                        <strong>Time:</strong> {log.time.toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>Detail:</strong> {log.detail}
+                      </p>
+                      {log.error && (
+                        <p className="text-destructive">
+                          <strong>Error:</strong> {log.error}
+                        </p>
+                      )}
+                      {log.result && <p className="text-xs">{log.result}</p>}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              ))}
+            </TableBody>
+          </ScrollArea>
+        </Table>
+      </div>
     </div>
   );
 }
