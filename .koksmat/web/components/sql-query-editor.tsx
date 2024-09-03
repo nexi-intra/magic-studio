@@ -23,16 +23,16 @@ import * as monacoEditor from "monaco-editor";
 import { format } from "sql-formatter";
 import { run } from "@/actions/server";
 import LayoutThreeRowsLeftPanelAndResults from "./layout-three-rows-left-panel-and-results";
+import LogViewer, { LogObject } from "./log-viewer";
 
 export interface SqlQueryEditorOptions {}
-
 export function SqlQueryEditor(props: {
   database: string;
   sql: string;
   name: string;
   onSave: (sql: string, name: string) => void;
   options?: SqlQueryEditorOptions;
-  toolbar: React.ReactNode;
+  toolbar?: React.ReactNode;
 }) {
   const monacoInstance = useMonaco();
   const magicbox = useContext(MagicboxContext);
@@ -41,6 +41,7 @@ export function SqlQueryEditor(props: {
   const [sqlExpression, setSqlExpression] = useState(props.sql);
   const [sqlResult, setSqlResult] = useState<any>();
   const [name, setName] = useState(props.name);
+  const [log, setlog] = useState<LogObject[]>([]);
 
   useEffect(() => {
     setSqlExpression(props.sql);
@@ -59,11 +60,21 @@ export function SqlQueryEditor(props: {
       600,
       "x"
     );
+    const logEntry: LogObject = {
+      time: new Date(),
+      title: "Running query",
+      detail: sqlExpression,
+      error: "",
+    };
 
     if (result.hasError) {
       setError(result.errorMessage ?? "Unknown error");
+      logEntry.error = result.errorMessage ?? "Unknown error";
+      setlog([...log, logEntry]);
       return;
     }
+
+    setlog([...log, logEntry]);
     setSqlResult(result.data);
   };
 
@@ -113,16 +124,8 @@ export function SqlQueryEditor(props: {
   const loggingPanel = (
     <div className="h-full">
       <div className="p-1">Log</div>
-      <MonacoEditor
-        defaultValue={props.sql}
-        height="100%"
-        language="text"
-        theme="vs-dark"
-        options={{
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-        }}
-      />
+
+      <LogViewer logs={log} />
     </div>
   );
   const leftPanel = (

@@ -7,7 +7,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ResizableLayoutProps {
-  toolbar: React.ReactNode;
+  toolbar?: React.ReactNode;
   leftPanel: React.ReactNode;
   rightPanel: React.ReactNode;
   resultPanel: React.ReactNode;
