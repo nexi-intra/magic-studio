@@ -15,10 +15,12 @@ import {
 } from "@/components/workflow-interfaces";
 import WorkflowStatus from "@/components/workflow-status";
 
-import React, { use, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 
 import useDatabaseWorksActivitymodel from "@/components/use-database-works-activitymodel";
 import { Button } from "@/components/ui/button";
+import { MagicboxContext } from "@/app/koksmat/magicbox-context";
+import UpdateActivitymodel from "@/actions/database/works/update_activitymodel";
 export default function Page(props: { params: { model: string } }) {
   const { model } = props.params;
   const [workflowData, setworkflowData] = useState<WorkflowData>();
@@ -36,6 +38,7 @@ export default function Page(props: { params: { model: string } }) {
 
   const [yamlText, setyamlText] = useState("");
   const [view, setview] = useState<"yaml" | "preview">("preview");
+  const magicbox = useContext(MagicboxContext);
   const selectedView = () => {
     switch (view) {
       case "yaml":
@@ -77,6 +80,16 @@ export default function Page(props: { params: { model: string } }) {
           >
             Copy workflow as JSON
           </WithClipboardCopy>,
+          <div key="3">
+            <Button
+              //   const result = await UpdateActivitymodel(
+              //     magicbox.authtoken,undefined,"",databaseRecord?.name || "",yaml.load(yamlText) as any,
+              // }}
+              variant={"secondary"}
+            >
+              Save
+            </Button>
+          </div>,
           <div key="2" className="flex items-center gap-2">
             <Button
               onClick={() => {
