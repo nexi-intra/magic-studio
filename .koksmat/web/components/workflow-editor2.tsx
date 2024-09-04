@@ -120,7 +120,7 @@ export default function WorkflowEditor<T>(props: {
             title="Workflow Editor"
             description="Create and edit workflows for your application."
             error={""}
-            tools={<div>Left</div>}
+            tools={[<div>Left</div>]}
           />
         </div>
         <div className="flex flex-col h-full">
