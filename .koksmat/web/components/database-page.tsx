@@ -37,7 +37,7 @@ import {
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useEffect, useState } from "react";
 import { APPNAME } from "@/app/global";
-import { ERDiagram } from "./mermaid-diagram";
+import { ERDiagram } from "./diagram-er";
 import { DatabaseToolbar } from "./database-toolbar";
 
 export interface Root {
@@ -128,7 +128,7 @@ SELECT json_build_object(
       setdbinfo(query.dataset[0].result);
     }
   }, [database, query]);
-
+  // return <div>1</div>;
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8 lg:p-10">
       <header className="border-b bg-background  py-3 shadow-sm sm:px-6">

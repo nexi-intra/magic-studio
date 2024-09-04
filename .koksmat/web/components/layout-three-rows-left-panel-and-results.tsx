@@ -48,6 +48,7 @@ export default function LayoutThreeRowsLeftPanelAndResults(
             </ResizablePanel>
             <ResizableHandle withHandle />
             {/* Right panel */}
+
             <ResizablePanel defaultSize={80}>
               <ResizablePanelGroup direction="vertical">
                 {/* Upper right panel */}
@@ -56,23 +57,28 @@ export default function LayoutThreeRowsLeftPanelAndResults(
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 {/* Lower right panel */}
-                <ResizablePanel defaultSize={50}>
-                  <ResizablePanelGroup direction="horizontal">
-                    {/* Result panel */}
-                    <ResizablePanel defaultSize={50}>
-                      <div className="h-full p-0">{resultPanel}</div>
-                    </ResizablePanel>
-                    <ResizableHandle withHandle />
-                    {/* Logging panel */}
-                    <ResizablePanel
-                      defaultSize={50}
-                      collapsible
-                      collapsedSize={5}
-                    >
-                      <div className="h-full p-0">{loggingPanel}</div>
-                    </ResizablePanel>
-                  </ResizablePanelGroup>
-                </ResizablePanel>
+                {resultPanel && loggingPanel && (
+                  <ResizablePanel defaultSize={50}>
+                    <ResizablePanelGroup direction="horizontal">
+                      {/* Result panel */}
+                      {resultPanel && (
+                        <ResizablePanel defaultSize={50}>
+                          <div className="h-full p-0">{resultPanel}</div>
+                        </ResizablePanel>
+                      )}
+                      <ResizableHandle withHandle />
+
+                      {/* Logging panel */}
+                      <ResizablePanel
+                        defaultSize={50}
+                        collapsible
+                        collapsedSize={5}
+                      >
+                        <div className="h-full p-0">{loggingPanel}</div>
+                      </ResizablePanel>
+                    </ResizablePanelGroup>
+                  </ResizablePanel>
+                )}
               </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>

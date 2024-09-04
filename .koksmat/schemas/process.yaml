@@ -1,0 +1,210 @@
+version: 1
+name: process
+id: pizza_order
+actors:
+  user: &user
+    name: "User"
+    description: "A person who interacts with the system."
+  system: &system
+    name: "System"
+    description: "The system"
+
+  delivery_person: &delivery_person
+    name: "Delivery Person"
+    description: "The person delivering the pizza."
+  restaurant: &restaurant
+    name: "Restaurant"
+    description: "The restaurant preparing the pizza."
+  shop: &shop
+    name: "Webshop"
+    description: "The webshop where the user orders the pizza."
+  app: &app
+    name: "App"
+    description: "The Wolt app."
+
+  auditlog: &auditlog
+    name: "Audit Log"
+    description: "The audit log."
+description: "Support a user in satisfying their hunger by ordering a pizza."
+purpose: "Like to be full and happy."
+general:
+  raci:
+    inform: *auditlog
+
+stage:
+  - name: "Feeling Hunger"
+    id: "hunger_phase"
+    raci:
+      responsible: "system"
+      consulted: *shop
+      informed: *auditlog
+    triggers:
+      actions:
+        - id: "hunger"
+          name: "Hunger"
+          description: "The feeling of hunger."
+          sql: "select * from hunger from state is null"
+    # This will generate an array of items
+
+    # for each item in the array, it will trigger the action sequence
+
+    # state
+    #{
+    #    "hunger_id": 1,
+    #    "state": null,
+    #    "user": {
+    #        "email": "niasdaf@nsdf.com",
+    #        "name": "Niasdf",
+    #        "phone": "123123123"
+    #    }
+    #}
+
+    actions:
+      - id: "register_hunger"
+        name: "Register Hunger"
+        description: "Recognize that you are hungry and decide to order a pizza."
+        icon: "alert-circle" # LucideReact icon reference
+        interactive: true
+        ui: https://order.intra.nexigroup.com?id=\(.user.email)&hunger_id=\(.hunger_id)
+
+        transaction: >
+          { "service": "order",
+            "transactions" : [
+              {
+                "order_id": "${order_id}",
+                "status": "posted"
+              }
+            ]
+          }
+      - id: "post order"
+        name: "Register Hunger"
+        description: "Recognize that you are hungry and decide to order a pizza."
+        icon: "ship"
+        interactive: false
+        ui: https://xx?id=\(.user.email)
+        sql: "select * from order where reference =${order_id} and  status ->> 'paid' is null status ->> 'posted' is  null"
+    decisions:
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+
+  - name: "Place order"
+    id: "place_order_phase"
+    raci:
+      responsible: *user
+      consulted: *shop
+      informed: *auditlog
+    triggers:
+      actions:
+        - id: "waiting"
+          name: "Waiting"
+          description: "The feeling of hunger."
+          sql: "select * from order where reference =${order_id} and  status ->> 'paid' is null status ->> 'posted' is not null"
+
+    actions:
+      - id: "paid_order"
+        name: "Paid Order"
+        description: "Pay the order."
+        icon: "truck" # LucideReact icon reference
+        interactive: true
+        ui: https://hunger.intra.nexigroup.com/track/${order_id}
+
+      - id: "order_confirmed"
+        name: "Order Confirmed"
+        description: "Order is confirmed."
+        icon: "box" # LucideReact icon reference
+        interactive: false
+        sql: "select * from order where reference =${order_id} and status ->> 'paid' is not null"
+
+    decisions:
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+
+  - name: "Waiting for Pizza"
+    id: "waiting_phase"
+    raci:
+      responsible: *delivery_person
+      informed: *user
+
+    triggers:
+      actions:
+        - id: "waiting"
+          name: "Waiting"
+          description: "The feeling of hunger."
+          sql: "select * from order where reference =${order_id}"
+    actions:
+      - id: "track_delivery"
+        name: "Track Delivery"
+        description: "Track the delivery of the pizza using the app."
+        icon: "truck" # LucideReact icon reference
+        interactive: true
+        ui: https://hunger.intra.nexigroup.com/track/${order_id}
+      - id: "receive_pizza"
+        name: "Receive Pizza"
+        description: "Get the pizza from the delivery person."
+        icon: "box" # LucideReact icon reference
+        interactive: false
+        ui: https://hunger.intra.nexigroup.com/aoi/receivepizza
+    decisions:
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+
+  - name: "Eating Pizza"
+    id: "eating_phase"
+    triggers:
+      actions:
+        - id: "eating"
+          name: "Eating"
+          description: "The feeling of hunger."
+          sql: "select * from order where reference =${order_id}"
+    actions:
+      - id: "eat_pizza"
+        name: "Eat Pizza"
+        description: "Enjoy your pizza."
+        icon: "utensils" # LucideReact icon reference
+        interactive: true
+        ui: https://hunger.intra.nexigroup.com/eat/${order_id}
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+        interactive: false
+        ui: https://hunger.intra.nexigroup.com/aoi/decidenext
+    decisions:
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+
+  - name: "Post feedback"
+    id: "feedback_phase"
+    triggers:
+      actions:
+        - id: "feedback"
+          name: "Feedback"
+          description: "The feeling of hunger."
+          sql: "select * from order where reference =${order_id}"
+    actions:
+      - id: "post_feedback"
+        name: "Post Feedback"
+        description: "Enjoy your pizza."
+        icon: "utensils" # LucideReact icon reference
+        interactive: true
+        ui: https://hunger.intra.nexigroup.com/feedback/${order_id}
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference
+        interactive: false
+        ui: https://hunger.intra.nexigroup.com/aoi/decidenext
+
+    decisions:
+      - id: "decide_next"
+        name: "Decide Next Action"
+        description: "Decide what to do next after eating the pizza."
+        icon: "more-horizontal" # LucideReact icon reference

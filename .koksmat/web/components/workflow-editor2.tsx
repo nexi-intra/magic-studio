@@ -28,6 +28,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import IconPicker from "./icon-picker";
+import CreateActivitymodel from "@/actions/database/works/create_activitymodel";
+import LayoutHeader from "./layout-header";
 
 export default function WorkflowEditor<T>(props: {
   flow: WorkflowFile | undefined;
@@ -38,33 +40,24 @@ export default function WorkflowEditor<T>(props: {
   const [newActivityName, setNewActivityName] = useState("");
   const [newActivityIcon, setNewActivityIcon] = useState("");
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const [error, seterror] = useState("");
 
-  function handleSave(sections: Section[], metadata: WorkflowMetadata) {
-    return async () => {
-      const payload = {
-        activity: "",
-        data: sections,
-        description: metadata.description,
-        name: metadata.title,
-        searchindex: "name:" + metadata.title,
-        tenant: "",
-      };
-      const args = [
-        "execute",
-        "works",
-        "update_activitymodel",
-        magicbox.authtoken,
-        JSON.stringify(payload),
-      ];
-
-      const result = await https("", "POST", "/api/run", {
-        args,
-        channel: "x",
-        timeout: 600,
-      });
-      alert(result.hasError ? result.errorMessage : "Saved successfully");
+  const handleSave = async (
+    sections: Section[],
+    metadata: WorkflowMetadata
+  ) => {
+    const data = {
+      sections,
+      metadata,
     };
-  }
+
+    CreateActivitymodel(magicbox.authtoken, newActivityName, "", "", data)
+      .then((result) => {})
+      .catch((e) => {
+        console.error(e);
+        seterror(e.toString());
+      });
+  };
 
   useEffect(() => {
     if (!props.flow) return;
@@ -121,79 +114,89 @@ export default function WorkflowEditor<T>(props: {
 
   return (
     <ToolContextProvider>
-      <div className="flex flex-col h-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Workflow Editor</h2>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Activity
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Activity</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newActivityName}
-                    onChange={(e) => setNewActivityName(e.target.value)}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="icon" className="text-right">
-                    Icon
-                  </Label>
-                  <div className="col-span-3 flex items-center gap-2">
+      <div className="w-full">
+        <div className="w-full">
+          <LayoutHeader
+            title="Workflow Editor"
+            description="Create and edit workflows for your application."
+            error={""}
+            tools={<div>Left</div>}
+          />
+        </div>
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Workflow Editor</h2>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Activity
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add New Activity</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
                     <Input
-                      id="icon"
-                      value={newActivityIcon}
-                      onChange={(e) => setNewActivityIcon(e.target.value)}
-                      className="flex-grow"
+                      id="name"
+                      value={newActivityName}
+                      onChange={(e) => setNewActivityName(e.target.value)}
+                      className="col-span-3"
                     />
-                    <Button
-                      type="button"
-                      onClick={() => setIsIconPickerOpen(true)}
-                    >
-                      Browse
-                    </Button>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="icon" className="text-right">
+                      Icon
+                    </Label>
+                    <div className="col-span-3 flex items-center gap-2">
+                      <Input
+                        id="icon"
+                        value={newActivityIcon}
+                        onChange={(e) => setNewActivityIcon(e.target.value)}
+                        className="flex-grow"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => setIsIconPickerOpen(true)}
+                      >
+                        Browse
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Button onClick={handleAddActivity}>Add Activity</Button>
-            </DialogContent>
-          </Dialog>
+                <Button onClick={handleAddActivity}>Add Activity</Button>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <EditorCanvas
+            handleSave={handleSave}
+            activityIcons={activityIcons}
+            initialSections={initialSections}
+            metadata={{
+              title: "",
+              description: "",
+            }}
+            handleAddSection={async () => {
+              const newId = nanoid();
+              const newSection: Section = {
+                id: `section-${newId}`,
+                title: `New Section ${newId}`,
+                content: "This is the content for the new section.",
+                collapsed: false,
+                columns: Array.from({ length: 4 }, (_, i) => ({
+                  id: `column-${newId}-${i + 1}`,
+                  items: [],
+                })),
+              };
+              return newSection;
+            }}
+          />
         </div>
-        <EditorCanvas
-          handleSave={handleSave}
-          activityIcons={activityIcons}
-          initialSections={initialSections}
-          metadata={{
-            title: "",
-            description: "",
-          }}
-          handleAddSection={async () => {
-            const newId = nanoid();
-            const newSection: Section = {
-              id: `section-${newId}`,
-              title: `New Section ${newId}`,
-              content: "This is the content for the new section.",
-              collapsed: false,
-              columns: Array.from({ length: 4 }, (_, i) => ({
-                id: `column-${newId}-${i + 1}`,
-                items: [],
-              })),
-            };
-            return newSection;
-          }}
-        />
       </div>
       <Dialog open={isIconPickerOpen} onOpenChange={setIsIconPickerOpen}>
         <DialogContent className="sm:max-w-[425px]">

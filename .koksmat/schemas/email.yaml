@@ -1,0 +1,96 @@
+version: 1
+name: process
+id: user_registration_notification
+actors:
+  user: &user
+    name: "User"
+    description: "A person registering on the platform."
+  system: &system
+    name: "System"
+    description: "The system sending the email."
+  admin: &admin
+    name: "Administrator"
+    description: "The admin who manages the system."
+  email_service: &email_service
+    name: "Email Service"
+    description: "The service responsible for sending emails."
+  auditlog: &auditlog
+    name: "Audit Log"
+    description: "The audit log that tracks all actions."
+
+description: "Notify admin upon new user registration."
+purpose: "Ensure admin is aware of new user registrations."
+general:
+  raci:
+    inform: *auditlog
+
+stage:
+  - name: "Check for New User Registration"
+    id: "registration_phase"
+    raci:
+      responsible: *system
+      informed: *auditlog
+    triggers:
+      actions:
+        - id: "new_registration"
+          name: "New Registration"
+          description: "Detect if a new user registration has occurred."
+          sql: "SELECT * FROM users WHERE registration_status = 'pending'"
+
+    # This will retrieve all new registrations from the database
+
+    actions:
+      - id: "process_registration"
+        name: "Process Registration"
+        description: "Check if new users have been registered and trigger email notification."
+        icon: "alert-circle"
+        interactive: false
+        ui: https://adminportal.intra.system.com/user/\(.user.id)
+
+        transaction: >
+          { "service": "email_notification",
+            "transactions": [
+              {
+                "user_id": "${user_id}",
+                "status": "triggered",
+                "email": "${user_email}"
+              }
+            ]
+          }
+
+      - id: "trigger_email"
+        name: "Send Email Notification"
+        description: "Notify the admin about a new user registration."
+        icon: "mail"
+        interactive: false
+        sql: "SELECT * FROM users WHERE user_id = ${user_id} AND email_sent = false"
+        transaction: >
+          { "service": "email_service",
+            "operation": "send",
+            "email_template": "new_user_notification",
+            "recipient": "${admin_email}",
+            "content": {
+              "subject": "New User Registration",
+              "body": "A new user has registered. User ID: ${user_id}"
+            }
+          }
+
+  - name: "Await Email Confirmation"
+    id: "email_confirmation_phase"
+    raci:
+      responsible: *system
+      informed: *auditlog
+    triggers:
+      actions:
+        - id: "email_sent_check"
+          name: "Email Sent Check"
+          description: "Confirm the email has been sent."
+          sql: "SELECT * FROM users WHERE user_id = ${user_id} AND email_sent = true"
+
+    actions:
+      - id: "email_confirmed"
+        name: "Email Confirmed"
+        description: "Mark that the email was successfully sent."
+        icon: "check-circle"
+        interactive: false
+        ui: https://adminportal.intra.system.com/user/email-status/\(.user.id)

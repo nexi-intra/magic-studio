@@ -58,7 +58,7 @@ export interface EditorCanvasProps {
   handleSave: (
     sections: Section[],
     metadata: WorkflowMetadata
-  ) => () => Promise<void>;
+  ) => Promise<void>;
   handleAddSection: () => Promise<Section>;
   activityIcons: ActivityIcon[];
   initialSections: Section[];
