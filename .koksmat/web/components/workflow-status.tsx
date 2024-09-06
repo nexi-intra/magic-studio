@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { StageComponent } from "./workflow-components";
 import { WorkflowData } from "./workflow-interfaces";
 
-export default function WorkflowStatus(props: { workflowData: WorkflowData }) {
-  const { workflowData } = props;
+export default function WorkflowStatus(props: {
+  workflowData: WorkflowData;
+  showDetails?: boolean;
+}) {
+  const { workflowData, showDetails } = props;
   const [currentStage, setCurrentStage] = useState(1);
   const [currentAction, setCurrentAction] = useState(0);
 

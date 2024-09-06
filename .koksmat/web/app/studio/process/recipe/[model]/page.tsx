@@ -1,5 +1,4 @@
 "use client";
-import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import DynamicIcon from "@/components/dynamic-icon";
 import { pizzaOrderWorkflow } from "@/components/flows/sample";
 import LayoutHeader from "@/components/layout-header";
@@ -17,16 +16,19 @@ import WorkflowStatus from "@/components/workflow-status";
 
 import React, { use, useContext, useEffect, useState } from "react";
 
-import useDatabaseWorksActivitymodel from "@/components/use-database-works-activitymodel";
 import { Button } from "@/components/ui/button";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import UpdateActivitymodel from "@/actions/database/works/update_activitymodel";
+import LogViewer, { LogObject } from "@/components/log-viewer";
+import { useDatabaseWorksActivitymodelItem } from "./useDatabaseWorksActivitymodelItem";
+import { Squirrel } from "lucide-react";
+
 export default function Page(props: { params: { model: string } }) {
   const { model } = props.params;
   const [workflowData, setworkflowData] = useState<WorkflowData>();
-
+  const [log, setlog] = useState<LogObject[]>([]);
   const { databaseRecord, isLoading, error } =
-    useDatabaseWorksActivitymodel(model);
+    useDatabaseWorksActivitymodelItem(model);
   useEffect(() => {
     if (databaseRecord) {
       setworkflowData(databaseRecord.data as any);
@@ -38,6 +40,7 @@ export default function Page(props: { params: { model: string } }) {
 
   const [yamlText, setyamlText] = useState("");
   const [view, setview] = useState<"yaml" | "preview">("preview");
+  const [viewDetails, setViewDetails] = useState(false);
   const magicbox = useContext(MagicboxContext);
   const selectedView = () => {
     switch (view) {
@@ -66,7 +69,11 @@ export default function Page(props: { params: { model: string } }) {
     }
   };
   const centerPanel = workflowData ? selectedView() : null;
-  const rightPanel = <div className="w-300">dsafds</div>;
+  const rightPanel = (
+    <div className="w-300">
+      <LogViewer logs={log} />
+    </div>
+  );
   const leftPanel = null; //<pre>{diagram}</pre>; //
   return (
     <div className="w-full h-full">
@@ -82,6 +89,24 @@ export default function Page(props: { params: { model: string } }) {
           </WithClipboardCopy>,
           <div key="3">
             <Button
+              onClick={async () => {
+                debugger
+                const result: any = await UpdateActivitymodel(
+                  magicbox.authtoken,
+                  databaseRecord
+                );
+
+                setlog((log) => [
+                  ...log,
+                  {
+                    time: new Date(),
+                    title: "UpdateActivitymodel",
+                    detail: JSON.stringify(result, null, 2),
+                    error: result?.data?.error || "",
+                    result: JSON.stringify(result, null, 2),
+                  },
+                ]);
+              }}
               //   const result = await UpdateActivitymodel(
               //     magicbox.authtoken,undefined,"",databaseRecord?.name || "",yaml.load(yamlText) as any,
               // }}
@@ -105,6 +130,9 @@ export default function Page(props: { params: { model: string } }) {
               variant="secondary"
             >
               {view === "preview" ? "YAML" : "View"}
+            </Button>
+            <Button onClick={() => setViewDetails(!viewDetails)}>
+              <Squirrel className="w-4 h-4" />
             </Button>
           </div>,
         ]}

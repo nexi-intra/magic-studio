@@ -64,9 +64,9 @@ export default function ComponentPage(props: {
             const args = [
               "-c",
               `echo "` +
-                data.sourceCode.replaceAll(`"`, `\"`) +
-                `" > ` +
-                filename,
+              data.sourceCode.replaceAll(`"`, `\"`) +
+              `" > ` +
+              filename,
             ];
             const command = "bash";
 
@@ -104,7 +104,7 @@ export default function ComponentPage(props: {
             });
           }}
         />
-        <PromptSuggestions initialSuggestions={initialSuggestions} />
+        {/* <PromptSuggestions initialSuggestions={initialSuggestions} /> */}
       </div>
     </div>
   );

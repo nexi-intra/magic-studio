@@ -49,38 +49,19 @@ try {
 }
   */
 
-export default async function UpdateActivitymodel(
+export default async function UpdateActivitymodel<T>(
   authtoken: string,
-  title: undefined,
-  description: string,
-  name: string,
-  activity: string,
-  data: object,
-  id?: number
+  data: T
 ) {
-  // constructs an object from the input parameters
-  const input = { title, description, name, activity, data };
+  const payload = JSON.parse(JSON.stringify(data).replaceAll("'", "''"));
 
-  // The tenant name and search index are applied upstream, so they are omitted from the schema
-  const __schema = _schema.omit({ tenant: true, searchindex: true });
-
-  // Input data is validated against the schema, and might be transform during that process
-  const item = __schema.safeParse(input);
-
-  if (!item.success) {
-    throw new Error(item.error.errors.map((err) => err.message).join(", "));
-  }
-
-  const dbrecord = { ...item.data, tenant: "", searchindex: "", id: id };
   const result = await execute(
     authtoken, // <-- this is the authentication token containing the user's credentials - the upn will be used as "actor" name
     "works", // <-- this is a reference to a record in the connections table in the mix database
     "magic-mix.app", // <-- this is the service name processing the request
     "update_activitymodel", // <-- this is the name of the procedure in the database pointed to by the connection
-    dbrecord // <-- this is the data to be sent to the procedure
+    payload // <-- this is the data to be sent to the procedure
   );
-  if (result.hasError) {
-    throw new Error(result.errorMessage);
-  }
-  return result.data;
+
+  return result;
 }

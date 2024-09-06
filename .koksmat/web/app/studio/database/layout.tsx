@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 export default function Layout(props: { children: any }) {
   const { children } = props;
-  return <div> {children}</div>;
+  return <div> {children}</div> // ;
 }

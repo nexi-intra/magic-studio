@@ -22,7 +22,7 @@ ORDER BY name
   );
   return (
     <div className="container ">
-      <DashboardDatabases databases={databases.dataset} />;
+      <DashboardDatabases databases={databases.dataset} />
     </div>
   );
 }
