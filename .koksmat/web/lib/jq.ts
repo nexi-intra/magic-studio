@@ -47,3 +47,25 @@ export async function applyJqFilter(
     throw error;
   }
 }
+
+export function renderTemplate(template: string, jsonString: string): string {
+  const data = JSON.parse(jsonString);
+
+  return template.replace(/\{\{(.+?)\}\}/g, (_, expr) => {
+    const keys = expr.trim().split(".");
+    let value: any = data;
+    for (const key of keys) {
+      value = value[key];
+      if (value === undefined) {
+        return `{{${expr}}}`; // Return the original if key doesn't exist
+      }
+    }
+    return value;
+  });
+}
+
+// // Usage example
+// const template = "Hello {{name}}, your age is {{age}}.";
+// const jsonString = '{"name": "John", "age": 30}';
+// const result = renderTemplate(template, jsonString);
+// console.log(result);

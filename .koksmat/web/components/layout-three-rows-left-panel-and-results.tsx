@@ -22,15 +22,15 @@ export default function LayoutThreeRowsLeftPanelAndResults(
     resultPanel,
     loggingPanel,
   }: ResizableLayoutProps = {
-    toolbar: <div>Toolbar</div>,
-    leftPanel: <div>Left Panel</div>,
-    rightPanel: <div>Right Panel</div>,
-    resultPanel: <div>Result Panel</div>,
-    loggingPanel: <div>Logging Panel</div>,
-  }
+      toolbar: <div>Toolbar</div>,
+      leftPanel: <div>Left Panel</div>,
+      rightPanel: <div>Right Panel</div>,
+      resultPanel: <div>Result Panel</div>,
+      loggingPanel: <div>Logging Panel</div>,
+    }
 ) {
   return (
-    <div className="w-[90vw] h-[80vh] border rounded-lg overflow-hidden">
+    <div className="w-full h-full border rounded-lg overflow-hidden">
       <ResizablePanelGroup direction="vertical">
         {/* Toolbar */}
         <ResizablePanel defaultSize={10} minSize={10} maxSize={10}>

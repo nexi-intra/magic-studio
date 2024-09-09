@@ -17,8 +17,17 @@ export default function Page() {
         Icon={CardStackIcon}
         slugPrefix={"/" + APPNAME + "/workspace/"}
         database={"mix"}
+        parse={(item) => {
+          return {
+            id: item.id,
+            title: item.title,
+            slug: item.slug,
+            description: item.description,
+          };
+        }
+        }
         sql={`
-SELECT W.name as title, '' as description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
+SELECT W.name as title, W.description as description, W.key as slug FROM workspace as W LEFT JOIN public.user as U ON W.user_id = U.id 
 WHERE U.email = '${magicbox?.user?.email}'
 
     

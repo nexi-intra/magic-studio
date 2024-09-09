@@ -22,6 +22,7 @@ import UpdateActivitymodel from "@/actions/database/works/update_activitymodel";
 import LogViewer, { LogObject } from "@/components/log-viewer";
 import { useDatabaseWorksActivitymodelItem } from "./useDatabaseWorksActivitymodelItem";
 import { Squirrel } from "lucide-react";
+import { TemplateEditorButton } from "@/components/template-editor";
 
 export default function Page(props: { params: { model: string } }) {
   const { model } = props.params;
@@ -135,6 +136,9 @@ export default function Page(props: { params: { model: string } }) {
               <Squirrel className="w-4 h-4" />
             </Button>
           </div>,
+          <div key="4">
+            <TemplateEditorButton />
+          </div>
         ]}
       />
       <div className="flex">

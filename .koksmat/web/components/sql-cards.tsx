@@ -107,7 +107,7 @@ export function ShowItems({
                 )}
                 <CardTitle>{item.title}</CardTitle>
               </CardHeader>
-              <CardDescription>{item.description}</CardDescription>
+              <CardDescription className="mx-6 my-3">{item.description}</CardDescription>
             </Link>
             {item.data && (
               <button
