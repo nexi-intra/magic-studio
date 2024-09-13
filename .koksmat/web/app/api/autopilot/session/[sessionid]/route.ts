@@ -1,11 +1,6 @@
 import { getUPNfromToken } from "@/app/api/workspace";
-import { run } from "@/app/koksmat/magicservices";
-import { tryCatch } from "@/app/officeaddin/actions/outlook-samples";
 import { log } from "@/lib/log";
 import { NatsMessageReceiver } from "@/lib/nats-message-receiver";
-import { getDate } from "date-fns";
-import { jwtDecode } from "jwt-decode";
-import { NatsConnection, connect, StringCodec } from "nats";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 export async function GET(
