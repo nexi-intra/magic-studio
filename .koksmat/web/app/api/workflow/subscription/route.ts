@@ -1,9 +1,16 @@
+import { https } from "@/app/koksmat/httphelper";
 import { workflowEmit } from "../server";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const result = await workflowEmit<any>("magic-flow.event", body, 10, "");
+
+    const result = await https(
+      "",
+      "POST",
+      "http://localhost:8080/v1/subscription",
+      { id: body.id }
+    );
     let hasError = result.hasError;
     if (hasError) {
       return new Response(JSON.stringify({ error: result.errorMessage }), {

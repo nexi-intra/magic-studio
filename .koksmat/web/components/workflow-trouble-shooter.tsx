@@ -9,8 +9,16 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Search, AlertCircle, Info, AlertTriangle, AlertOctagon } from "lucide-react"
 import TraceTable from "./trace-table"
+import { https } from "@/app/koksmat/httphelper"
+import { nanoid } from "nanoid"
+import { trace } from "console"
 
 type LogLevel = "verbose" | "info" | "warning" | "error" | "critical"
+
+export interface Message {
+  subject: string
+  data: string
+}
 
 interface TraceItem {
   id: number
@@ -116,13 +124,69 @@ function generateTraceItems(count: number): TraceItem[] {
 // console.log(traceItems);
 
 
+const useSubscription = () => {
+  const [events, setevents] = useState<TraceItem[]>([])
+  const [eventCounter, seteventCounter] = useState(0)
+  useEffect(() => {
+    let running = true;
+
+    const run = async () => {
+      const id = nanoid();
+      while (running) {
+        try {
+          const response = await https<Message[]>("", "POST", "/api/workflow/subscription", { action: "getMessages", id });
+
+          if (!running) break; // Stop if running flag is false
+
+          if (response.errorMessage) {
+            console.log(response.errorMessage);
+          } else {
+            if (response.data) {
+              console.log("Messages", response.data);
+              const newEvents = response.data.map((message) => {
+                const eventItem: TraceItem = {
+                  id: 1,
+                  level: "info",
+                  message: message.subject,
+                  timestamp: new Date().toISOString(),
+                  flowName: "Flow",
+                  flowInstanceId: "flow-1"
+                };
+                return eventItem
+              })
+              const allEvents = [...events, ...newEvents]
+
+              setevents(allEvents);
+              //seteventCounter(eventCounter + 1);
+            }
+
+
+          }
+        } catch (error) {
+          if (!running) break; // Stop if running flag is false
+          console.error('API call failed:', error);
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      running = false;
+    };
+  }, []);
+  return { events, eventCounter }
+};
+
+
+
 export default function WorkflowTroubleshooter({
   initialFromDate = "",
   initialToDate = "",
   initialFlowName = "",
   initialFlowDetails = "",
   initialLogLevel = "info",
-  initialTraceItems = generateTraceItems(1000),
+  initialTraceItems = [],// generateTraceItems(1000),
   initialSelectedFlow = null,
   traceConnect,
   traceDisconnect
@@ -134,7 +198,13 @@ export default function WorkflowTroubleshooter({
   const [logLevel, setLogLevel] = useState<LogLevel>(initialLogLevel)
   const [traceItems, setTraceItems] = useState<TraceItem[]>(initialTraceItems)
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(initialSelectedFlow)
+  const { events } = useSubscription();
+  useEffect(() => {
 
+    traceItems.push(...events);
+    setTraceItems(traceItems);
+
+  }, [events]);
   const onTraceUpdated = useCallback((newTrace: TraceItem) => {
     setTraceItems(prevItems => [...prevItems, newTrace])
   }, [])
@@ -176,6 +246,8 @@ export default function WorkflowTroubleshooter({
         return true
     }
   })
+
+
 
   return (
     <div className="container mx-auto p-4 space-y-4">
