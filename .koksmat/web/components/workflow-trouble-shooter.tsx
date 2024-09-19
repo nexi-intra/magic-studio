@@ -37,6 +37,7 @@ interface Flow {
 }
 
 interface WorkflowTroubleshooterProps {
+  traceId: string,
   initialFromDate?: string
   initialToDate?: string
   initialFlowName?: string
@@ -123,64 +124,136 @@ function generateTraceItems(count: number): TraceItem[] {
 
 // console.log(traceItems);
 
+async function fetchEvents(transid: string): Promise<TraceItem[]> {
+  const response = await https<Message[]>("", "POST", "/api/workflow/subscription", { action: "getMessages", id: transid });
+  if (!response.data) return []
 
-const useSubscription = () => {
-  const [events, setevents] = useState<TraceItem[]>([])
-  const [eventCounter, seteventCounter] = useState(0)
+  // Create new events based on the current eventCounter
+  return response.data.map((message, index) => {
+    console.log("Received Message", message);
+    const eventItem: TraceItem = {
+      id: index + 1, // Use index to ensure unique IDs
+      level: "info",
+      message: message.subject,
+      timestamp: new Date().toISOString(),
+      flowName: "Flow",
+      flowInstanceId: "flow-1"
+    };
+    return eventItem;
+  });
+}
+
+// const useSubscription = (id: string) => {
+//   const [events, setevents] = useState<TraceItem[]>([]);
+//   const [eventCounter, seteventCounter] = useState(0);
+
+//   useEffect(() => {
+//     let running = true;
+
+//     const run = async () => {
+//       seteventCounter((prevCounter) => prevCounter + 10); // Initial increment
+//       while (running) {
+//         try {
+//           const response = await https<Message[]>("", "POST", "/api/workflow/subscription", { action: "getMessages", id });
+
+//           if (!running) break; // Stop if running flag is false
+
+//           if (response.errorMessage) {
+//             console.log(response.errorMessage);
+//           } else {
+//             if (response.data) {
+//               console.log("Messages", response.data);
+//               if (response.data) {
+//                 let itemCount
+//                 // Create new events based on the current eventCounter
+//                 const newEvents = response.data.map((message, index) => {
+//                   const eventItem: TraceItem = {
+//                     id: eventCounter + index + 1, // Use index to ensure unique IDs
+//                     level: "info",
+//                     message: message.subject,
+//                     timestamp: new Date().toISOString(),
+//                     flowName: "Flow",
+//                     flowInstanceId: "flow-1"
+//                   };
+//                   return eventItem;
+//                 });
+//                 setevents((prevEvents) => {
+
+
+
+//                   alert("New event received " + (eventCounter + newEvents.length));
+//                   return [...prevEvents, ...newEvents];
+//                 });
+//                 seteventCounter((prevCounter) => prevCounter + response.data.length); // Increment by the number of new events
+//               }
+
+//             }
+
+//           }
+//         }
+//         } catch (error) {
+//         if (!running) break; // Stop if running flag is false
+//         console.error('API call failed:', error);
+//       }
+//     }
+//   };
+
+//   run();
+
+//   return () => {
+//     running = false;
+//   };
+// }, [id, eventCounter]); // Added 'eventCounter' as a dependency
+
+// return { events, eventCounter };
+// };
+
+
+function useSubscription(traceId: string, fetchEvents: (traceId: string) => Promise<TraceItem[]>) {
+  const [events, setEvents] = useState<TraceItem[]>([]);
+  const [eventCounter, setPollCount] = useState(0);
+
   useEffect(() => {
-    let running = true;
+    let isMounted = true;
 
-    const run = async () => {
-      const id = nanoid();
-      while (running) {
-        try {
-          const response = await https<Message[]>("", "POST", "/api/workflow/subscription", { action: "getMessages", id });
+    const pollEvents = async () => {
+      try {
+        const newEvents = await fetchEvents(traceId);
 
-          if (!running) break; // Stop if running flag is false
-
-          if (response.errorMessage) {
-            console.log(response.errorMessage);
-          } else {
-            if (response.data) {
-              console.log("Messages", response.data);
-              const newEvents = response.data.map((message) => {
-                const eventItem: TraceItem = {
-                  id: 1,
-                  level: "info",
-                  message: message.subject,
-                  timestamp: new Date().toISOString(),
-                  flowName: "Flow",
-                  flowInstanceId: "flow-1"
-                };
-                return eventItem
-              })
-              const allEvents = [...events, ...newEvents]
-
-              setevents(allEvents);
-              //seteventCounter(eventCounter + 1);
-            }
-
-
+        if (isMounted) {
+          if (newEvents && newEvents.length > 0) {
+            setEvents(prevEvents => [...prevEvents, ...newEvents]);
           }
-        } catch (error) {
-          if (!running) break; // Stop if running flag is false
-          console.error('API call failed:', error);
+
+          // Update the poll count
+          setPollCount(prevCount => prevCount + 1);
+        }
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      } finally {
+        if (isMounted) {
+          // Schedule the next poll
+          setTimeout(pollEvents, 10); // Wait 10 ticks before the next poll
         }
       }
     };
 
-    run();
+    // Start polling
+    pollEvents();
 
+    // Cleanup on unmount
     return () => {
-      running = false;
+      isMounted = false;
     };
-  }, []);
-  return { events, eventCounter }
-};
+  }, [traceId, fetchEvents]);
+
+  return { events, eventCounter };
+}
 
 
 
 export default function WorkflowTroubleshooter({
+  traceId,
   initialFromDate = "",
   initialToDate = "",
   initialFlowName = "",
@@ -198,11 +271,11 @@ export default function WorkflowTroubleshooter({
   const [logLevel, setLogLevel] = useState<LogLevel>(initialLogLevel)
   const [traceItems, setTraceItems] = useState<TraceItem[]>(initialTraceItems)
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(initialSelectedFlow)
-  const { events } = useSubscription();
+  const { events, eventCounter } = useSubscription(traceId, fetchEvents);
   useEffect(() => {
 
-    traceItems.push(...events);
-    setTraceItems(traceItems);
+    //traceItems.push(...events);
+    setTraceItems([...events]);
 
   }, [events]);
   const onTraceUpdated = useCallback((newTrace: TraceItem) => {
@@ -304,6 +377,7 @@ export default function WorkflowTroubleshooter({
         {/* WorkflowEngineTrace */}
         <div className="border rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-2">Workflow Engine Trace</h2>
+          {eventCounter}
           <div className="flex space-x-2 mb-2">
             {(["verbose", "info", "warning", "error", "critical"] as LogLevel[]).map((level) => (
               <Badge

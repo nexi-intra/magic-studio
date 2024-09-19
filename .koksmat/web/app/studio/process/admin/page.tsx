@@ -1,6 +1,9 @@
+"use client";
 import WorkflowDebugger from '@/components/workflow-debugger'
 import WorkflowTroubleshooter from '@/components/workflow-trouble-shooter'
-import React from 'react'
+import { nanoid } from 'nanoid';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { use, useEffect, useState } from 'react'
 type FlowMessage = {
   type: string;
   payload: Record<string, unknown>;
@@ -52,9 +55,26 @@ const flowMessages: FlowMessage[] = [
   },
 ];
 export default function Page() {
+  const searchParams = useSearchParams()
+  const path = usePathname()
+  const router = useRouter()
+  const traceid = searchParams.get('traceid')
+  const [id, setid] = useState("")
+
+  useEffect(() => {
+    if (!traceid) {
+      const id = nanoid()
+      router.push(`${path}?traceid=${id}`)
+    }
+    setid(traceid!)
+
+  }, [traceid])
+  if (!id) {
+    return <div>Setting traceid</div>
+  }
   return (
     <div>
-      <WorkflowDebugger flowMessages={flowMessages} />
-      <WorkflowTroubleshooter /></div>
+      {/* <WorkflowDebugger flowMessages={flowMessages} /> */}
+      <WorkflowTroubleshooter traceId={id} /></div>
   )
 }

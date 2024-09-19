@@ -80,16 +80,18 @@ export default function TraceTable({ traceItems, onClick }: TraceTableProps) {
               </Button>
             </TableHead>
             <TableHead>
-              <Button variant="ghost" onClick={() => handleSort('level')}>
-                Level <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>Message</TableHead>
-            <TableHead>
               <Button variant="ghost" onClick={() => handleSort('timestamp')}>
                 Timestamp <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
+            <TableHead>Message</TableHead>
+            <TableHead>
+              <Button variant="ghost" onClick={() => handleSort('level')}>
+                Level <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+
+
             <TableHead>
               <Button variant="ghost" onClick={() => handleSort('flowName')}>
                 Flow Name <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -99,12 +101,14 @@ export default function TraceTable({ traceItems, onClick }: TraceTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedItems.map((item) => (
-            <TableRow key={item.id} onClick={() => onClick(item)}>
+          {sortedItems.map((item, index) => (
+            <TableRow key={index} onClick={() => onClick(item)}>
               <TableCell>{item.id}</TableCell>
-              <TableCell>{item.level}</TableCell>
-              <TableCell>{item.message}</TableCell>
               <TableCell><TimeAgo timestamp={item.timestamp} /></TableCell>
+              <TableCell>{item.message}</TableCell>
+              <TableCell>{item.level}</TableCell>
+
+
               <TableCell>{item.flowName}</TableCell>
               <TableCell>{item.flowInstanceId}</TableCell>
             </TableRow>
