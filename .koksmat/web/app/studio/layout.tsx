@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 };
 export default function Layout(props: { children: any }) {
   const { children } = props;
-  
+
   return (
-    <div>
-  
+    <div className="h-full w-full">
+
       <ClientLayout>{children}</ClientLayout>
     </div>
   );

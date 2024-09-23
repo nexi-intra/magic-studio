@@ -104,7 +104,7 @@ export default function LogViewer({
             </TableRow>
           </TableHeader>
           <ScrollArea className="h-[400px]">
-            <div className="">{clock}</div>
+            {/* <div className="">{clock}</div> */}
             <TableBody>
               {sortedLogs.map((log, index) => (
                 <Sheet key={index}>

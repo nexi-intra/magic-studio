@@ -17,30 +17,35 @@ export default function Page(props: { params: { database: string } }) {
   const [error, seterror] = useState("");
   const toolbar = <QueryEditorToolbar database={database} />;
   return (
-    <SqlQueryEditor
-      toolbar={toolbar}
-      database={database}
-      name={name}
-      onSave={async (sql, name) => {
-        seterror("");
-        const result = await CreateSqlquery(
-          magicbox.authtoken,
-          name,
-          "",
-          sql.replaceAll("'", "''"),
-          2,
-          {}
-        );
-        if (result.hasError) {
-          seterror(result.errorMessage ?? "Unknown error");
-        } else {
+    <div>
+
+      <SqlQueryEditor
+        toolbar={toolbar}
+        database={database}
+        name={name}
+        onSave={async (sql, name) => {
           seterror("");
-          router.push(
-            "/" + APPNAME + "/database/" + database + "/query(" + result.data
+          const result = await CreateSqlquery(
+            magicbox.authtoken,
+            name,
+            "",
+            sql.replaceAll("'", "''"),
+            2,
+            {}
           );
-        }
-      }}
-      sql=""
-    />
+          if (result.hasError) {
+            seterror(result.errorMessage ?? "Unknown error");
+          } else {
+            seterror("");
+            router.push(
+              "/" + APPNAME + "/database/" + database + "/query(" + result.data
+            );
+          }
+        }}
+        sql=""
+      />
+
+    </div>
+
   );
 }

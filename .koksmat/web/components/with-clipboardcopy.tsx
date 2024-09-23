@@ -24,7 +24,7 @@ export default function WithClipboardCopy(props: {
       className="flex items-center gap-2"
     >
       {children}
-      {hoovering && !copied && (
+      {!copied && (
         <CopyIcon
           className="h-5 w-5 text-muted-foreground"
           // inClick handler which cancel default
@@ -34,7 +34,7 @@ export default function WithClipboardCopy(props: {
           }}
         />
       )}
-      {hoovering && copied && (
+      {copied && (
         <Check className="h-5 w-5 text-muted-foreground" />
       )}
     </div>

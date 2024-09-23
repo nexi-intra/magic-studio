@@ -37,6 +37,7 @@ import { useExampleHook } from "@/components/providers/lookup-provider";
 import ErrorBoundary from "@/components/error-boundary";
 import ThemeToggle from "@/components/theme-toggle";
 import { MagicboxContext } from "../koksmat/magicbox-context";
+import Tracer from "../koksmat/components/tracer";
 
 export default function ClientLayout(props: { children: any }) {
   const { children } = props;
@@ -146,6 +147,9 @@ export default function ClientLayout(props: { children: any }) {
               centerfooter={<GlobalPasteHandling />}
             >
               {children}
+              <div className="hidden md:block">
+                {magicbox.showTracer && <Tracer />}
+              </div>
             </ResizableLayout>
           </BreadcrumbProvider>
         </Authenticate>

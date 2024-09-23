@@ -30,7 +30,7 @@ export default function LayoutThreeRowsLeftPanelAndResults(
     }
 ) {
   return (
-    <div className="w-full h-full border rounded-lg overflow-hidden">
+    <div className="w-full h-full min-h-[80vh] bg-fuchsia-300 border rounded-lg overflow-hidden">
       <ResizablePanelGroup direction="vertical">
         {/* Toolbar */}
         <ResizablePanel defaultSize={10} minSize={10} maxSize={10}>

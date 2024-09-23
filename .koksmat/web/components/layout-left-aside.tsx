@@ -137,9 +137,9 @@ export default function ResizableLayout(props: {
 
             <main
               ref={mainRef}
-              className="flex-grow overflow-auto relative w-full"
+              className="flex-grow overflow-auto relative w-full h-full"
             >
-              <div className="p-10 flex">{props.children}</div>
+              <div className="p-10  w-full min-h-[80vh] flex">{props.children}</div>
             </main>
             <footer className="bg-muted border-t h-12 flex items-center justify-between px-4">
               <div>{props.leftfooter}</div>

@@ -250,6 +250,34 @@ function useSubscription(traceId: string, fetchEvents: (traceId: string) => Prom
   return { events, eventCounter };
 }
 
+function ALive(props: { counter: number, threshold: number }) {
+  const { counter, threshold } = props;
+  const [lastChanged, setLastChanged] = useState(Date.now());
+  const [isRed, setIsRed] = useState(false);
+
+  useEffect(() => {
+    // Reset the lastChanged timestamp whenever the `number` changes
+    setLastChanged(Date.now());
+    setIsRed(false);
+  }, [counter]);
+
+  useEffect(() => {
+    // Timer to check if the threshold has been exceeded
+    const interval = setInterval(() => {
+      if (Date.now() - lastChanged >= threshold * 1000) {
+        setIsRed(true);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastChanged, threshold]);
+
+  return (
+    <div className={isRed ? 'bg-red-600' : 'bg-green-500'}>
+      &nbsp;
+    </div>
+  );
+}
 
 
 export default function WorkflowTroubleshooter({
@@ -324,9 +352,9 @@ export default function WorkflowTroubleshooter({
 
   return (
     <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Workflow Engine Troubleshooter</h1>
+      {/* <h1 className="text-2xl font-bold">Workflow Engine Troubleshooter</h1>
 
-      {/* Search Section */}
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <Label htmlFor="fromDate">From Date/Time</Label>
@@ -370,14 +398,14 @@ export default function WorkflowTroubleshooter({
       <Button className="w-full md:w-auto" onClick={handleSearch}>
         <Search className="w-4 h-4 mr-2" />
         Search Flows
-      </Button>
+      </Button> */}
 
       {/* Main Content Area */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* WorkflowEngineTrace */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-xl font-semibold mb-2">Workflow Engine Trace</h2>
-          {eventCounter}
+          <h2 className="text-xl font-semibold mb-2 flex"><div className="grow">Workflow Engine Trace</div><div className="mt-2 w-4 h-4 rounded-full overflow-clip"> <ALive counter={eventCounter} threshold={6} /></div></h2>
+
           <div className="flex space-x-2 mb-2">
             {(["verbose", "info", "warning", "error", "critical"] as LogLevel[]).map((level) => (
               <Badge
