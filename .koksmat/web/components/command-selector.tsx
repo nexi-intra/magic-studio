@@ -24,9 +24,11 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
+
 export interface CommandSelectorItem {
   id: string;
   title: string;
+  timestamp?: Date;
   description: string;
   children?: JSX.Element;
   slug: string;

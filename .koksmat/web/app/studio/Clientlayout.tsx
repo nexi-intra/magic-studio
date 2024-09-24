@@ -16,6 +16,7 @@ import { BreadcrumbProvider } from "@/components/contexts/breadcrumb-context";
 import {
   Activity,
   AppWindowMac,
+  Boxes,
   CookingPotIcon,
   DatabaseIcon,
   Globe,
@@ -74,19 +75,19 @@ export default function ClientLayout(props: { children: any }) {
       icon: <Globe className="h-5 w-5" />,
       label: "APIs",
       href: href.APIS,
-      info: "Browse available services",
+      info: "Browse services",
     },
     {
-      icon: <Activity className="h-5 w-5" />,
+      icon: <Boxes className="h-5 w-5" />,
       href: "/studio/workspace/auto/kubernetes",
       label: "Activity",
-      info: "Monitor your services",
+      info: "Monitor infrastructure",
     },
     {
       icon: <Shield className="h-5 w-5" />,
       label: "Access Control",
       href: "/studio/access",
-      info: "Control your access",
+      info: "Control access",
     },
   ];
 

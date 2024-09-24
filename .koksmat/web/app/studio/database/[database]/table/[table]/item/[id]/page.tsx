@@ -63,6 +63,7 @@ export default function Page(props: {
       }
       //console.log(typeInterface);
     });
+
     const interfaceDefintions = interfaces.join("\n");
     setinterfaceDefintions(interfaceDefintions);
     // const load = async () => {

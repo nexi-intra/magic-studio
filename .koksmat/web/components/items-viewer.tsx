@@ -24,9 +24,10 @@ import {
   ChevronsUpDown,
   ChevronLeft,
   ChevronRight,
+  Calendar,
 } from "lucide-react";
 
-export type Visualisation = "combobox" | "list" | "table" | "cards";
+export type Visualisation = "combobox" | "list" | "table" | "cards" | "history";
 
 export interface PagingObject {
   prevPage: () => void;
@@ -49,7 +50,41 @@ export interface ItemsViewerProps {
   paging?: PagingObject;
 }
 
-export default function Component({
+// Helper function to categorize commands based on age
+const categorizeByAge = (commands: CommandSelectorItem[]) => {
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const categorized = {
+    today: [] as CommandSelectorItem[],
+    thisWeek: [] as CommandSelectorItem[],
+    thisMonth: [] as CommandSelectorItem[],
+    older: [] as CommandSelectorItem[],
+  };
+
+  commands.forEach((command) => {
+    if (!command.timestamp) {
+      categorized.older.push(command);
+      return;
+    }
+
+    if (command.timestamp >= startOfDay) {
+      categorized.today.push(command);
+    } else if (command.timestamp >= startOfWeek) {
+      categorized.thisWeek.push(command);
+    } else if (command.timestamp >= startOfMonth) {
+      categorized.thisMonth.push(command);
+    } else {
+      categorized.older.push(command);
+    }
+  });
+
+  return categorized;
+};
+export default function ItemsViewer({
   visualisation,
   className,
   onSelect,
@@ -57,7 +92,7 @@ export default function Component({
   commands: initialCommands,
   value,
   allowSwitch = false,
-  allowedVisualizations = ["combobox", "list", "table", "cards"],
+  allowedVisualizations = ["combobox", "list", "table", "cards", "history"],
   paging,
 }: ItemsViewerProps) {
   const [filter, setFilter] = useState("");
@@ -179,7 +214,7 @@ export default function Component({
                       <tr
                         key={index}
                         onClick={() => onSelect(command)}
-                        className="cursor-pointer hover:bg-secondary"
+                        className="cursor-pointer hover:bg-secondary "
                       >
                         <td className="p-2">{command.title}</td>
                         <td className="p-2">{command.description}</td>
@@ -221,6 +256,25 @@ export default function Component({
             {renderPagination()}
           </>
         );
+      case "history":
+        return (
+          <>
+            <div className="">
+              {Object.entries(categorizeByAge(paginatedCommands)).map(
+                ([category, commands], index) => (
+                  <div key={index}>
+                    <h3 className="text-lg font-semibold">{category}</h3>
+                    {commands.map((command) => (
+                      <div className="cursor-pointer hover:bg-secondary" onClick={() => onSelect(command)} key={command.id}>{command.title}</div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
+            {renderPagination()}
+          </>
+
+        )
       default:
         return <div>Undefined visualization</div>;
     }
@@ -235,6 +289,11 @@ export default function Component({
     { type: "list", icon: <ListFilter className="h-4 w-4" />, tooltip: "List" },
     { type: "table", icon: <Table className="h-4 w-4" />, tooltip: "Table" },
     { type: "cards", icon: <Grid className="h-4 w-4" />, tooltip: "Cards" },
+    {
+      type: "history",
+      icon: <Calendar className="h-4 w-4" />,
+      tooltip: "History",
+    },
   ].filter((icon) =>
     allowedVisualizations.includes(icon.type as Visualisation)
   );

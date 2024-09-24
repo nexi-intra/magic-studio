@@ -28,27 +28,46 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { APPNAME } from "@/app/global";
+import { useSavedQueries } from "./useSavedQueries";
+import { useRouter } from "next/navigation";
+export interface Root {
+  Result: Result[]
+}
 
-export function QueryEditorToolbar(props: { database: string }) {
-  const { database } = props;
+export interface Result {
+  name: string
+  sql: string
+  description: string
+  updated_at: Date
+}
+
+export function QueryEditorToolbar(props: { database: string, handleSave: () => void }) {
+  const { database, handleSave } = props;
+  const router = useRouter()
+
+  const { viewSavedQueries: savedQueries } = useSavedQueries(database, {
+    allowSwitch: false,
+    onSelect: (query) => {
+      //alert(query)
+      const newUrl = "/" + APPNAME + "/database/" + database + "/query/" + query
+      router.push(newUrl)
+    }
+  })
+
+
+
   return (
     <div className="flex items-center gap-4 py-4 px-6 bg-background border-b">
-      <div className="relative">
-        <Input
-          type="search"
-          placeholder="Search existing queries..."
-          className="w-60 pl-9"
-        />
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-      </div>
+      {savedQueries}
+
       <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
         <Button>
           <PlusIcon className="w-4 h-4 mr-2" />
           Add New
         </Button>
       </Link>
-      <Button variant="outline">Save</Button>
-      <DropdownMenu>
+      <Button onClick={handleSave} variant="outline">Save</Button>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
             Save As <ChevronDownIcon className="w-4 h-4 ml-2" />
@@ -65,8 +84,8 @@ export function QueryEditorToolbar(props: { database: string }) {
           <DropdownMenuSeparator />
           <DropdownMenuItem>Save</DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
-      <DropdownMenu>
+      </DropdownMenu> */}
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
             View <ChevronDownIcon className="w-4 h-4 ml-2" />
@@ -82,7 +101,7 @@ export function QueryEditorToolbar(props: { database: string }) {
             Code Editor
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </div>
   );
 }
