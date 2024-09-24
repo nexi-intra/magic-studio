@@ -57,6 +57,7 @@ export function useDatabaseMixSqlqueryItemRead(id: string) {
       seterror("No data found");
       return;
     }
+    debugger
     setdatabaseRecord(databaseQuery.dataset[0]);
 
 

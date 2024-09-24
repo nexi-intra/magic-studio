@@ -15,17 +15,42 @@ export function useDatabaseMixSqlqueryItemUpdate() {
  
 * ----------------------------------------------------------
 */
+  interface MixSqlqueryItem {
+    id: number;
+    created_at: string;
+    created_by: string;
+    updated_at: string;
+    updated_by: string;
+    deleted_at: null;
+    tenant: string;
+    searchindex: string;
+    name: string;
+    description: string;
+    sql: string;
+    connection_id: number;
+    schema: Schema;
+    koksmat_masterdataref: null;
+    koksmat_bucket: null;
+    koksmat_masterdata_id: null;
+    koksmat_masterdata_etag: null;
+    koksmat_state: null;
+    koksmat_compliancetag: null;
+  }
+  interface Schema {
+    schema: string;
+  }
+  type updateMixSqlqueryItem = Omit<MixSqlqueryItem, "created_at" | "created_by" | "updated_at" | "updated_by" | "deleted_at" | "koksmat_masterdataref" | "koksmat_bucket" | "koksmat_masterdata_id" | "koksmat_masterdata_etag" | "koksmat_state" | "koksmat_compliancetag">;
   const magicbox = useContext(MagicboxContext);
   const [error, seterror] = useState("");
   const [loading, setloading] = useState(false);
   const [result, setresult] = useState<any>();
-  const update = async (record: any) => {
+  const update = async (record: updateMixSqlqueryItem) => {
     setloading(true);
     seterror("");
     const result = await execute(
 
       magicbox.authtoken, // <-- this is the authentication token containing the user's credentials - the upn will be used as "actor" name
-      "works", // <-- this is a reference to a record in the connections table in the mix database
+      "mix", // <-- this is a reference to a record in the connections table in the mix database
       "magic-mix.app", // <-- this is the service name processing the request
       "update_sqlquery", // <-- this is the name of the procedure in the database pointed to by the connection
       record // <-- this is the data to be sent to the procedure

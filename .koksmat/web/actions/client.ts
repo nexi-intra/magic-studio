@@ -25,14 +25,14 @@ export async function execute(
   database: string,
   servicename: string,
   processname: string,
-  payload: any
+  payload: object
 ): Promise<Result<string>> {
   const args = [
     "execute",
     database,
     processname,
     token,
-    JSON.stringify(payload),
+    JSON.stringify(payload, null, 2),
   ];
 
   const response: any = await https<string>(token, "POST", "/api/run", {
