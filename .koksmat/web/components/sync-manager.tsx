@@ -190,9 +190,11 @@ export default function SyncManagerPage(props: {
               database={database}
               sql={""}
               name={table}
-              onSave={function (sql: string, name: string): void {
+              onChange={(newSQL) => {
+
                 throw new Error("Function not implemented.");
               }}
+
             />
           </div>
         </ActionDialog>

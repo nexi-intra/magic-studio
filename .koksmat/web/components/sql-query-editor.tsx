@@ -111,7 +111,7 @@ export function SqlQueryEditor(props: {
                 //defaultValue={props.sql}
                 value={props.sql}
                 height="100vh"
-                language="postgres"
+                language="sql"
                 onChange={(value) => {
                   setSqlExpression(value!!);
                   props.onChange(value!!);
@@ -119,7 +119,7 @@ export function SqlQueryEditor(props: {
                 theme="vs-dark"
                 options={{
                   minimap: { enabled: true },
-                  scrollBeyondLastLine: false,
+                  scrollBeyondLastLine: true,
                 }}
               />
             </div>

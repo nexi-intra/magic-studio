@@ -80,7 +80,7 @@ export default function ClientLayout(props: { children: any }) {
     {
       icon: <Boxes className="h-5 w-5" />,
       href: "/studio/workspace/auto/kubernetes",
-      label: "Activity",
+      label: "Infrastructure",
       info: "Monitor infrastructure",
     },
     {
