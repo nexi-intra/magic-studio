@@ -1,7 +1,7 @@
 import { useSQLSelect3 } from "@/app/koksmat/usesqlselect3";
 import { useState, useEffect } from "react";
 import { CommandSelectorItem } from "./command-selector";
-import ItemsViewer from "./items-viewer";
+import ItemsViewer, { Visualisation } from "./items-viewer";
 import { Result } from "./query-editor-toolbar";
 import {
   HoverCard,
@@ -10,9 +10,14 @@ import {
 } from "@/components/ui/hover-card"
 
 
-export function useSavedQueries(database: string, options?: { allowSwitch: boolean, onSelect?: (id: string) => void }) {
+export function useSavedQueries(database: string, options?: {
+
+  defaultVisualisation?: Visualisation,
+  allowedVisualisations?: Visualisation[],
+  allowSwitch?: boolean, onSelect?: (id: string) => void
+}) {
   const [queries, setqueries] = useState<CommandSelectorItem[]>([]);
-  const query = useSQLSelect3<Result>(database, "select id,name,sql,description,updated_at from sqlquery order by name");
+  const query = useSQLSelect3<Result>(database, "select id,name,sql,description,updated_at,updated_by from sqlquery order by name");
   useEffect(() => {
     if (query && query.dataset && query.dataset.length > 0) {
       //setdbinfo(query.dataset[0].result);
@@ -22,6 +27,7 @@ export function useSavedQueries(database: string, options?: { allowSwitch: boole
           title: item.name,
           description: item.name,
           timestamp: item.updated_at,
+          author: item.updated_by,
           children: <HoverCard>
             <HoverCardTrigger>Hover</HoverCardTrigger>
             <HoverCardContent>
@@ -41,7 +47,8 @@ export function useSavedQueries(database: string, options?: { allowSwitch: boole
   return ({
     viewSavedQueries: <ItemsViewer
       allowSwitch={options?.allowSwitch}
-      visualisation="combobox"
+      visualisation={options?.defaultVisualisation ?? "combobox"}
+      allowedVisualizations={options?.allowedVisualisations}
       value=""
       placeholder="Queries"
       commands={queries ? queries : []}

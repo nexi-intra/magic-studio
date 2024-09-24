@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Check, Edit2, Save, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,14 @@ interface EditableTextProps {
   initialText: string;
   onSave: (text: string) => Promise<boolean>;
   fixed?: boolean;
+  className?: string;
 }
 
 export default function EditableText({
   initialText,
   onSave,
   fixed,
+  className
 }: EditableTextProps) {
   const [text, setText] = useState(initialText);
   const [changed, setchanged] = useState(false);
@@ -22,6 +24,12 @@ export default function EditableText({
   const [isHovered, setIsHovered] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
+  useEffect(() => {
+    setText(initialText);
+
+
+  }, [initialText])
+
   const { toast } = useToast();
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -106,7 +114,7 @@ export default function EditableText({
 
   return (
     <div
-      className="group relative inline-block  "
+      className={"group relative inline-block  " + className}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

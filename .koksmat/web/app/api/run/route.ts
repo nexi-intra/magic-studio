@@ -14,11 +14,15 @@ export async function POST(request: Request) {
     if (hasError) {
       return new Response(JSON.stringify({ error: result.errorMessage }));
     }
-    if (!result.data?.Result?.OK) {
-      return new Response(JSON.stringify({ error: "Unknown error" }));
+    if (!result.data?.Result) {
+      return new Response(
+        JSON.stringify({
+          error: "No error signalled, but empty result returned",
+        })
+      );
     }
 
-    const returnValue = result.data?.Result?.ID;
+    const returnValue = result.data?.Result;
     return new Response(JSON.stringify(returnValue));
   } catch (error) {
     return Response.error();

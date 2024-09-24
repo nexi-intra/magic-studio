@@ -26,6 +26,8 @@ import LayoutThreeRowsLeftPanelAndResults from "./layout-three-rows-left-panel-a
 import LogViewer, { LogObject } from "./log-viewer";
 import { ScrollArea } from "./ui/scroll-area";
 import { useSavedQueries } from "./useSavedQueries";
+import { useInterfaceFromJson } from "./hooks/useInterfaceFromJson";
+import { capitalizeFirstChar } from "@/lib/capitalizeFirstChar";
 
 interface ResizableLayoutProps {
   toolbar?: React.ReactNode;
@@ -52,6 +54,7 @@ export function SqlQueryEditor(props: {
   const [sqlResult, setSqlResult] = useState<any>();
   const [name, setName] = useState(props.name);
   const [log, setlog] = useState<LogObject[]>([]);
+  const interfaceGenerator = useInterfaceFromJson(""); // todo: consider using a better name
 
   useEffect(() => {
     setSqlExpression(props.sql);
@@ -85,6 +88,7 @@ export function SqlQueryEditor(props: {
       return;
     }
     logEntry.result = JSON.stringify(result.data.Result, null, 2);
+    interfaceGenerator.setjson(JSON.stringify(result.data.Result, null, 2))
     setlog([...log, logEntry]);
     setSqlResult(logEntry.result);
   };
@@ -133,28 +137,57 @@ export function SqlQueryEditor(props: {
                 <div className="p-2 bg-slate-100">
                   Result
                 </div>
-                <MonacoEditor
-                  //defaultValue={sqlResult}
-                  value={sqlResult}
-                  height="100%"
-                  language="json"
-                  theme="vs-dark"
-                  options={{
-                    minimap: { enabled: true },
-                    scrollBeyondLastLine: true,
-                  }}
-                />
+                {!sqlResult &&
+                  (
+                    // like to use tailwindcss to center the text horizontally and vertically
+
+                    <div className="flex items-center justify-center h-full" >Run to get the result</div>
+                  )
+
+                }
+                {sqlResult && (
+                  <MonacoEditor
+                    //defaultValue={sqlResult}
+                    value={sqlResult}
+                    height="100%"
+                    language="json"
+                    theme="vs-dark"
+                    options={{
+                      minimap: { enabled: true },
+                      scrollBeyondLastLine: true,
+                    }}
+                  />
+                )}
               </div>
             </ResizablePanel>
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50}>
-              <div className="">
+              <div className="h-full">
                 <div className="p-2 bg-slate-100">
-                  Log
+                  Interface
                 </div>
+                {!interfaceGenerator.interfaceDefintions &&
+                  (
+                    // like to use tailwindcss to center the text horizontally and vertically
 
+                    <div className="flex items-center justify-center h-full" >Run to get the interface definition</div>
+                  )
 
-                <LogViewer logs={log} />
+                }
+
+                {interfaceGenerator.interfaceDefintions && (<MonacoEditor
+                  //defaultValue={sqlResult}
+                  value={interfaceGenerator.interfaceDefintions}
+                  height="100%"
+                  language="typescript"
+                  theme="vs-dark"
+                  options={{
+                    minimap: { enabled: true },
+                    scrollBeyondLastLine: true,
+                  }} />
+                )}
+                {/* <LogViewer logs={log} /> */}
+
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>

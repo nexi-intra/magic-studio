@@ -29,6 +29,7 @@ export interface CommandSelectorItem {
   id: string;
   title: string;
   timestamp?: Date;
+  author?: string;
   description: string;
   children?: JSX.Element;
   slug: string;

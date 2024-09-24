@@ -34,6 +34,8 @@ export default function Layout(props: {
   const [error, setError] = useState("");
   const [log, setlog] = useState<LogObject[]>([]);
   const { viewSavedQueries } = useSavedQueries(database, {
+    defaultVisualisation: "history",
+    allowedVisualisations: ["history", "list", "table", "cards"],
     allowSwitch: true, onSelect: (query) => {
       //alert(query)
       const newUrl = "/" + APPNAME + "/database/" + database + "/query/" + query

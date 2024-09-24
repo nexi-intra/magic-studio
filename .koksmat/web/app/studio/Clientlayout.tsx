@@ -45,46 +45,47 @@ export default function ClientLayout(props: { children: any }) {
   const [leftNavCollapsed, setleftNavCollapsed] = useState(false);
   const [ismobile, setismobile] = useState(false);
   const magicbox = useContext(MagicboxContext);
+  const iconClassname = "h-5 w-5 xl:h-6 xl:w-6 2xl:h-7 2xl:w-7";
   const topItems: NavItem[] = [
     {
-      icon: <KoksmatChef className="h-5 w-5" />,
+      icon: <KoksmatChef className={iconClassname} />,
       label: "Home",
       href: href.HOME,
       info: "Go to home page",
     },
 
     {
-      icon: <CookingPotIcon className="h-5 w-5" />,
+      icon: <CookingPotIcon className={iconClassname} />,
       href: href.PROCESS,
       label: "Processes",
       info: "Control and govern your app",
     },
     {
-      icon: <AppWindowMac className="h-5 w-5" />,
+      icon: <AppWindowMac className={iconClassname} />,
       href: href.WORKSPACES,
       label: "Workspace",
       info: "Connect with your workspace",
     },
     {
-      icon: <DatabaseIcon className="h-5 w-5" />,
+      icon: <DatabaseIcon className={iconClassname} />,
       label: "Databases",
       href: href.DATABASE,
       info: "Work with data",
     },
     {
-      icon: <Globe className="h-5 w-5" />,
+      icon: <Globe className={iconClassname} />,
       label: "APIs",
       href: href.APIS,
       info: "Browse services",
     },
     {
-      icon: <Boxes className="h-5 w-5" />,
+      icon: <Boxes className={iconClassname} />,
       href: "/studio/workspace/auto/kubernetes",
       label: "Infrastructure",
       info: "Monitor infrastructure",
     },
     {
-      icon: <Shield className="h-5 w-5" />,
+      icon: <Shield className={iconClassname} />,
       label: "Access Control",
       href: "/studio/access",
       info: "Control access",
@@ -95,7 +96,7 @@ export default function ClientLayout(props: { children: any }) {
     {
       icon: (
         <ThemeToggle>
-          <Moon className="h-5 w-5 rotate-90 transition-all dark:rotate-0 " />
+          <Moon className={iconClassname + "rotate-90 transition-all dark:rotate-0 "} />
         </ThemeToggle>
       ),
       label: "Theme",
@@ -103,19 +104,19 @@ export default function ClientLayout(props: { children: any }) {
       info: "Change your theme",
     },
     {
-      icon: <Settings className="h-5 w-5" />,
+      icon: <Settings className={iconClassname} />,
       label: "Settings",
       href: "/studio/settings",
       info: "Adjust your settings",
     },
     {
-      icon: <HelpCircle className="h-5 w-5" />,
+      icon: <HelpCircle className={iconClassname} />,
       label: "Help",
       href: "https://learn.koksmat.com",
       info: "Get help and support",
     },
     {
-      icon: <LogOut className="h-5 w-5" />,
+      icon: <LogOut className={iconClassname} />,
       label: "Logout",
       onClick: async () => {
         await magicbox.signOut();
