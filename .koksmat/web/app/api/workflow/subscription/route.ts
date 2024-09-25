@@ -4,13 +4,10 @@ import { workflowEmit } from "../server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
-    const result = await https(
-      "",
-      "POST",
-      "http://localhost:8080/v1/subscription",
-      { id: body.id }
-    );
+    const host = process.env.MAGICMIXAPI ?? "http://localhost:8080";
+    const result = await https("", "POST", `${host}/v1/subscription`, {
+      id: body.id,
+    });
     let hasError = result.hasError;
     if (hasError) {
       return new Response(JSON.stringify({ error: result.errorMessage }), {

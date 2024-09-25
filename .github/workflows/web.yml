@@ -86,6 +86,8 @@ jobs:
                       env:
                         - name: NATS
                           value: nats://nats:4222
+                        - name: MAGICMIXAPI
+                          value: http://magic-mix-api:4321
 
 
           "@ | Out-File -FilePath deployment.yml
