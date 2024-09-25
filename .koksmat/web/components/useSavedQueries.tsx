@@ -4,11 +4,11 @@ import ItemsViewer, { Visualisation } from "./items-viewer";
 import { useSqlQueryContext } from "./contexts/sqlquery-context";
 
 
-export function useSavedQueries(options?: {
+export function useSavedQueries(database: string, options?: {
 
-  defaultVisualisation?: Visualisation,
-  allowedVisualisations?: Visualisation[],
-  allowSwitch?: boolean, onSelect?: (id: string) => void
+  defaultVisualisation?: Visualisation;
+  allowedVisualisations?: Visualisation[];
+  allowSwitch?: boolean; onSelect?: (id: string) => void;
 }) {
 
   const sqlQueryContext = useSqlQueryContext()

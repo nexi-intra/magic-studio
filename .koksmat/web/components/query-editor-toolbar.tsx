@@ -46,6 +46,7 @@ export function QueryEditorToolbar(props: { database: string, handleSave: () => 
   const router = useRouter()
 
   const { viewSavedQueries: savedQueries } = useSavedQueries(database, {
+
     allowSwitch: false,
     onSelect: (query) => {
       //alert(query)
