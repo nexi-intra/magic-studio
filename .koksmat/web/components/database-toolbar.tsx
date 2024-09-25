@@ -42,7 +42,7 @@ export function DatabaseToolbar(props: { database: string }) {
     <div className="flex w-full">
       <div className="flex-grow"></div>
       <Link href={"/" + APPNAME + "/database/" + database + "/query"}>
-        <Button className="h-9 px-6">New Query</Button>
+        <Button className="h-9 px-6">Queries</Button>
       </Link>
     </div>
   );

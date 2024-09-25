@@ -66,6 +66,7 @@ const categorizeByAge = (commands: CommandSelectorItem[]) => {
   };
 
   commands.forEach((command) => {
+    //debugger
     if (!command.timestamp) {
       categorized.older.push(command);
       return;
