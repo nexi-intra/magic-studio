@@ -170,7 +170,7 @@ export default function Page(props: { params: { database: string, slug: string[]
     sqlQueryUpdater.update({ ...databaseRecord })
 
   }} />;
-  const { databaseRecord, isLoading, error: databaseerror } = useDatabaseMixSqlqueryItemRead(subpath);  // replace props.id with the id of the record you want to load
+  const { databaseRecord, isLoading, error: databaseerror } = useDatabaseMixSqlqueryItemRead(database, subpath);  // replace props.id with the id of the record you want to load
   const sqlQueryUpdater = useDatabaseMixSqlqueryItemUpdate(database);
   const { createItem } = useDatabaseMixSqlqueryItemCreate(database);
   const [nameManuallySet, setnameManuallySet] = useState(false)
