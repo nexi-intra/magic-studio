@@ -67,6 +67,7 @@ function useDatabaseMixSqlqueryItemCreate(database: string) {
   const [loading, setloading] = useState(false);
   const [result, setresult] = useState<any>();
   const toaster = useToast()
+  const router = useRouter();
   const createItem = async (record: updateMixSqlqueryItem) => {
     setloading(true);
     seterror("");
@@ -87,7 +88,8 @@ function useDatabaseMixSqlqueryItemCreate(database: string) {
         const databaseResult: any = result.data;
         toaster.toast({ title: "New record created", description: "Taking you there" })
         setTimeout(() => {
-          window.location.href = `/studio/database/${APPNAME}/query/${databaseResult.id}`
+          router.push(`/${APPNAME}/database/${database}/query/${databaseResult.id}`)
+
         }, 1000)
       }
 
