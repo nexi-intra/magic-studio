@@ -6,12 +6,12 @@ export const metadata: Metadata = {
     "https://nexi-intra-magic-studio-canary.intra.nexigroup.com"
   ),
   title: {
-    template: "%s | KOKSMAT studio",
-    default: "KOKSMAT studio",
+    template: "%s | Magic Buttons Studio",
+    default: "Magic Buttons studio",
   },
   openGraph: {
-    title: "KOKSMAT studio",
-    description: "The place to cook Magic Button Apps.",
+    title: "Magic Buttons",
+    description: "The place to cook Magic Buttons.",
     images: [
       {
         url: "/studio/og",
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     ],
   },
 
-  applicationName: "KOKSMAT studio",
+  applicationName: "Magic Button Studio",
   referrer: "origin-when-cross-origin",
   keywords: ["no code", "low code", "power apps", "power automate"],
   creator: "Niels Gregers Johansen",
   publisher: "Niels Gregers Johansen",
-  description: "The place to cook Magic Button Apps.",
+  description: "The place to cook Magic Buttons.",
 };
 export default function Layout(props: { children: any }) {
   const { children } = props;

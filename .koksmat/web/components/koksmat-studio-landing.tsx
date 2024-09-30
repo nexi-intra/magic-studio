@@ -82,7 +82,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
       <header className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center text-gray-800 dark:text-gray-100">
-          Welcome to Koksmat Studio
+          Welcome to Magic Button Studio
         </h1>
         <p className="text-xl text-center mt-4 text-gray-600 dark:text-gray-300">
           Crafting Your Code, Securing Your Data, Elevating Your AI
@@ -101,7 +101,7 @@ export default function LandingPage() {
             Ready to cook up your next big project?
           </h2>
           <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
-            Explore Koksmat Studio today and elevate your digital craftsmanship.
+            Explore Magic Button Studio today and elevate your digital craftsmanship.
           </p>
           <Link href={href.ROLE}>
             <Button className="mt-8 text-lg" size="lg">

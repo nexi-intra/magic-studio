@@ -16,7 +16,7 @@ export default function MenuRoot() {
     <div>
       <Menubar>
         <MenubarMenu>
-          <MenubarTrigger>Koksmat Studio</MenubarTrigger>
+          <MenubarTrigger>Magic Button Studio</MenubarTrigger>
           <MenubarContent>
             <MenubarItem>
               <Link href="/" className="w-full">
