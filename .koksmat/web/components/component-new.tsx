@@ -45,7 +45,7 @@ export default function ComponentNew(props: {
     resolver: zodResolver(formSchema),
     defaultValues: {
       componentName: "",
-      sourceCode: "",
+      sourceCode: " comment here",
     },
   });
 
@@ -78,7 +78,7 @@ export default function ComponentNew(props: {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="sourceCode"
             render={({ field }) => (
@@ -98,7 +98,7 @@ export default function ComponentNew(props: {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <Button type="submit">Create Component</Button>
         </form>
       </Form>

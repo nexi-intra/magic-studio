@@ -9,11 +9,45 @@ import { vsCodeOpen } from "@/lib/vscode-open";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
 import PromptSuggestions from "@/components/prompt-suggestions";
 import { id } from "date-fns/locale";
+import { createComponent } from "@/components/create-component";
+import TemplateEditor from "@/components/template-editor";
 /*
 //Example usage:
 const result = convertToDashCase("StudioWelcomePage");
 console.log(result); // Outputs: studio-welcome-page
   */
+
+
+interface TemplateType {
+  id: string;
+  title: string;
+  description: string;
+  path: string;
+  extention: string;
+}
+
+const templates: TemplateType[] = [
+  {
+    id: "1",
+    title: "Web Component",
+    description: "Generate a story opening",
+    path: ".koksmat/web/components",
+    extention: ".tsx"
+  },
+  {
+    id: "2",
+    title: "Koksmat Go function",
+    description: "Generate a story opening",
+    path: ".koksmat/app/functions",
+    extention: ".go"
+  },
+  {
+    id: "2",
+    title: "Go kitchen function",
+    description: "Generate a story opening",
+    path: "kitchen",
+    extention: ".go"
+  }]
 function convertToDashCase(input: string): string {
   return input
     .replace(/([a-z])([A-Z])/g, "$1-$2") // Insert dash between lowercase and uppercase
@@ -49,62 +83,34 @@ export default function ComponentPage(props: {
     <div>
       <h1 className="text-2xl font-bold mb-4  m-4">Create component</h1>
 
-      <div className="flex w-full h-full m-4">
-        <ComponentNew
-          onSubmitted={async (data) => {
-            const filename = convertToDashCase(data.componentName) + ".tsx";
-            const cwd = pathJoin(
-              workspaceContext.kitchenroot,
-              kitchen,
-              ".koksmat",
-              "web",
-              "components"
-            );
+      <div className="flex w-full h-full m-4 flex-wrap">
+        {templates.map((template, index) => (
+          <div key={index} className="p-5 m-5  border ">
+            {template.title}
+            <ComponentNew
+              onSubmitted={async (data) => {
+                createComponent({
+                  cwd: pathJoin(
+                    workspaceContext.kitchenroot,
+                    kitchen,
+                    ...template.path.split("/"),
+                    // ".koksmat",
+                    // "web",
+                    // "components"
+                  ),
+                  extension: template.extention,
+                  componentName: data.componentName,
+                  sourceCode: data.sourceCode,
+                  workspaceid,
+                  magicbox,
+                })
 
-            const args = [
-              "-c",
-              `echo "` +
-              data.sourceCode.replaceAll(`"`, `\"`) +
-              `" > ` +
-              filename,
-            ];
-            const command = "bash";
+              }}
+            />
+          </div>
+        ))}
 
-            const request1 = new Request(`/api/autopilot/exec`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${magicbox.authtoken}`,
-              },
-              body: JSON.stringify({
-                sessionid: workspaceid,
-                action: "execute",
-                command,
-                args,
-                cwd,
-              }),
-            });
-            const result = await fetch(request1).catch((e) => {
-              console.error(e);
-              toast({
-                title: "Error",
-                description: "Failed to create component",
-                variant: "destructive",
-              });
-            });
 
-            if (!result) return;
-            vsCodeOpen(magicbox.authtoken, filename, cwd);
-
-            toast({
-              title: "Component Created!",
-              description: `Your new component "${data.componentName}" has been created with the provided source code and saved to ${filename}.
-            Have asked vs code to open the file
-            `,
-            });
-          }}
-        />
-        {/* <PromptSuggestions initialSuggestions={initialSuggestions} /> */}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 
 // Image metadata
-export const alt = "Magic Button Studio";
+export const alt = "Koksmat Studio";
 export const size = {
   width: 1200,
   height: 630,
@@ -33,7 +33,7 @@ export default async function OpenGraphImage() {
           justifyContent: "center",
         }}
       >
-        Magic Button Studio
+        Koksmat Studio
       </div>
     ),
     // ImageResponse options

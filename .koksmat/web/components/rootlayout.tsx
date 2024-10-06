@@ -43,7 +43,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           prefetch={false}
         >
           <KoksmatChef className="h-6 w-6 transition-all group-hover:scale-110" />
-          <span className="sr-only">Magic Button Studio</span>
+          <span className="sr-only">Koksmat Studio</span>
         </Link>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -147,7 +147,7 @@ export function NavigationItems(props: { withCaptions: boolean }) {
           prefetch={false}
         >
           <ChefHatIcon className="h-5 w-5 transition-all group-hover:scale-110" />
-          <span className="sr-only">Magic Button Studio</span>
+          <span className="sr-only">Koksmat Studio</span>
         </Link>
 
         <Link

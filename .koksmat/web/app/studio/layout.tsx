@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     ],
   },
 
-  applicationName: "Magic Button Studio",
+  applicationName: "Koksmat Studio",
   referrer: "origin-when-cross-origin",
   keywords: ["no code", "low code", "power apps", "power automate"],
   creator: "Niels Gregers Johansen",

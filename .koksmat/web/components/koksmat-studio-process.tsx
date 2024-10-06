@@ -49,18 +49,18 @@ export default function KoksmatStudioProcess() {
         </div>
         <div className="mt-16 bg-white p-8 rounded-lg shadow-xl">
           <h3 className="text-2xl font-bold mb-4 text-orange-800 text-center">
-            Magic Button Studio: Your Master Chef&apos;s Kitchen
+            Koksmat Studio: Your Master Chef&apos;s Kitchen
           </h3>
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
             <div className="flex-1 text-center md:text-left">
               <p className="text-lg text-orange-700 mb-4">
-                At Magic Button Studio, our process definitions are anchored in these
+                At Koksmat Studio, our process definitions are anchored in these
                 recipes, each representing a task or function within your
                 organization.
               </p>
               <p className="text-lg text-orange-700">
                 Whether you&apos;re crafting a single dish or orchestrating a
-                banquet, Magic Button Studio helps you design and manage your
+                banquet, Koksmat Studio helps you design and manage your
                 business processes with the precision of a master chef.
               </p>
             </div>
