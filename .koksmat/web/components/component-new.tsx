@@ -25,10 +25,8 @@ const formSchema = z.object({
       message:
         "Component name must start with a capital letter and contain only letters",
     }),
-  sourceCode: z
-    .string()
-    .min(1, { message: "Source code is required" })
-    .max(10000, { message: "Source code must be 10000 characters or less" }),
+
+  isTest: z.boolean(),
 });
 
 // Infer the type from the schema
@@ -45,7 +43,7 @@ export default function ComponentNew(props: {
     resolver: zodResolver(formSchema),
     defaultValues: {
       componentName: "",
-      sourceCode: " comment here",
+
     },
   });
 
@@ -78,27 +76,8 @@ export default function ComponentNew(props: {
               </FormItem>
             )}
           />
-          {/* <FormField
-            control={form.control}
-            name="sourceCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Source Code</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Enter your component's source code here..."
-                    className="font-mono"
-                    rows={10}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Paste or type the source code for your new component.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
+
+
           <Button type="submit">Create Component</Button>
         </form>
       </Form>

@@ -90,6 +90,7 @@ export default function ComponentPage(props: {
             <ComponentNew
               onSubmitted={async (data) => {
                 createComponent({
+                  ...data,
                   cwd: pathJoin(
                     workspaceContext.kitchenroot,
                     kitchen,
@@ -99,8 +100,6 @@ export default function ComponentPage(props: {
                     // "components"
                   ),
                   extension: template.extention,
-                  componentName: data.componentName,
-                  sourceCode: data.sourceCode,
                   workspaceid,
                   magicbox,
                 })

@@ -3,46 +3,64 @@
  * 
  * This component handles the creation of new components in the Koksmat Studio.
  * It accepts parameters for the working directory, file extension, component name,
- * source code, workspace ID, and authentication token. The component wraps the
- * source code with appropriate comments based on the file extension and creates
- * the file in the specified directory.
+ * source code, workspace ID, authentication token, and a flag to indicate if it's a test file.
+ * The component wraps the source code with appropriate comments based on the file extension
+ * and creates the file in the specified directory. For test files, it adjusts the filename
+ * according to the language-specific conventions.
  */
 
 import { toast } from "@/components/ui/use-toast"
-
 import { vsCodeOpen } from "@/lib/vscode-open"
-/*
-//Example usage:
-const result = convertToDashCase("StudioWelcomePage");
-console.log(result); // Outputs: studio-welcome-page
-  */
+
 function convertToDashCase(input: string): string {
   return input
-    .replace(/([a-z])([A-Z])/g, "$1-$2") // Insert dash between lowercase and uppercase
-    .toLowerCase(); // Convert the entire string to lowercase
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .toLowerCase();
 }
+
 interface CreateComponentParams {
   cwd: string
   extension: string
   componentName: string
-  sourceCode: string
+
   workspaceid: string
   magicbox: {
     authtoken: string
   }
+  isTest: boolean
 }
 
 export async function createComponent({
   cwd,
   extension,
   componentName,
-  sourceCode,
-  workspaceid,
-  magicbox
-}: CreateComponentParams) {
-  const filename = `${convertToDashCase(componentName)}${extension}`
 
-  const commentedCode = addComments(sourceCode, extension)
+  workspaceid,
+  magicbox,
+  isTest
+}: CreateComponentParams) {
+  let filename = `${convertToDashCase(componentName)}${extension}`
+
+  if (isTest) {
+    switch (extension) {
+      case '.go':
+        filename = `${convertToDashCase(componentName)}_test.go`
+        break
+      case '.ts':
+      case '.tsx':
+        filename = `${convertToDashCase(componentName)}.test${extension}`
+        break
+      case '.ps1':
+        filename = `${convertToDashCase(componentName)}.Tests.ps1`
+        break
+      // Add more cases for other languages as needed
+      default:
+        // If no specific test naming convention, append 'test' to the filename
+        filename = `${convertToDashCase(componentName)}.test${extension}`
+    }
+  }
+
+  const commentedCode = addComments("", extension)
 
   const args = [
     "-c",
@@ -75,13 +93,13 @@ export async function createComponent({
 
     toast({
       title: "Component Created!",
-      description: `Your new component "${componentName}" has been created with the provided source code and saved to ${filename}. VS Code has been asked to open the file.`,
+      description: `Your new ${isTest ? "test " : ""}component "${componentName}" has been created with the provided source code and saved to ${filename}. VS Code has been asked to open the file.`,
     })
   } catch (error) {
     console.error(error)
     toast({
       title: "Error",
-      description: "Failed to create component",
+      description: `Failed to create ${isTest ? "test " : ""}component`,
       variant: "destructive",
     })
   }
@@ -100,4 +118,3 @@ function addComments(sourceCode: string, extension: string): string {
 
   return `${startComment}\n${sourceCode}\n${endComment}`
 }
-
