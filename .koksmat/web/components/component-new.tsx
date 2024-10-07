@@ -101,7 +101,7 @@ export default function ComponentNew(props: {
                     Is this a test component?
                   </FormLabel>
                   <FormDescription>
-                    Check this box if you're creating a test file for your component.
+                    Check this box if you&apos;re creating a test file for your component.
                   </FormDescription>
                 </div>
               </FormItem>
