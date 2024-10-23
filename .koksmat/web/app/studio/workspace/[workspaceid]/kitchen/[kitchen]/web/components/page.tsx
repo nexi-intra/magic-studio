@@ -28,6 +28,34 @@ interface TemplateType {
 
 const templates: TemplateType[] = [
   {
+    id: "10",
+    title: "V2 - Web Component",
+    description: "Generate a story opening",
+    path: "components",
+    extention: ".tsx"
+  },
+  {
+    id: "10",
+    title: "V2 - API Component",
+    description: "Generate a story opening",
+    path: "app/api",
+    extention: ".ts"
+  },
+  {
+    id: "10",
+    title: "API Component",
+    description: "Generate a api component",
+    path: ".koksmat/web/app/api",
+    extention: ".ts"
+  },
+  {
+    id: "11",
+    title: "Entity type",
+    description: "Generate a type file",
+    path: ".koksmat/web/app/api/entity/[entity]/types",
+    extention: ".ts"
+  },
+  {
     id: "1",
     title: "Web Component",
     description: "Generate a story opening",
@@ -42,7 +70,7 @@ const templates: TemplateType[] = [
     extention: ".go"
   },
   {
-    id: "2",
+    id: "3",
     title: "Go kitchen function",
     description: "Generate a story opening",
     path: "kitchen",

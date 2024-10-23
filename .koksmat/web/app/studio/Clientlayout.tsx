@@ -39,6 +39,7 @@ import ErrorBoundary from "@/components/error-boundary";
 import ThemeToggle from "@/components/theme-toggle";
 import { MagicboxContext } from "../koksmat/magicbox-context";
 import Tracer from "../koksmat/components/tracer";
+import { FeatureContextProvider } from "@/components/feature-context-provider";
 
 export default function ClientLayout(props: { children: any }) {
   const { children } = props;
@@ -126,36 +127,38 @@ export default function ClientLayout(props: { children: any }) {
     },
   ];
   return (
-    <AppProvider>
-      <ErrorBoundary>
-        <Authenticate apiScope={UserProfileAPI}>
-          <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
-            <GlobalDropHandling />
-            <ResizableLayout
-              logo={<Link href={"/" + APPNAME}></Link>}
-              onMobileChange={(ismobile) => setismobile(ismobile)}
-              onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
-              leftnav={
-                <LeftNavigation
-                  topItems={topItems}
-                  bottomItems={bottomItems}
-                  isCollapsed={leftNavCollapsed}
-                  isMobile={ismobile}
-                />
-              }
-              breadcrumb={<GlobalBreadcrumb />}
-              topnav={<TabNavigatorWithReorder />}
-              shop={<GlobalShopButton />}
-              centerfooter={<GlobalPasteHandling />}
-            >
-              {children}
-              <div className="hidden md:block">
-                {magicbox.showTracer && <Tracer />}
-              </div>
-            </ResizableLayout>
-          </BreadcrumbProvider>
-        </Authenticate>
-      </ErrorBoundary>
-    </AppProvider>
+    <FeatureContextProvider>
+      <AppProvider>
+        <ErrorBoundary>
+          <Authenticate apiScope={UserProfileAPI}>
+            <BreadcrumbProvider lookupHandlers={[useExampleHook()]}>
+              <GlobalDropHandling />
+              <ResizableLayout
+                logo={<Link href={"/" + APPNAME}></Link>}
+                onMobileChange={(ismobile) => setismobile(ismobile)}
+                onCollapseChange={(collapsed) => setleftNavCollapsed(collapsed)}
+                leftnav={
+                  <LeftNavigation
+                    topItems={topItems}
+                    bottomItems={bottomItems}
+                    isCollapsed={leftNavCollapsed}
+                    isMobile={ismobile}
+                  />
+                }
+                breadcrumb={<GlobalBreadcrumb />}
+                topnav={<TabNavigatorWithReorder />}
+                shop={<GlobalShopButton />}
+                centerfooter={<GlobalPasteHandling />}
+              >
+                {children}
+                <div className="hidden md:block">
+                  {magicbox.showTracer && <Tracer />}
+                </div>
+              </ResizableLayout>
+            </BreadcrumbProvider>
+          </Authenticate>
+        </ErrorBoundary>
+      </AppProvider>
+    </FeatureContextProvider>
   );
 }
