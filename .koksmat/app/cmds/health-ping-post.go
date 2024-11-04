@@ -11,8 +11,8 @@ package cmds
 import (
 	"context"
 
-	"github.com/magicbutton/magic-master/execution"
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/execution"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 func HealthPingPost(ctx context.Context, args []string) (*string, error) {

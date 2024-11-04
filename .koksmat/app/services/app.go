@@ -11,8 +11,8 @@ package services
 import (
 	"encoding/json"
 
-	"github.com/magicbutton/magic-master/services/endpoints/app"
-	. "github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/services/endpoints/app"
+	. "github.com/nexi-intra/magic-studio/utils"
 	"github.com/nats-io/nats.go/micro"
 )
 

@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "id": "flow-new-distribution-list",
+  "context": {
+    "environment": "production",
+    "user": "requestingUser123",
+    "requestDate": "2024-09-03T10:00:00Z"
+  },
+  "metadata": {
+    "name": "New Distribution List Request",
+    "description": "A process to handle requests for creating a new distribution list.",
+    "tags": ["distribution list", "request", "creation"]
+  },
+  "spec": {
+    "steps": [
+      {
+        "name": "Submit Request",
+        "description": "User submits a request for a new distribution list.",
+        "action": "submitRequest",
+        "inputs": {
+          "listName": "team-updates",
+          "listDescription": "A list for team updates."
+        },
+        "outputs": {
+          "requestId": "REQ-123456"
+        }
+      },
+      {
+        "name": "Approve Request",
+        "description": "Manager reviews and approves the request.",
+        "action": "approveRequest",
+        "inputs": {
+          "requestId": "REQ-123456"
+        },
+        "outputs": {
+          "approvalStatus": "approved"
+        },
+        "conditions": {
+          "mustBeApproved": true
+        }
+      },
+      {
+        "name": "Create Distribution List",
+        "description": "Agent creates the distribution list.",
+        "action": "createList",
+        "inputs": {
+          "listName": "team-updates",
+          "requestId": "REQ-123456"
+        },
+        "outputs": {
+          "creationStatus": "success",
+          "listId": "DL-789012"
+        }
+      },
+      {
+        "name": "Notify User",
+        "description": "User is notified about the successful creation of the distribution list.",
+        "action": "notifyUser",
+        "inputs": {
+          "userId": "requestingUser123",
+          "listId": "DL-789012"
+        },
+        "outputs": {
+          "notificationStatus": "sent"
+        }
+      }
+    ]
+  },
+  "errors": {
+    "failureHandling": [
+      {
+        "step": "Approve Request",
+        "onFailure": "notifyUser",
+        "message": "Request was not approved."
+      },
+      {
+        "step": "Create Distribution List",
+        "onFailure": "notifyUser",
+        "message": "Distribution list could not be created."
+      }
+    ]
+  }
+}

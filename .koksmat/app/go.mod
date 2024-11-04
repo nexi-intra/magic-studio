@@ -1,4 +1,4 @@
-module github.com/magicbutton/magic-master
+module github.com/nexi-intra/magic-studio
 
 go 1.21
 

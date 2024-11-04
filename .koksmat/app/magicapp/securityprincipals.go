@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 type Authorization struct {

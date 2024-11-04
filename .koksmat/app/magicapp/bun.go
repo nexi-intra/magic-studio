@@ -10,7 +10,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/extra/bundebug"
 
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 func OpenDatabase() {

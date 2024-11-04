@@ -15,7 +15,7 @@ import (
 	"github.com/swaggest/usecase"
 	"github.com/swaggest/usecase/status"
 
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 var authenticationTag = "Authentication"

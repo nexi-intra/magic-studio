@@ -33,7 +33,7 @@ To start a new project using the KOKSMAT framework, follow these steps:
 
 2. **Create a New Repository**:
 
-   - Use the master template repository: [magic-master](https://github.com/magicbutton/magic-master)
+   - Use the master template repository: [magic-master](https://github.com/nexi-intra/magic-studio)
    - Name the new repository according to the project subject (e.g., `intranet-tools`).
 
 3. **Set Up the Repository**:
@@ -57,7 +57,7 @@ To start a new project using the KOKSMAT framework, follow these steps:
      ```
 5. **Change name**
 
-- Search and replace "magicbutton/magic-master" with your repos name "owner/repo"
+- Search and replace "nexi-intra/magic-studio" with your repos name "owner/repo"
 
 ### Continuous Integration and Deployment with GitHub Actions
 

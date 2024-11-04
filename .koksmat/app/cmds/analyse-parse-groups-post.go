@@ -13,8 +13,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/magicbutton/magic-master/execution"
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/execution"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 func AnalyseParseGroupsPost(ctx context.Context, body []byte, args []string) (*string, error) {

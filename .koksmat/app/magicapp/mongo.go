@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/magicbutton/magic-master/utils"
+	"github.com/nexi-intra/magic-studio/utils"
 )
 
 func MongoTest() error {

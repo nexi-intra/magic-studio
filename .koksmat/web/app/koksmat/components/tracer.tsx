@@ -68,7 +68,9 @@ function ShowLogEntryDetails(props: {
 
             {showResponse && (
               <div className="max-h-96">
-                <pre>{JSON.stringify(entry.response, null, 2)}</pre>
+                <pre className="whitespace-pre-wrap">
+                  {JSON.stringify(entry.response, null, 2)}
+                </pre>
               </div>
             )}
           </DialogDescription>

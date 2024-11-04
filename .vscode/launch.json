@@ -39,5 +39,18 @@
             "cwd": "${workspaceFolder}/.koksmat/web",
             "command": "npm run dev"
           },
+          {
+			"name": "Run Extension",
+			"type": "extensionHost",
+            "cwd": "${workspaceFolder}/.koksmat/vscode-extention",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}/.koksmat/vscode-extention"
+			],
+			"outFiles": [
+				"${workspaceFolder}/.koksmat/vscode-extention/dist/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		}
     ]
 }

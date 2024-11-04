@@ -8,12 +8,13 @@ import {
   User,
   AuthSource,
   ServiceCallLogEntry,
+  Product,
 } from "./magicbox-context";
 import { IPublicClientApplication, PopupRequest } from "@azure/msal-browser";
 import { MagicRequest } from "./magicservices";
 import { Result } from "./httphelper";
 import { set } from "date-fns";
-
+import { useToast } from "@/components/ui/use-toast";
 type Props = {
   children?: React.ReactNode;
 };
@@ -26,12 +27,41 @@ export const MagicboxProvider = ({ children }: Props) => {
   const [authSource, setauthSource] = useState<AuthSource>("");
   const [pca, setpca] = useState<IPublicClientApplication>();
   const [transactionId, settransactionId] = useState("");
+  const [currentWorkspace, setcurrentWorkspace] = useState("");
+
+  const [currentOrganization, setcurrentOrganization] = useState("");
+  const [currentRepository, setcurrentRepository] = useState("");
+  const [currentBranch, setcurrentBranch] = useState("");
+  const [basket, setbasket] = useState<Product[]>([]);
+
+  const { toast } = useToast();
   const servicecalllog = useMemo<ServiceCallLogEntry[]>(() => {
     return [];
   }, []);
 
   const [showtracer, setshowtracer] = useState(false);
+  const handlePaste = (data: string) => {
+    setbasket([...basket, { type: "text", data }]);
+    setversion(version + 1);
+    toast({
+      title: "Added text to basket",
+    });
+  };
   const magicbox: MagicboxContextType = {
+    currentWorkspace,
+    setCurrentWorkspace: (workspace: string) => {
+      if (workspace === currentWorkspace) return;
+      setcurrentOrganization("");
+      setcurrentRepository("");
+      setcurrentBranch("");
+
+      localStorage.setItem("currentWorkspace", workspace);
+      setcurrentWorkspace(workspace);
+      setversion(version + 1);
+      toast({
+        title: "Workspace " + workspace + " set as current.",
+      });
+    },
     session,
     version,
     refresh: () => {
@@ -63,7 +93,10 @@ export const MagicboxProvider = ({ children }: Props) => {
       }
     },
     signOut: function (): void {
-      pca?.loginRedirect();
+      pca?.logoutPopup();
+      setuser(undefined);
+      setauthSource("");
+      setauthtoken("");
     },
     setAccount: function (
       username: string,
@@ -103,12 +136,56 @@ export const MagicboxProvider = ({ children }: Props) => {
       localStorage.setItem("showtracer", showTracer ? "true" : "false");
       setshowtracer(showTracer);
     },
+    currentOrganization,
+    setCurrentOrganization: function (organization: string): void {
+      if (organization === currentOrganization) return;
+      localStorage.setItem("currentOrganization", organization);
+      setcurrentOrganization(organization);
+      setcurrentRepository("");
+      setcurrentBranch("");
+    },
+    currentRepository,
+    setCurrentRepository: function (repository: string): void {
+      if (repository === currentRepository) return;
+      localStorage.setItem("currentRepository", repository);
+      setcurrentBranch("");
+      setcurrentRepository(repository);
+    },
+    currentBranch,
+    setCurrentBranch: function (branch: string): void {
+      localStorage.setItem("currentBranch", branch);
+      setcurrentBranch(branch);
+    },
+    handlePaste,
+    basket,
+    handleFileDrop: function (data: any): void {
+      handlePaste(data);
+    },
+    handleTextDrop: function (data: string): void {
+      handlePaste(data);
+    },
   };
 
   useEffect(() => {
     const showtracer = localStorage.getItem("showtracer");
     if (showtracer) {
       setshowtracer(showtracer === "true");
+    }
+    const currentWorkspace = localStorage.getItem("currentWorkspace");
+    if (currentWorkspace) {
+      setcurrentWorkspace(currentWorkspace);
+    }
+    const currentOrganization = localStorage.getItem("currentOrganization");
+    if (currentOrganization) {
+      setcurrentOrganization(currentOrganization);
+    }
+    const currentRepository = localStorage.getItem("currentRepository");
+    if (currentRepository) {
+      setcurrentRepository(currentRepository);
+    }
+    const currentBranch = localStorage.getItem("currentBranch");
+    if (currentBranch) {
+      setcurrentBranch(currentBranch);
     }
   }, []);
   return (

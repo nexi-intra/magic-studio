@@ -1,13 +1,13 @@
 {
   "version": {
     "minor": 0,
-    "build": 5,
-    "patch": 5,
+    "build": 6,
+    "patch": 6,
     "major": 0
   },
-  "appname": "magic-master",
-  "dnsprod": "people.intra.nexigroup.com",
-  "dnstest": "people-test.intra.nexigroup.com",
-  "imagename": "ghcr.io/magicbutton/magic-master",
+  "appname": "magic-studio",
+  "dnsprod": "magic.intra.nexigroup.com",
+  "dnstest": "test-magic.intra.nexigroup.com",
+  "imagename": "ghcr.io/nexi-intra/magic-studio",
   "port": 4444
 }
