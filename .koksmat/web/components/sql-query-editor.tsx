@@ -1,33 +1,17 @@
 "use client";
 
-import React, { useRef, useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import MonacoEditor, { useMonaco } from "@monaco-editor/react";
-import SqlColumnSelector from "./sql-column-selector";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { LabelWithEditor } from "./label-with-editor";
-import {
-  SaveIcon,
-  PlayIcon,
-  CircleStopIcon,
-  Maximize2Icon,
-  FileMinusIcon,
-  FileCodeIcon,
-} from "lucide-react";
 import { MagicboxContext } from "@/app/koksmat/magicbox-context";
-import * as monacoEditor from "monaco-editor";
-import { format } from "sql-formatter";
 import { run } from "@/actions/server";
-import LayoutThreeRowsLeftPanelAndResults from "./layout-three-rows-left-panel-and-results";
-import LogViewer, { LogObject } from "./log-viewer";
-import { ScrollArea } from "./ui/scroll-area";
-import { useSavedQueries } from "./useSavedQueries";
+import { LogObject } from "./log-viewer";
 import { useInterfaceFromJson } from "./hooks/useInterfaceFromJson";
-import { capitalizeFirstChar } from "@/lib/capitalizeFirstChar";
 
 interface ResizableLayoutProps {
   toolbar?: React.ReactNode;
